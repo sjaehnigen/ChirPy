@@ -920,7 +920,7 @@ class _XYZ():
         self._vel_au()
         self.cell_aa_deg = _np.array(self.cell_aa_deg)
 
-    def _check_distances(self):
+    def _check_distances(self, clean=False):
         '''current frame only'''
         if self._type == 'trajectory':
             _warnings.warn('can only check distance for single frame',
@@ -938,6 +938,22 @@ class _XYZ():
                 _warnings.warn(f'Found too close atoms {_i[0]} and {_j[0]} ('
                                f'{_np.round(_j[1], decimals=3)} Å)!',
                                _ChirPyWarning, stacklevel=2)
+        if clean:
+            # --- BETA: does not find all redundant atoms if they are not too
+            # close
+            _tbd = []
+            for _i in _too_close:
+                if _i[0] in _tbd:
+                    continue
+                for _j in _i[1]:
+                    if _j[0] in _tbd:
+                        continue
+                    _tbd.append(_j[0])
+            _warnings.warn(f'{len(_tbd)} duplicate atoms found: {_tbd}',
+                           _ChirPyWarning, stacklevel=2)
+            mask = _np.ones(self.n_atoms).astype(int)
+            mask[_tbd] = 0
+            self.split(mask, select=[1])
 
     def _is_equal(self, other, atol=1e-08, noh=True):
         '''atol adds up to dist_crit_aa from vdw radii'''

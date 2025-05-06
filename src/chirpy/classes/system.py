@@ -86,6 +86,13 @@ class _SYSTEM(_CORE):
         if hasattr(self, 'Modes'):
             self.Modes.cell_aa_deg = _np.array(_cell)
 
+    def _check_distances(self, clean=False):
+        self.XYZ._check_distances(clean=clean)
+        if clean:
+            self.mol_map = None
+            self.define_molecules()
+        self._sync_class()
+
     def _sync_class(self, check_consistency=True, **kwargs):
         if (_cell := kwargs.get('cell_aa_deg')) is not None:
             self._cell_aa_deg(_cell)

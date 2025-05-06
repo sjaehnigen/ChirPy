@@ -113,6 +113,18 @@ def main():
             help="Output molecular centers to as mol-<outfile>.",
             default=False,
             )
+    parser.add_argument(
+            "--sort",
+            action='store_true',
+            help="Alphabetically sort atoms",
+            default=False
+            )
+    parser.add_argument(
+            "--clean",
+            action='store_true',
+            help="Remove misplaced atoms from system (ALPHA)",
+            default=False
+            )
     args = parser.parse_args()
 
     cp.config.set_verbose(args.verbose)
@@ -154,7 +166,7 @@ def main():
         del read_args['cell_aa_deg']
 
     _load = cp.classes.system.Molecule(args.fn, **read_args, fmt=i_fmt)
-    _load.XYZ._check_distances()
+    _load._check_distances(clean=args.clean)
 
     # --- keep only coordinates
     if hasattr(_load, 'Modes'):

@@ -59,8 +59,8 @@ def cumavg(data):
     return np.cumsum(data, axis=0)/np.arange(1, len(data)+1)
 
 
-def movavg(a, n=3):
-    ret = np.cumsum(a, dtype=float)
+def movavg(a, n=3, axis=0):
+    ret = np.cumsum(a, dtype=float, axis=axis)
     ret[n:] = ret[n:] - ret[:-n]
 
     # return ret[n - 1:] / n
