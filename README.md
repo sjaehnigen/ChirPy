@@ -22,8 +22,8 @@ Furthermore:
 Copy or clone the repository into a local directory. Open a bash terminal and change directory to the local copy of the repository.
 
 Make sure you have the following packages installed:
-- `python` >= 3.10
-- `pip` >= 22.3
+- `python` >= 3.13
+- `pip` >= 25.1
 - `packmol` >= 20.0 (optional)
 
 You can also use [Anaconda](https://anaconda.org) to create a *chirpy* environment from the delivered `conda_env.yml` file:

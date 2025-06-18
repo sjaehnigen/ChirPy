@@ -7,7 +7,7 @@
 #    https://github.com/sjaehnigen/chirpy
 #
 #
-#  Copyright (c) 2020-2024, The ChirPy Developers.
+#  Copyright (c) 2020-2025, The ChirPy Developers.
 #
 #
 #  Released under the GNU General Public Licence, v3 or later
@@ -29,14 +29,15 @@
 # ----------------------------------------------------------------------
 
 
-import numpy as np
+import numpy as _np
+import scipy as _sp
 import copy
 from periodictable import elements as _EL
 import warnings as _warnings
 from . import config
 
 # --- Levi-Civita
-eijk = np.zeros((3, 3, 3))
+eijk = _np.zeros((3, 3, 3))
 eijk[0, 1, 2] = eijk[1, 2, 0] = eijk[2, 0, 1] = 1
 eijk[0, 2, 1] = eijk[2, 1, 0] = eijk[1, 0, 2] = -1
 
@@ -55,8 +56,8 @@ pico = 1.E-12
 femto = 1.E-15
 
 # --- misc constants
-pi = np.pi  # pi
-avog = 6.02214129E+23  # Avogadro constant [mol-1]
+pi = _np.pi  # pi
+avog = _sp.constants.Avogadro  # Avogadro constant [mol-1]
 
 # --- S.I. constants
 c_si = 2.99792458E+08  # speed of light [m/s]
@@ -182,7 +183,7 @@ def current_current_prefactor_au(T_K, n=1):
     # --- transition to current dipole moment squared gives factor 1/omega**2
     # --- see also McQuarrie, Statisical Mechanics, Appendix F
     beta_au = 1 / (T_K * k_B_au)
-    prefactor_au = 4 * np.pi**2 * finestr / 3 / n * beta_au
+    prefactor_au = 4 * pi**2 * finestr / 3 / n * beta_au
     return prefactor_au
 
 
@@ -353,15 +354,15 @@ def symbols_to_numbers(symbols):
 
 
 def symbols_to_masses(symbols):
-    return np.array(_get_property(symbols, 'mass'))
+    return _np.array(_get_property(symbols, 'mass'))
 
 
 def symbols_to_valence_charges(symbols):
-    return np.array(_get_property(symbols, 'valence_charge'))
+    return _np.array(_get_property(symbols, 'valence_charge'))
 
 
 def symbols_to_rvdw(symbols):
-    return np.array(_get_property(symbols, 'van_der_waals_radius'))
+    return _np.array(_get_property(symbols, 'van_der_waals_radius'))
 
 
 numbers_to_masses = symbols_to_masses
@@ -388,7 +389,7 @@ def get_conversion_factor(name, unit):
                 'pm_fs': v_si2au * 1000,
                 'nm_ps': v_si2au * 1000,
                 'si': v_si2au,
-                'ase': np.sqrt(E_eV2au/m_amu_au),  # time in aa*SQRT(u/eV)
+                'ase': _np.sqrt(E_eV2au/m_amu_au),  # time in aa*SQRT(u/eV)
                 },
             'electric_dipole': {
                 'au': 1.,
@@ -424,7 +425,7 @@ def convert(units):
         return 1.
 
     if isinstance(units, list):
-        convert = np.array([get_conversion_factor(_i, _j)
+        convert = _np.array([get_conversion_factor(_i, _j)
                             for _i, _j in units])
     elif isinstance(units, tuple):
         convert = get_conversion_factor(*units)

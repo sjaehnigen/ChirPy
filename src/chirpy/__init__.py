@@ -7,7 +7,7 @@
 #    https://github.com/sjaehnigen/chirpy
 #
 #
-#  Copyright (c) 2020-2024, The ChirPy Developers.
+#  Copyright (c) 2020-2025, The ChirPy Developers.
 #
 #
 #  Released under the GNU General Public Licence, v3 or later
@@ -28,12 +28,12 @@
 #
 # ----------------------------------------------------------------------
 
-__version__ = "0.27.1"
+__version__ = "0.28.0"
 
 
 import sys
 
-assert sys.version_info[:2] >= (3, 10), "Python version >= 3.10 required."
+assert sys.version_info[:2] >= (3, 13), "Python version >= 3.13 required."
 
 import multiprocessing as _mp
 import multiprocessing.pool as _mpp

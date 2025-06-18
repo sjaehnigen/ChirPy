@@ -7,7 +7,7 @@
 #    https://github.com/sjaehnigen/chirpy
 #
 #
-#  Copyright (c) 2020-2024, The ChirPy Developers.
+#  Copyright (c) 2020-2025, The ChirPy Developers.
 #
 #
 #  Released under the GNU General Public Licence, v3 or later
@@ -31,7 +31,7 @@
 import numpy as _np
 import copy as _copy
 from scipy.interpolate import interpn as _interpn
-from scipy.integrate import simps as _simps
+from scipy.integrate import simpson as _simps
 from scipy.ndimage import gaussian_filter1d as _gaussian_filter1d
 import warnings as _warnings
 

@@ -7,7 +7,7 @@
 #    https://github.com/sjaehnigen/chirpy
 #
 #
-#  Copyright (c) 2020-2024, The ChirPy Developers.
+#  Copyright (c) 2020-2025, The ChirPy Developers.
 #
 #
 #  Released under the GNU General Public Licence, v3 or later
@@ -31,7 +31,6 @@
 import sys
 import importlib
 import warnings
-from IPython import get_ipython
 import multiprocessing
 import platform
 
@@ -81,10 +80,3 @@ def set_verbose(s, reload_modules=True):
     if reload_modules:
         _reload_modules()
 
-
-# --- check if run in ipython/jupyter notebook
-if get_ipython() is not None:
-    if "IPKernelApp" in get_ipython().config:
-        # warnings.warn('jupyter: enabling chirpy verbosity', stacklevel=2)
-        if not __verbose__:
-            set_verbose(True)
