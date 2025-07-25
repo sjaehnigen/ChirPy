@@ -114,7 +114,7 @@ def _cpmd(frame, convert=1, n_lines=1, filetype='TRAJECTORY'):
                          f'with given units of shape {convert.shape}')
 
 
-def _free(frame, columns='iddd', convert=1, n_lines=1):
+def _free(frame, columns='iddd', headlines=0, convert=1, n_lines=1):
     '''Kernel for processing free format frame.
        Column support: i s m d
        i ... iterations/frames
@@ -144,17 +144,24 @@ def _free(frame, columns='iddd', convert=1, n_lines=1):
     data = []
     # --- frame never starts with blank line --> EOF
     #     (+treatment of blank lines at EOF)
+    if headlines > n_lines:
+        raise ValueError("number of headlines exceeds total number of lines")
     if (_first_line := next(frame).strip()) == '':
         warnings.warn('blank line invoked end of file',
                       config.ChirPyWarning,
                       stacklevel=2)
         raise StopIteration
-    data.append(_parse_columns(_first_line))
+    if headlines > 0:
+        # --- loop headlines (but do no read them)
+        for _l in range(headlines-1):
+            next(frame)
+    else:
+        data.append(_parse_columns(_first_line))
 
     for _l in frame:
         data.append(_parse_columns(_l))
 
-    if len(data) != n_lines:
+    if len(data) != n_lines - headlines:
         raise ValueError('File broken or incomplete')
 
     _return = tuple(zip(*data))
@@ -401,7 +408,8 @@ def arcIterator(FN, **kwargs):
         return _reader(FN, _nlines, _kernel, **kwargs)
 
 
-def freeIterator(FN, columns='iddd', nlines=None, units=1, **kwargs):
+def freeIterator(FN, columns='iddd', nlines=None, units=1, headlines=0,
+                 **kwargs):
     '''Iterator for free data of the format:
          i(frame) [m s ... (additional columns)] x0 x1 x2 ... (coordinate)
 
@@ -417,6 +425,8 @@ def freeIterator(FN, columns='iddd', nlines=None, units=1, **kwargs):
        nlines: number of lines per frame
          if None auto-guessed if frame (\'i\') is in the column set
        units: conversion set with one item per data coloumn (\'d\')
+       headlines: number of lines preceeding data block in each frame
+                  (the content of headlines is ignored)
        '''
     _kernel = _free
     kwargs['columns'] = columns
@@ -431,10 +441,12 @@ def freeIterator(FN, columns='iddd', nlines=None, units=1, **kwargs):
 
     # --- auto guess nlines
     if (_nlines := nlines) is None:
-        _nlines = 1
+        _nlines = headlines + 1
         try:
             _icol = columns.index('i')
             with _open(FN, 'r') as _f:
+                for _l in range(headlines):
+                    _f.readline()
                 _fr = _f.readline().strip().split()[_icol]
                 try:
                     while _f.readline().strip().split()[_icol] == _fr:
@@ -446,10 +458,11 @@ def freeIterator(FN, columns='iddd', nlines=None, units=1, **kwargs):
             pass
 
     if config.__os__ == 'Linux':
-        return Producer(_reader(FN, _nlines, _kernel, **kwargs),
+        return Producer(_reader(FN, _nlines, _kernel, headlines=headlines,
+                                **kwargs),
                         maxsize=20, chunksize=4)
     else:
-        return _reader(FN, _nlines, _kernel, **kwargs)
+        return _reader(FN, _nlines, _kernel, headlines=headlines, **kwargs)
 
 
 def pdbIterator(FN, **kwargs):

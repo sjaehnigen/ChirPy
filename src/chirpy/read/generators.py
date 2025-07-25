@@ -43,7 +43,7 @@ def _gen(f):
     '''Global generator for all formats'''
     # byte stream:
     # return (line for line in f if b'NEW DATA' not in line)
-    return (line for line in f if 'NEW DATA' not in line)
+    return (line for line in f if 'NEW DATA' not in line and '#' not in line)
 
 
 # def _bopen(*args, **kwargs):

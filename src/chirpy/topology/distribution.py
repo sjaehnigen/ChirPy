@@ -41,7 +41,8 @@ def radial_distribution_function(positions,
                                  cell=None,
                                  rng=(0.1, 10),
                                  bins=100,
-                                 half_vector=None):
+                                 half_vector=None,
+                                 remove_zeros=True):
     '''Compute the normalised radial distribution function (RDF).
        Array of positions ((n_frames, n_particles, 3)) is evaluated
        against an array of origins ((n_frames, n_origins, 3)).
@@ -60,9 +61,11 @@ def radial_distribution_function(positions,
 
     def _rdf(_P, rng, bins):
         '''RDF kernel.
-           _P … positions of shape (n_frames, n_particles, 3)
+           _P … positions of shape (n_frames, n_particles)
            '''
-
+#        if remove_zeros:
+#            _P = _P[_P != 0.0]
+#
         R = np.linspace(rng[0], rng[1], bins)
         rdf = np.histogram(
                 _P,
