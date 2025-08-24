@@ -267,14 +267,14 @@ _rvdw_list = [
 for _z, _rvdw in _rvdw_list:
     elements[_z].van_der_waals_radius = _rvdw
     elements[_z].van_der_waals_radius_units = 'pm'
-# --- valence charges (pseudopotentials) for some elements
+# --- valence charges (valid for MT pseudopotentials) for some elements
 _ZV_list = [
     ('H',  1),
     ('D',  1),
-    ('He', 2),
-    ('Li', 3),
-    ('Be', 4),
-    # B
+    # ('He', 2),  # 0?
+    # ('Li', 1),
+    # ('Be', 2),
+    ('B',  3),
     ('C',  4),
     ('N',  5),
     ('O',  6),
