@@ -30,18 +30,20 @@
 
 
 import warnings as _warnings
+
+from . import config
 # --- ChirPy uses "CP2K convention"
 
 _warnings.warn('Mandatory units are specified by variable suffix _<unit> '
-               '(e.g., pos_aa)', stacklevel=2)
-_warnings.warn('au = atomic units', stacklevel=2)
-_warnings.warn('aa = ångström', stacklevel=2)
-_warnings.warn('amu = atomic mass unit', stacklevel=2)
+               '(e.g., pos_aa)', config.ChirPyWarning, stacklevel=2)
+_warnings.warn('au = atomic units', config.ChirPyWarning, stacklevel=2)
+_warnings.warn('aa = ångström', config.ChirPyWarning, stacklevel=2)
+_warnings.warn('amu = atomic mass unit', config.ChirPyWarning, stacklevel=2)
 _warnings.warn('Modules in physics expect atomic units for all variables. '
                'Make sure to convert input before calling the methods!',
-               stacklevel=2)
+               config.ChirPyWarning, stacklevel=2)
 _warnings.warn('Derived units follow the convention rigorously.',
-               stacklevel=2)
+               config.ChirPyWarning, stacklevel=2)
 
 # --- atomic units
 charge = 'au'

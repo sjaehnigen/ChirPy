@@ -602,7 +602,7 @@ def cifReader(FN, fill_unit_cell=True):
         if _label is None:
             warnings.warn('could not find at least one item from '
                           f'attribute list: {_list}. Broken file?',
-                          RuntimeWarning,
+                          config.ChirPyWarning,
                           stacklevel=2)
         return _label
 
@@ -646,10 +646,13 @@ def cifReader(FN, fill_unit_cell=True):
                         '_atom_site_label',
                         '_atom_site.label',
                         ]))
-    names = tuple(get_label([
-                        '_atom_site_label',
-                        '_atom_site.label',
-                        ]))
+    try:
+        names = tuple(get_label([
+                            '_atom_site_label',
+                            '_atom_site.label',
+                            ]))
+    except TypeError:
+        names = copy.deepcopy(symbols)
 
     symbols = constants.symbols_to_symbols(symbols)  # clean up
 
@@ -660,7 +663,9 @@ def cifReader(FN, fill_unit_cell=True):
             '_space_group_crystal_system',
             '_symmetry_cell_setting',
             '_symmetry_space_group_name_h-m',
-            ]).lower()
+            '_space_group_name_H-M_alt'
+            ]).lower().replace(" ", "")
+    # better use SG number?
 
     if _space_group_label is None:
         warnings.warn('No space group label found in file!',
@@ -679,9 +684,18 @@ def cifReader(FN, fill_unit_cell=True):
             '_symmetry_equiv_pos_as_xyz',
             ])
     if _space_group_symop is None:
-        warnings.warn('No symmetry operations found in file!',
+        _space_group_symop = symmetry_operations[_space_group_label]
+
+    if _space_group_symop is None:
+        warnings.warn('No symmetry operations found for '
+                      '{_space_group_label} in file or library',
                       config.ChirPyWarning,
                       stacklevel=2)
+        _x = x
+        _y = y
+        _z = z
+        _symbols = symbols
+        _names = names
     else:
         _x = _y = _z = []
         _symbols = _names = ()
@@ -719,3 +733,34 @@ def cifReader(FN, fill_unit_cell=True):
 
     # --- add frames dimension (no support of cif trajectories)
     return np.array([data]), _names, _symbols, cell_aa_deg, [title]
+
+
+symmetry_operations = {
+        'p1': (
+            'x, y, z',
+            ),
+        'p21': (  # y convention (b)
+            'x, y, z',
+            '-x, y+1/2, -z',
+            ),
+        'p212121': (
+            'x, y, z',
+            'x+1/2, -y+1/2, -z',
+            '-x, y+1/2, -z+1/2',
+            '-x+1/2, -y, z+1/2',
+            ),
+        'pna21': (
+            'x, y, z',
+            '1/2-x, 1/2+y, 1/2+z',
+            '1/2+x, 1/2-y, z',
+            '-x, -y, 1/2+z',
+            ),
+        'p3121': (
+            'x, y, z',
+            '-y, x-y, z+1/3',
+            '-x+y, -x, z+2/3',
+            'y, x, -z',
+            '-x, -x+y, -z+1/3',
+            'x-y, -y, -z+2/3',
+            ),
+        }
