@@ -96,7 +96,7 @@ class _BoxObject(_CORE):
                              _load.mol_map)],
                     **nargs)
         else:
-            return cls(members=[(1, _load.XYZ)],
+            return cls(members=[(1, _load.XYZ._frame)],
                        **nargs)
 
     def _cell_vec_aa(self, **kwargs):
@@ -213,9 +213,11 @@ class _BoxObject(_CORE):
                             '\'%s\' and \'%s\''
                             % (type(self).__name__, type(other).__name__))
         new = _copy.deepcopy(self)
+        del new.cell_aa_deg, new.cell_vec_aa
         new.members *= other
         new._cell_vec_aa = lambda: other ** (1/3) * self._cell_vec_aa()
         new.cell_vec_aa = new._cell_vec_aa()
+        new.cell_aa_deg = new._cell_aa_deg()
         new.volume_aa3 = new._volume_aa3()
         new._sync_class()
         new._clean_members()
@@ -381,7 +383,7 @@ class Solution(_BoxObject):
             _BoxObject.__init__(
                         self,
                         symmetry='orthorhombic',
-                        members=[(int(round(_in)), _is)
+                        members=[(int(round(_in)), _is._frame)   # use _frame to avoid iterator
                                  for _in, _is in zip(_n, _slt + [_slv])],
                         **nargs)  # by definition solvent is the last member
 
@@ -474,10 +476,10 @@ class Solution(_BoxObject):
                               mol_map=self._mol_map())
 
         self.mol_map = self._mol_map()
-        _load.define_molecules(silent=True)
+        # _load.define_molecules(silent=True)
         _load.sort_atoms(_np.argsort(_load.mol_map, kind='stable'))
-        if self.pbc:
-            _load.center_molecule(0)
+        # if self.pbc:
+        #     _load.center_molecule(0)
         if sort_atoms:
             _load.sort_atoms()
         if write_pdb:
