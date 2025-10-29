@@ -234,13 +234,13 @@ def assign_molecule(molecule, n_mol, n_atoms, neigh_list, atom, atom_count):
     return molecule, atom_count
 
 
-def read_topology_file(fn):
+def read_topology_file(fn, **kwargs):
     '''Returns dict of properties'''
 
     from ..read.coordinates import pdbReader, xyzReader
     from ..interface import cp2k
 
-    fmt = fn.split('.')[-1]
+    fmt = kwargs.get('fmt', fn.split('.')[-1])
     if fmt == 'pdb':
         # A little old messy code
         data, names, symbols, residues, cell_aa_deg, title = pdbReader(fn)

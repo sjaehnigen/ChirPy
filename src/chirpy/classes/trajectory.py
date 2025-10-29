@@ -732,7 +732,7 @@ class _XYZ():
 
             elif fmt in ['cp2k', 'restart', 'inp']:
                 # --- single frame only
-                _dict = read_topology_file(fn)
+                _dict = read_topology_file(fn, fmt='cp2k')
                 symbols = _dict['symbols']
                 names = _dict['names']
                 comments = _dict['comments_topo']
