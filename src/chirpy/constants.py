@@ -61,15 +61,15 @@ avog = _sp.constants.Avogadro  # Avogadro constant [mol-1]
 
 # --- S.I. constants
 c_si = 2.99792458E+08  # speed of light [m/s]
-h_si = 6.62606957E-34  # Planck's constant [Js]
+h_si = 6.62606896E-34  # Planck's constant [Js]
 hbar_si = h_si / (2*pi)  # reduced planck constant [Js]
-m_p_si = 1.67262177E-27  # mass protron [kg]
+m_p_si = 1.672621637E-27  # mass protron [kg]
 m_e_si = 9.10938291E-31  # mass electron [kg]
 m_amu_si = 1.660538921E-27  # atomic mass unit [kg]
-e_si = 1.60217657E-19  # unit charge [C]
-eps0_si = 8.854187817E-12  # vacuum permittivity
-a0_si = 0.529177210859E-10  # Bohr radius [m]
-k_B_si = 1.3806488E-23  # Boltzmann constant [J/K]
+e_si = 1.602176487E-19  # unit charge [C]
+eps0_si = 8.85418781762039E-12  # vacuum permittivity
+a0_si = 0.52917720859E-10  # Bohr radius [m]
+k_B_si = 1.3806504E-23  # Boltzmann constant [J/K]
 mu_b_si = e_si * hbar_si / 2 / m_e_si  # Bohr magneton [J/T]
 
 # --- A.U. conversion factors
