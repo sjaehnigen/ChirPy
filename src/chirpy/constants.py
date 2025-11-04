@@ -57,7 +57,7 @@ femto = 1.E-15
 
 # --- misc constants
 pi = _np.pi  # pi
-avog = _sp.constants.Avogadro  # Avogadro constant [mol-1]
+avog = 6.02214179000000e+23 # Avogadro constant [mol-1]
 
 # --- S.I. constants
 c_si = 2.99792458E+08  # speed of light [m/s]
