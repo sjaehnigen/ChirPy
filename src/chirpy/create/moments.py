@@ -84,13 +84,13 @@ class OriginGauge(_CORE):
 
         # --- check for required gauge lever and weights
         if any(_i in self._set for _i in 'cm') and self.r_au is None:
-            raise ValueError(f'moment set \'{self._set }\' requires argument:'
+            raise ValueError(f'moment set \'{self._set}\' requires argument:'
                              'origin_aa')
         if 'm' in self._set and self.c_au is None:
-            raise ValueError(f'moment set \'{self._set }\' requires argument:'
+            raise ValueError(f'moment set \'{self._set}\' requires argument:'
                              'current_dipole_au')
         if self.q_au is None:
-            raise ValueError(f'moment set \'{self._set }\' requires argument:'
+            raise ValueError(f'moment set \'{self._set}\' requires argument:'
                              'charge_au')
 
         # --- periodic boundaries
@@ -119,8 +119,22 @@ class OriginGauge(_CORE):
 
     def shift_origin_gauge(self, origins_aa, assignment=None,
                            number_of_types=None):
-        '''origins in angstrom of shape ([n_frames], n_origins, 3)'''
-        _O = _copy.deepcopy(origins_aa) * constants.l_aa2au
+        '''
+        origins:    np.array in angstrom of shape ([n_frames], n_origins, 3)
+        assignment: array/list of origin indices if no. of origins changes
+        '''
+
+        if len(origins_aa.shape) < 2:
+            raise ValueError('origins_aa must have at least two dimensions')
+        elif len(origins_aa.shape) == 2 and hasattr(self, 'n_frames'):
+            _O = _np.tile(origins_aa, (self.n_frames, 1, 1))
+        elif len(origins_aa.shape) > 3:
+            raise ValueError(
+                    'origins_aa cannot have more than three dimensions')
+        else:
+            _O = _copy.deepcopy(origins_aa)
+
+        _O *= constants.l_aa2au
         # --- add np.newaxis for n_units
         _O = _O[None].swapaxes(0, -2)
 

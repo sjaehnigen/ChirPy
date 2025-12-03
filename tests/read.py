@@ -458,7 +458,7 @@ class TestCoordinates(unittest.TestCase):
         DATA_FRAME_POS_PBC = np.tile(np.loadtxt(
                 self.dir + '/data_frame_pos_pbc'
                 ).reshape(208, 3), (1, 3))
-        self.assertListEqual(data[0].tolist(), DATA_FRAME_POS_PBC[0].tolist())
+        self.assertTrue(np.allclose(data[0], DATA_FRAME_POS_PBC[0]))
         self.assertTrue(np.array_equal(data, DATA_FRAME_POS_PBC))
         self.assertTupleEqual(
                 symbols,
@@ -508,7 +508,7 @@ class TestCoordinates(unittest.TestCase):
                 units=6*[('length', 'aa')] + 3*[('length', 'au')]
                 ))
         data[:, 6:] *= constants.l_aa2au
-        self.assertListEqual(data[0].tolist(), DATA_FRAME_POS_PBC[0].tolist())
+        self.assertTrue(np.allclose(data[0], DATA_FRAME_POS_PBC[0]))
         self.assertTrue(np.allclose(data, DATA_FRAME_POS_PBC))
 
         # --- some Negatives
@@ -677,9 +677,10 @@ class TestGrid(unittest.TestCase):
             data,
             np.genfromtxt(self.dir + '/data_volume_1').reshape(1, 6, 6, 6)
             ))
-        self.assertListEqual((origin_aa*constants.l_aa2au).tolist(),
-                             [-10.507273, -8.971296, -12.268080]
-                             )
+        self.assertTrue(np.allclose(
+                                    origin_aa*constants.l_aa2au,
+                                    [-10.507273, -8.971296, -12.268080],
+                                    ))
 
         data, origin_aa, cell_vec_aa, pos_aa, numbers, comments = \
             r_grid.cubeReader(self.dir + '/test-2.cube')

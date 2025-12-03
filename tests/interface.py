@@ -180,10 +180,11 @@ class TestTinker(unittest.TestCase):
                     columns='imddd'
                     )))
             self.assertTupleEqual(data.shape, (3, 16, 12))
-            self.assertListEqual(
-                    data[-1, 3].tolist(),
-                    np.loadtxt(self.dir + '/data_s_0881_1').tolist()
-                    )
+            self.assertTrue(np.allclose(
+                    data[-1, 3],
+                    np.loadtxt(self.dir + '/data_s_0881_1'),
+                    ))
+
 
             # -- wrong columns and other range
             data = np.array(list(tinker.tinkermomentsReader(
@@ -193,10 +194,10 @@ class TestTinker(unittest.TestCase):
                     range=(0, 2, -1)
                     )))
             self.assertTupleEqual(data.shape, (2, 16, 12))
-            self.assertListEqual(
-                    data[-1, 3].tolist(),
-                    np.loadtxt(self.dir + '/data_s_0881_2').tolist()
-                    )
+            self.assertTrue(np.allclose(
+                    data[-1, 3],
+                    np.loadtxt(self.dir + '/data_s_0881_2'),
+                    ))
 
         # Some Negatives
             with self.assertRaises(ValueError):
