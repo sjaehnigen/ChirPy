@@ -29,6 +29,8 @@
 #
 # ----------------------------------------------------------------------
 
+'''Assemble molecular moments from topology, trajectory, and MOMENTS data.'''
+
 import argparse
 import numpy as np
 import warnings
@@ -44,6 +46,7 @@ from chirpy import config
 
 
 def main():
+    '''Assemble molecular moments from the supplied inputs.'''
     parser = argparse.ArgumentParser(
             description="Process MOMENTS output of electronic (Wannier)\
                          states and add (classical) nuclear contributions to\
@@ -198,6 +201,7 @@ def main():
         print('')
 
     def _get_batch(batch=None):
+        '''Expand moments, coordinates, and centers for the given batch.'''
         _return = (
                 MOMENTS.expand(batch=batch, ignore_warning=True),
                 SYS.XYZ.expand(batch=batch, ignore_warning=True),

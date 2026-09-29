@@ -27,6 +27,9 @@
 #   If not, see <https://www.gnu.org/licenses/>.
 #
 # ----------------------------------------------------------------------
+
+'''File readers for coordinates, grids, modes, and topology data.'''
+
 from . import topology
 from . import coordinates
 from . import generators

@@ -29,6 +29,8 @@
 #
 # ----------------------------------------------------------------------
 
+'''Evaluate APT and AAT sum rules from tensor inputs.'''
+
 import argparse
 import numpy as np
 

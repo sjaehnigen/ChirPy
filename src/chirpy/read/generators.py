@@ -29,6 +29,9 @@
 # ----------------------------------------------------------------------
 
 
+'''Helpers for streaming and batching coordinate readers.'''
+
+
 from itertools import islice, zip_longest
 import warnings
 import numpy as np
@@ -87,8 +90,9 @@ def _get(_it, kernel, **kwargs):
     _sk = kwargs.pop("skip", [])
 
     class _line_iterator():
-        '''self._r ... the frame that will be returned next (!)'''
+        '''Iterate over frame-sized slices from a line stream.'''
         def __init__(self):
+            '''Initialise the frame iterator state.'''
             self.current_line = 0
             self._it = _it
             self._r = 0
@@ -103,9 +107,11 @@ def _get(_it, kernel, **kwargs):
                     self._r += 1
 
         def __iter__(self):
+            '''Return the iterator itself.'''
             return self
 
         def __next__(self):
+            '''Return the next frame-sized slice of lines.'''
             while (self._r - r0) % _ir != 0 or self._r + self._offset in _sk:
                 [next(_it) for _ik in range(n_lines)]
                 if self._r + self._offset in _sk:

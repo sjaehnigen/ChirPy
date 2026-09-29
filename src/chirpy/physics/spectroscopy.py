@@ -28,6 +28,9 @@
 #
 # ----------------------------------------------------------------------
 
+'''Spectroscopic observables and spectra from time-correlation functions.'''
+
+
 import copy
 import numpy as np
 import warnings as _warnings
@@ -229,6 +232,7 @@ def circular_dichroism_from_tcf(*args, **kwargs):
 
 
 def _apply_cut_sphere(x, pos, clip, cell=None, inverse=False):
+    '''Apply one or more spherical masks to an observable array.'''
     if len(clip) != 0:
         y = np.zeros_like(x)
         for _tr in clip:
@@ -244,6 +248,7 @@ def _apply_cut_sphere(x, pos, clip, cell=None, inverse=False):
 
 
 def _spectrum_from_tcf(*args, **kwargs):
+    '''Compatibility wrapper for :func:`spectrum_from_tcf`.'''
     return spectrum_from_tcf(*args, **kwargs)
 
 
@@ -330,6 +335,7 @@ def spectrum_from_tcf(*args,
     _z = len(args)
 
     def _err(_s, _z):
+        '''Raise a mode-specific argument-count error.'''
         raise TypeError('tcf expected %d argument, got %d' % (_s, _z))
     if mode == 'abs':
         _s = 1
@@ -471,9 +477,7 @@ def spectrum_from_tcf(*args,
 
 
 def gauge_transport_particle_i(_i, pos, cur, cell, **kwargs) -> tuple:
-    '''_i ... index of particle
-       pos/cur ... full arrays of shape (n_frames, n_particles, 3)
-       '''
+    '''Return the gauge-transport spectrum for one particle index.'''
     n_frames, n_particles, n_dim = pos.shape
     a = cur[:, _i]
 
@@ -496,10 +500,7 @@ def compute_gauge_transport_term(cur, pos, cell,
                                  unwrap_pbc=True,
                                  parallel=True,
                                  **kwargs):
-    '''
-       unwrap_pbc ... unwrap particles before the calculation
-       parallel ... execute job in parallel (PALARRAY)
-    '''
+    '''Return the gauge-transport correction to the CD spectrum.'''
     n_frames, n_particles, n_dim = pos.shape
 
     if cell is None:

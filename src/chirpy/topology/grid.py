@@ -29,6 +29,9 @@
 # ----------------------------------------------------------------------
 
 
+'''Grid-based regularisation kernels for topology-related data.'''
+
+
 import numpy as np
 import warnings
 

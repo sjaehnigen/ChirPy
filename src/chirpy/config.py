@@ -28,6 +28,8 @@
 #
 # ----------------------------------------------------------------------
 
+'''Runtime configuration of ChirPy (parallelisation, verbosity, OS).'''
+
 import sys
 import importlib
 import warnings
@@ -42,14 +44,17 @@ __os__ = platform.system()
 
 
 class ChirPyWarning(UserWarning):
+    '''Warning category used for ChirPy-specific runtime notices.'''
     pass
 
 
 def version_info():
+    '''Return the ChirPy version as a tuple of integers.'''
     return tuple([int(_v) for _v in version.split('.')])
 
 
 def _reload_modules():
+    '''Reload all currently imported chirpy submodules (except config).'''
     # --- apply changes to loaded modules
     modules = tuple(sys.modules.values())
     for module in modules:
@@ -59,6 +64,7 @@ def _reload_modules():
 
 
 def set_pal_n_cores(s, reload_modules=True):
+    '''Set the number of cores used for parallel processing.'''
     global __pal_n_cores__
     __pal_n_cores__ = int(s)
     if __verbose__:

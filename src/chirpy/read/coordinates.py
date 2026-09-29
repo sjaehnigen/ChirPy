@@ -29,6 +29,9 @@
 # ----------------------------------------------------------------------
 
 
+'''Readers for coordinate and trajectory file formats.'''
+
+
 import numpy as np
 import warnings
 import copy
@@ -122,6 +125,7 @@ def _free(frame, columns='iddd', headlines=0, convert=1, n_lines=1):
        d ... data'''
 
     def _parse_columns(line):
+        '''Parse one free-format line according to the column specifier.'''
         content = {}
         # --- ToDo: is this slowing down the generator?
         for _c, _l in zip(columns, line.strip().split()):
@@ -227,6 +231,7 @@ def _pdb(frame, convert=1., n_lines=1):
         [], [], [], [], [], None, None
 
     def mk_int(s):
+        '''Convert a residue field to int, defaulting blank entries to zero.'''
         return int(s) if s.strip() else 0
 
     # --- explict for loop for adpated handling StopIteration
@@ -566,12 +571,10 @@ def arcReader(FN, **kwargs):
 
 
 def pdbReader(FN, **kwargs):
-    '''Read complete PDB file at once using MDAnalysis.
+    '''Read a complete PDB file at once.
        Returns data, names, symbols, res, cell_aa_deg, title
        of current frame.
        Does not support variable cell size, use iterator for this.
-
-       https://www.mdanalysis.org/docs/documentation_pages/coordinates/PDB.html
        '''
     buf = list(zip(*pdbIterator(FN, **kwargs)))
 
@@ -588,7 +591,9 @@ def cifReader(FN, fill_unit_cell=True):
     '''Read CIF file and return a filled unit cell.
        '''
     def _measurement2float(number):
+        '''Convert CIF numeric fields with uncertainties to floats.'''
         def _convert(st):
+            '''Strip CIF uncertainty markers before float conversion.'''
             return float(st.replace('(', '').replace(')', ''))
         if isinstance(number, str):
             return _convert(number)
@@ -596,6 +601,7 @@ def cifReader(FN, fill_unit_cell=True):
             return [_convert(_st) for _st in number]
 
     def get_label(_list):
+        '''Return the first available CIF entry from a list of keys.'''
         _label = None
         for _l in _list:
             _label = _load.get(_l, _label)

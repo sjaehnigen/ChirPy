@@ -29,6 +29,7 @@
 #
 # ----------------------------------------------------------------------
 
+'''Convert an ORCA Hessian file to a vibrational mode file.'''
 
 import argparse
 from chirpy.classes import system

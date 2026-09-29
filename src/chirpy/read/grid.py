@@ -29,6 +29,9 @@
 # ----------------------------------------------------------------------
 
 
+'''Readers for volumetric grid data files.'''
+
+
 import numpy as np
 from itertools import islice
 from .generators import _reader, _open
@@ -81,9 +84,11 @@ def _cube(frame, **kwargs):
 
 
 def cubeIterator(FN, **kwargs):
-    '''Iterator for xyzReader
-       Usage: next() returns data, symbols, comments of
-       current frame'''
+    '''Iterate over CUBE frames.
+
+       Usage: next() returns grid data, origin, cell, coordinates,
+       numbers, and comments of the current frame.
+       '''
     _kernel = _cube
 
     with _open(FN, 'r', **kwargs) as _f:
@@ -106,7 +111,7 @@ def cubeIterator(FN, **kwargs):
 
 
 def cubeReader(FN, **kwargs):
-    '''Read complete XYZ file at once'''
+    '''Read a complete CUBE file at once.'''
     data, origin_aa, cell_vec_aa, pos_aa, numbers, comments = \
         zip(*cubeIterator(FN, verbose=False, **kwargs))
 

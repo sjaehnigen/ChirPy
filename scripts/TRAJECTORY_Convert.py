@@ -29,6 +29,8 @@
 #
 # ----------------------------------------------------------------------
 
+'''Convert and process trajectory data.'''
+
 import sys
 import argparse
 import numpy as np

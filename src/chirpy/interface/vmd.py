@@ -28,6 +28,8 @@
 #
 # ----------------------------------------------------------------------
 
+'''Utilities for writing simple VMD drawing scripts.'''
+
 
 import numpy as np
 import copy
@@ -36,6 +38,8 @@ from scipy.interpolate import UnivariateSpline
 
 
 class VMDPaths():
+    '''Represent one or more paths for VMD drawing commands.'''
+
     def __init__(self, positions_aa, auto_smooth=True):
         '''Read a set of paths defines by node positions in angstrom with
            shape (n_points p. path[, n_paths], 3)'''
@@ -57,6 +61,8 @@ class VMDPaths():
     def smooth(self):
         '''Smoothing with k=3 spline'''
         def spline(points):
+            '''Smooth one path with cubic splines.'''
+
             x = np.arange(points.shape[0])
             spl0 = UnivariateSpline(x, points[:, 0])
             spl1 = UnivariateSpline(x, points[:, 1])
@@ -148,6 +154,8 @@ class VMDPaths():
             for t0, t1 in zip(p0, p1)])
 
     def _draw(self, sparse=5, **kwargs):
+        '''Generate draw commands for the stored paths.'''
+
         block = ''
         p0 = None
         for ip, p1 in enumerate(self.pos_aa[::sparse]):

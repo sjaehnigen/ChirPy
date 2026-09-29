@@ -29,6 +29,8 @@
 #
 # ----------------------------------------------------------------------
 
+'''Convert and process moments trajectories.'''
+
 import argparse
 import numpy as np
 

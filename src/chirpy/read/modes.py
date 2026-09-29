@@ -29,6 +29,9 @@
 # ----------------------------------------------------------------------
 
 
+'''Readers for vibrational mode files.'''
+
+
 import numpy as np
 import warnings as _warnings
 

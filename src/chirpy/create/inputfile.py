@@ -28,15 +28,21 @@
 #
 # ----------------------------------------------------------------------
 
+'''Writers for simple quantum-chemistry input files.'''
+
 from ..interface import cpmd
 
 
 class QMCalculation():
+    '''Container for basic quantum-calculation settings.'''
+
     def __init__(self, *args, **kwargs):
+        '''Initialise default calculation parameters.'''
         self.functional = None
         self.type = 'MD sampling'
         self.eps = 1.E-7
 
     def write_input_file(self, fn, code='cpmd'):
+        '''Write an input file for the selected backend.'''
         if code == 'cpmd':
             cpmd.CPMDjob().write_input_file(fn)

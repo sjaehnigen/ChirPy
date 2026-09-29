@@ -29,6 +29,8 @@
 #
 # ----------------------------------------------------------------------
 
+'''Print atom spread values for frames in a structure or trajectory.'''
+
 import argparse
 from chirpy.classes import system
 

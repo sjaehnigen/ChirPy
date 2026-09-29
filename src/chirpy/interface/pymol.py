@@ -28,6 +28,8 @@
 #
 # ----------------------------------------------------------------------
 
+'''Helpers for writing simple PyMOL command files.'''
+
 
 import sys as _sys
 import copy as _copy
@@ -43,7 +45,11 @@ known_types = {'modevectors': 'Modevectors',
 
 
 class PymolObject():
+    '''Container for one or more named PyMOL objects.'''
+
     def __init__(self, *args, **kwargs):
+        '''Create a PyMOL object wrapper from the requested type.'''
+
         name = kwargs.get('name', 'obj1')
         self.__name__ = name
         try:
@@ -59,6 +65,8 @@ class PymolObject():
             _sys.exit(1)
 
     def __add__(self, other):
+        '''Return a combined wrapper containing objects from both operands.'''
+
         new = _copy.deepcopy(self)
         for name in other.__name__.split('+'):
             if not hasattr(new, name):
@@ -69,6 +77,8 @@ class PymolObject():
         return new
 
     def __iadd__(self, other):
+        '''Append objects from another wrapper in place.'''
+
         for name in other.__name__.split('+'):
             if not hasattr(self, name):
                 setattr(self, name, getattr(other, name))
@@ -78,6 +88,8 @@ class PymolObject():
         return self
 
     def write(self, fn):
+        '''Write all contained PyMOL commands to a file.'''
+
         with open(fn, 'w') as f:
             f.write('# Pymolrc File generated with ChirPy\n')
         for name in self.__name__.split('+'):
@@ -85,14 +97,22 @@ class PymolObject():
 
 
 class NamedObject():
+    '''Base class for simple named PyMOL objects.'''
+
     def __init__(self, *args, **kwargs):
+        '''Store the object name and run type-specific initialisation.'''
+
         self.__name__ = kwargs.get('name', 'obj1')
         self._type_init(*args, **kwargs)
 
     def _type_init(self):
+        '''Initialise type-specific object data.'''
+
         pass
 
     def rename(self):
+        '''Rename the object.'''
+
         pass
 # class UnnamedObject():
 
@@ -103,6 +123,8 @@ class Modevectors(NamedObject):
     '''Defines vectors in space. Expects a numpy array of vectors and a
        corresponding array of starting points. A common origin is possible.'''
     def _type_init(self, p0, p1, **kwargs):
+        '''Store vector start and end points plus display settings.'''
+
         if len(p0.shape) != 2:
             raise TypeError('Please give a 2-dimensional array of points!')
         if p0.shape[1] != 3:
@@ -128,6 +150,8 @@ class Modevectors(NamedObject):
         self.tailrgb = str(kwargs.get('tailrgb', (1.0, 1.0, 1.0)))
 
     def write(self, fn):
+        '''Append the modevector commands for this object to a file.'''
+
         with open(fn, 'a') as f:
             for ip, (p0, p1) in enumerate(zip(*[self.p0, self.p1])):
                 f.write('pseudoatom p0, name=C, resi =  % d, ' % ip)
@@ -153,25 +177,45 @@ class Modevectors(NamedObject):
 
 
 class Selection(NamedObject):
+    '''Placeholder for PyMOL selection objects.'''
+
     def __init__(self, **kwargs):
+        '''Initialise a selection placeholder.'''
+
         print('This is a selection')
 
 
 class Surface(NamedObject):
-    def __init__(self, **kwargs): pass
+    '''Placeholder for PyMOL surface objects.'''
+
+    def __init__(self, **kwargs):
+        '''Initialise a surface placeholder.'''
+        pass
 
 
 class Volume(NamedObject):
-    def __init__(self, **kwargs): pass
+    '''Placeholder for PyMOL volume objects.'''
+
+    def __init__(self, **kwargs):
+        '''Initialise a volume placeholder.'''
+        pass
 
 
 class Molecule(NamedObject):
+    '''Placeholder for PyMOL molecule objects.'''
+
     def __init__(self, **kwargs):
+        '''Initialise a molecule placeholder.'''
+
         print('I have my own initial method')
 
 
 class Distance(NamedObject):
-    def __init__(self, **kwargs): pass
+    '''Placeholder for PyMOL distance objects.'''
+
+    def __init__(self, **kwargs):
+        '''Initialise a distance placeholder.'''
+        pass
 
 # # unnamed classes
 # class Colours(UnnamedObject):

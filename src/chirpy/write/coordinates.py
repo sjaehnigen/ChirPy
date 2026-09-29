@@ -28,6 +28,8 @@
 #
 # ----------------------------------------------------------------------
 
+"""Writers for coordinate trajectory and structure files."""
+
 
 from itertools import zip_longest
 import warnings

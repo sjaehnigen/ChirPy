@@ -29,6 +29,7 @@
 #
 # ----------------------------------------------------------------------
 
+'''Convert spectral data from reciprocal centimeters to electron volts.'''
 
 import argparse
 import numpy as np
@@ -36,6 +37,7 @@ from chirpy import constants
 
 
 def main():
+    '''Convert spectral data from reciprocal centimeters to electron volts.'''
     parser = argparse.ArgumentParser()
     parser.add_argument('-f', '--fn_in',          default=None)
     parser.add_argument('-o',  '--fn_out',         default='out.dat')

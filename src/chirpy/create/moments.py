@@ -28,6 +28,8 @@
 #
 # ----------------------------------------------------------------------
 
+'''Helpers for transforming electromagnetic moment data.'''
+
 import numpy as _np
 import copy as _copy
 
@@ -53,6 +55,7 @@ class OriginGauge(_CORE):
                  charge_au=None,
                  cell_aa_deg=None,
                  ):
+        '''Initialise the moment set and gauge metadata.'''
 
         # --- parse moments
         self.c_au = _copy.deepcopy(current_dipole_au)
@@ -99,6 +102,7 @@ class OriginGauge(_CORE):
             self.cell_au_deg[:3] *= constants.l_aa2au
 
     def __add__(self, other):
+        '''Concatenate two origin-gauge data sets.'''
         # if not _np.allclose(self.cell_au_deg, other.cell_au_deg):
         #     raise ValueError('the objects do not agree in cell')
         new = _copy.deepcopy(self)
@@ -119,10 +123,11 @@ class OriginGauge(_CORE):
 
     def shift_origin_gauge(self, origins_aa, assignment=None,
                            number_of_types=None):
-        '''
-        origins:    np.array in angstrom of shape ([n_frames], n_origins, 3)
-        assignment: array/list of origin indices if no. of origins changes
-        '''
+        '''Shift the moments to a new set of origins.
+
+           origins_aa is given in angstrom with shape ([n_frames], n_origins, 3).
+           assignment maps units to origins when their counts differ.
+           '''
 
         if len(origins_aa.shape) < 2:
             raise ValueError('origins_aa must have at least two dimensions')

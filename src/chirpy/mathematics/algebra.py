@@ -29,6 +29,8 @@
 # ----------------------------------------------------------------------
 
 
+'''Vector and matrix algebra helpers (angles, rotations, products, etc.).'''
+
 import numpy as np
 from scipy.interpolate import RegularGridInterpolator
 

@@ -28,6 +28,7 @@
 #
 # ----------------------------------------------------------------------
 
+'''Physical constants, unit prefixes/conversions and periodic-table data.'''
 
 import numpy as _np
 import scipy as _sp
@@ -142,14 +143,17 @@ E_aufreq2Hz = 1 / t_au
 
 
 def E_J2nm(x):
+    '''Convert energy in Joule to wavelength in nm.'''
     return h_si * c_si / x / nano
 
 
 def E_nm2J(x):
+    '''Convert wavelength in nm to energy in Joule.'''
     return h_si * c_si / x * nano
 
 
 def E_Hz2nm(x):
+    '''Convert frequency in Hz to wavelength in nm.'''
     return E_J2nm(x * E_Hz2J)
 
 
@@ -294,6 +298,8 @@ for _z, _ZV in _ZV_list:
 
 
 def _get_property(kinds, key, fmt=None, fill_value=None):
+    '''Look up a periodic-table property for each entry in kinds, guessing
+       progressively shorter element symbols/names if needed.'''
     pr = []
     for _k in kinds:
         try:
@@ -342,26 +348,32 @@ def _get_property(kinds, key, fmt=None, fill_value=None):
 
 
 def numbers_to_symbols(numbers):
+    '''Convert a list of atomic numbers to element symbols.'''
     return tuple(_get_property(numbers, 'symbol'))
 
 
 def symbols_to_symbols(numbers):
+    '''Normalise/validate a list of element symbols.'''
     return tuple(_get_property(numbers, 'symbol', fill_value='self'))
 
 
 def symbols_to_numbers(symbols):
+    '''Convert a list of element symbols to atomic numbers.'''
     return _get_property(symbols, 'number', fmt=int)
 
 
 def symbols_to_masses(symbols):
+    '''Convert a list of element symbols to atomic masses.'''
     return _np.array(_get_property(symbols, 'mass'))
 
 
 def symbols_to_valence_charges(symbols):
+    '''Convert a list of element symbols to valence charges.'''
     return _np.array(_get_property(symbols, 'valence_charge'))
 
 
 def symbols_to_rvdw(symbols):
+    '''Convert a list of element symbols to van der Waals radii.'''
     return _np.array(_get_property(symbols, 'van_der_waals_radius'))
 
 
@@ -421,6 +433,9 @@ def get_conversion_factor(name, unit):
 
 
 def convert(units):
+    '''Return the conversion factor for the given units specification
+       (a (name, unit) tuple, list of such tuples, plain number, or
+       'default').'''
     if units == 'default':
         return 1.
 

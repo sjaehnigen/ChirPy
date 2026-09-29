@@ -29,6 +29,8 @@
 #
 # ----------------------------------------------------------------------
 
+'''Calculate and plot a power spectrum from atomic velocities.'''
+
 import argparse
 import numpy as np
 from matplotlib import pyplot as plt

@@ -29,6 +29,9 @@
 # ----------------------------------------------------------------------
 
 
+'''Topology helpers for molecular dissection and file-based assignments.'''
+
+
 import numpy as np
 import copy
 
@@ -39,6 +42,7 @@ from ..constants import symbols_to_symbols
 
 
 def fermi_cutoff_function(distance, R_cutoff, D):
+    '''Evaluate a Fermi-style cutoff function for a distance array.'''
     return 1 / (1 + np.exp((distance - R_cutoff) / D))
 
 
@@ -112,6 +116,7 @@ def define_molecules(pos_aa, symbols, cell_aa_deg=None, neigh_cutoff_aa=24.):
     _batch = _make_batches(MIN, MAX, _n_b)
 
     def _w(p):
+        '''Wrap positions into the working cell when periodicity is active.'''
         return wrap_pbc(p, _cell)
 
     pair_list = []

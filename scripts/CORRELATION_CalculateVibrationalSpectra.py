@@ -29,6 +29,8 @@
 #
 # ----------------------------------------------------------------------
 
+'''Calculate and plot vibrational spectra from dipole time correlations.'''
+
 import sys
 import argparse
 import warnings

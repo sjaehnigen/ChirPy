@@ -28,6 +28,8 @@
 #
 # ----------------------------------------------------------------------
 
+'''Helpers for constructing collective variables and molecular systems.'''
+
 from . import inputfile
 from . import moments
 from . import supercell

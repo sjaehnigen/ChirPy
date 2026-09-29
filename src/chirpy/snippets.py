@@ -28,6 +28,8 @@
 #
 # ----------------------------------------------------------------------
 
+'''Small generic helper functions shared across ChirPy modules.'''
+
 import numpy as _np
 import warnings
 from . import config

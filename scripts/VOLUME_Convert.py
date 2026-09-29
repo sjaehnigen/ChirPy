@@ -29,6 +29,8 @@
 #
 # ----------------------------------------------------------------------
 
+'''Write volume data into file.'''
+
 
 import argparse
 from chirpy.classes import volume

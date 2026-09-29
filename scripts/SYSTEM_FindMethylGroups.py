@@ -29,6 +29,8 @@
 #
 # ----------------------------------------------------------------------
 
+'''Find methyl-like subgroups in a molecular structure.'''
+
 
 import argparse
 import numpy as np

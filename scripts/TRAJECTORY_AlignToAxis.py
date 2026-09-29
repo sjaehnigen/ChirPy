@@ -29,6 +29,8 @@
 #
 # ----------------------------------------------------------------------
 
+'''Align a line between two atoms to a chosen axis.'''
+
 import argparse
 import numpy as np
 from chirpy.classes import system

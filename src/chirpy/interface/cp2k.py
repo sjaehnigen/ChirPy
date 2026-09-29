@@ -28,12 +28,18 @@
 #
 # ----------------------------------------------------------------------
 
+'''Readers for CP2K input, restart, and property files.'''
+
 import warnings
 import numpy as np
 
 
 def parse_restart_file(fn):
+    '''Parse a CP2K input or restart file into nested sections.'''
+
     def _collect(_iter):
+        '''Collect one nested CP2K section from an iterator of lines.'''
+
         COL = {}
         COL['KEYWORDS'] = []
         for _l in _iter:
@@ -65,6 +71,8 @@ def parse_restart_file(fn):
 
 
 def read_ener_file(fn):
+    '''Read a CP2K ENER file and return the recorded time series.'''
+
     with open(fn, 'r') as f:
         f.readline()[1:]   # title
         steps = f.readlines()

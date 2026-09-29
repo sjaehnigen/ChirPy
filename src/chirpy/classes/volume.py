@@ -28,6 +28,8 @@
 #
 # ----------------------------------------------------------------------
 
+'''Classes for scalar and vector data on regular 3D grids.'''
+
 import numpy as _np
 import copy as _copy
 from scipy.interpolate import interpn as _interpn
@@ -49,7 +51,10 @@ from ..visualise import print_info
 
 
 class ScalarField(_CORE):
+    '''Scalar data defined on a regular three-dimensional grid.'''
+
     def __init__(self, *args, **kwargs):
+        '''Load a scalar field from file, object, or raw grid data.'''
         self._print_info = [print_info.print_cell]
         if len(args) > 1:
             raise TypeError("File reader of %s takes at most 1 argument!"
@@ -106,6 +111,7 @@ class ScalarField(_CORE):
             self = self.sparse(sparse)
 
     def _sync_class(self):
+        '''Update cached grid, atom, and cell metadata.'''
         # --- backward compatibility to version < 0.17.1
         for _a in ['pos', 'cell_vec', 'origin']:
             self._print_info = [print_info.print_cell]
@@ -153,11 +159,13 @@ class ScalarField(_CORE):
 
     @classmethod
     def from_domain(cls, domain, **kwargs):
+        '''Create a scalar field from an expanded domain object.'''
         return cls.from_data(data=domain.expand(), **kwargs)
 
     @classmethod
     def from_data(cls, data, cell_vec_aa,
                   origin_aa=None, pos_aa=None, numbers=None):
+        '''Create a scalar field directly from grid data and metadata.'''
         obj = cls.__new__(cls)
         # --- quick workaround to find out if vectorfield
         if data.shape[0] == 3:
@@ -224,12 +232,14 @@ class ScalarField(_CORE):
         return new
 
     def __sub__(self, other):
+        '''Return the difference between two fields.'''
         self = self.__add__(other, factor=-1)
         return self
 
     def _is_similar(self, other, strict=1, return_false=False):
         '''level of strictness: 1...similar, 2...very similar, 3...equal'''
         def _f_check(a):
+            '''Whether attribute a differs between self and other.'''
             return [_BOOL for _BOOL in (
                 (getattr(self, a) != getattr(other, a), )
                 if isinstance(getattr(self, a), int)
@@ -287,6 +297,7 @@ class ScalarField(_CORE):
         return True
 
     def integral(self):
+        '''Return the numerical integral over the full grid.'''
         return self.voxel*_simps(_simps(_simps(self.data)))
 
     def normalise(self, norm=None, thresh=1.E-8, **kwargs):
@@ -359,6 +370,7 @@ class ScalarField(_CORE):
         new = _copy.deepcopy(self)
 
         def _apply(_i):
+            '''Subsample new along axis _i by stride sp.'''
             new.data = _np.moveaxis(_np.moveaxis(new.data, _i, 0)[::sp],
                                     0,
                                     _i)
@@ -378,6 +390,7 @@ class ScalarField(_CORE):
     def crop(self, r, dims='xyz'):
         '''r tuple of len=len(dims)'''
         def _apply(_i, _r):
+            '''Crop self along axis _i to the range _r.'''
             self.data = _np.moveaxis(_np.moveaxis(
                                         self.data,
                                         _i,
@@ -405,6 +418,7 @@ class ScalarField(_CORE):
            dry run: return crop tuple without actually cropping
            '''
         def _get_ab(d, axis):
+            '''Lower/upper index bounds along axis where d exceeds thresh.'''
             if thresh < _np.amax(d):
                 upper = _np.array(d.shape)[axis] -\
                         _np.amin(_np.array(d.shape) - _np.argwhere(d > thresh),
@@ -451,6 +465,7 @@ class ScalarField(_CORE):
             self.origin_aa = rotate_vector(self.origin_aa, R, origin=_o)
 
     def write(self, fn, attribute='data', **kwargs):
+        '''Write a stored scalar attribute to file.'''
         fmt = kwargs.get('fmt', fn.split('.')[-1])
         if not hasattr(self, attribute):
             raise AttributeError(
@@ -478,7 +493,10 @@ class ScalarField(_CORE):
 
 
 class VectorField(ScalarField):
+    '''Vector data defined on a regular three-dimensional grid.'''
+
     def __init__(self, *args, **kwargs):
+        '''Load a vector field from components, file, or raw data.'''
         self._print_info = [print_info.print_cell]
         if len(args) not in [0, 1, 3]:
             raise TypeError(
@@ -523,16 +541,19 @@ class VectorField(ScalarField):
 
     @staticmethod
     def _ip2ind(ip, F):
+        '''Convert a flat index into vector-field grid indices.'''
         return _np.unravel_index(ip, F.shape[1:])
 
     @staticmethod
     def _read_vec(F, ip):
+        '''Read one vector from flattened index ``ip`` in ``F``.'''
         _slc = (slice(None), ) \
                + tuple([_i for _i in VectorField._ip2ind(ip, F)])
         return F[_slc]
 
     @staticmethod
     def _write_vec(F, ip, V):
+        '''Write vector ``V`` at flattened index ``ip`` in ``F``.'''
         _slc = (slice(None), ) \
                + tuple([_i for _i in VectorField._ip2ind(ip, F)])
         F[_slc] = V
@@ -542,6 +563,7 @@ class VectorField(ScalarField):
         return _np.zeros(self.data.shape[1:])
 
     def rotate(self, *args, **kwargs):
+        '''Reject direct vector-field rotation via this method.'''
         raise NotImplementedError(
                 'Use the ScalarField method for each component!')
 
@@ -565,6 +587,7 @@ class VectorField(ScalarField):
            Output velocities are in atomic units.
            '''
         def get_value(p):
+            '''Interpolate the grid value at point p.'''
             return self._rtransform(_interpn(points,
                                              values,
                                              (p[0], p[1], p[2]),
@@ -679,6 +702,7 @@ class VectorField(ScalarField):
 
     @staticmethod
     def _helmholtz_components(data, cell_vec_aa):
+        '''Return Helmholtz components together with divergence and rotation.'''
         div, rot = divrot(data, cell_vec_aa)
         V = _k_potential(div, _np.array(cell_vec_aa))[1]/(4*_np.pi)
         A1 = _k_potential(rot[0], _np.array(cell_vec_aa))[1]
@@ -694,9 +718,11 @@ class VectorField(ScalarField):
         return irrotational_field, solenoidal_field, div, rot
 
     def divergence_and_rotation(self):
+        '''Calculate divergence and rotation of the vector field.'''
         self.div, self.rot = divrot(self.data, self.cell_vec_aa)
 
     def helmholtz_decomposition(self):
+        '''Store irrotational, solenoidal, and homogeneous components.'''
         irr = self.__class__.from_object(self)
         sol = self.__class__.from_object(self)
         hom = self.__class__.from_object(self)

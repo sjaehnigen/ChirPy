@@ -29,6 +29,9 @@
 # ----------------------------------------------------------------------
 
 
+'''Distribution functions for analysing spatial particle correlations.'''
+
+
 import numpy as np
 
 from .mapping import vector_pbc, cell_volume
@@ -80,6 +83,7 @@ def radial_distribution_function(positions,
         return rdf
 
     def get_P(s, o, _hv=None, cell=cell):
+        '''Return origin-centred distances, optionally restricted to a half-space.'''
         _P = vector_pbc(o[:, None], s, cell=cell)
 
         if _hv is not None:  # beta
@@ -104,6 +108,7 @@ def radial_distribution_function(positions,
 
     if half_vector is not None:
         def _func(x):
+            '''Evaluate the RDF contribution for one origin in a half-sphere.'''
             return _rdf(
                      get_P(
                         positions,
@@ -117,6 +122,7 @@ def radial_distribution_function(positions,
 
     else:
         def _func(x):
+            '''Evaluate the RDF contribution for one origin.'''
             return _rdf(
                      get_P(
                         positions,
@@ -132,4 +138,5 @@ def radial_distribution_function(positions,
 
 
 def rdf(*args, **kwargs):
+    '''Alias for radial_distribution_function.'''
     return radial_distribution_function(*args, **kwargs)

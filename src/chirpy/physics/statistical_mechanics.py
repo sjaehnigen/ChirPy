@@ -29,6 +29,9 @@
 # ----------------------------------------------------------------------
 
 
+'''Statistical-mechanics utilities for energies, distributions, and spectra.'''
+
+
 import numpy as np
 import scipy
 from .. import constants
@@ -83,12 +86,14 @@ def maxwell_boltzmann_distribution(T_K, *args, option='energy'):
             }
 
     def PDF(x):
+        '''Evaluate the selected Maxwell-Boltzmann probability density.'''
         return _options.get(option)(T_K, x, *args)
 
     return PDF
 
 
 def signal_filter(n_frames, filter_length=None, filter_type='welch'):
+    '''Return a one-sided window for filtering finite signals.'''
     if filter_length is None:
         filter_length = n_frames
     if filter_length > n_frames:
@@ -172,6 +177,7 @@ def time_correlation_function(*args,
                          % (len(_sh1), _sh1))
 
     def _corr(_val1, _val2):
+        '''Return the full FFT-based correlation for the given signals.'''
         _sig = np.array([scipy.signal.correlate(
                                                 v1,
                                                 v2,

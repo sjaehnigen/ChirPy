@@ -28,6 +28,9 @@
 #
 # ----------------------------------------------------------------------
 
+'''ChirPy: a python package for chirality, dynamics, and molecular
+   vibrations.'''
+
 __version__ = "0.30.3"
 
 import sys

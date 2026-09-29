@@ -28,6 +28,8 @@
 #
 # ----------------------------------------------------------------------
 
+'''Writer for Gaussian cube grid data.'''
+
 # outbuffer method may result in memory outage ==> Replace it
 
 from .. import constants

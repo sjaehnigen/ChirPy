@@ -28,6 +28,8 @@
 #
 # ----------------------------------------------------------------------
 
+'''Classes describing molecular systems and supercells.'''
+
 import numpy as _np
 import warnings as _warnings
 import copy as _copy
@@ -79,6 +81,7 @@ class _SYSTEM(_CORE):
                                stacklevel=2)
 
     def _cell_aa_deg(self, cell_aa_deg):
+        '''Update the unit-cell description on all linked objects.'''
         _cell = _copy.deepcopy(cell_aa_deg)
         self.cell_aa_deg = _np.array(_cell)
         # --- deep change to iterator frame
@@ -87,6 +90,7 @@ class _SYSTEM(_CORE):
             self.Modes.cell_aa_deg = _np.array(_cell)
 
     def _check_distances(self, clean=False):
+        '''Check interatomic distances and optionally rebuild molecules.'''
         self.XYZ._check_distances(clean=clean)
         if clean:
             self.mol_map = None
@@ -94,6 +98,7 @@ class _SYSTEM(_CORE):
         self._sync_class()
 
     def _sync_class(self, check_consistency=True, **kwargs):
+        '''Synchronise cached system attributes from the coordinate object.'''
         if (_cell := kwargs.get('cell_aa_deg')) is not None:
             self._cell_aa_deg(_cell)
         elif not hasattr(self, 'cell_aa_deg'):
@@ -131,6 +136,7 @@ class _SYSTEM(_CORE):
             self._check_consistency(tag=kwargs.get('tag', ''))
 
     def _check_consistency(self, tag=''):
+        '''Check consistency between linked objects and topology data.'''
         if hasattr(self, 'Modes'):
             # --- ToDo: synchronize all sub-objects (pos_aa, cell_aa_deg)
             try:
@@ -177,6 +183,7 @@ class _SYSTEM(_CORE):
         return new
 
     def read_fn(self, *args, **kwargs):
+        '''Read coordinates and optional vibrational data from file input.'''
         self.XYZ = self._XYZ(*args, **kwargs)
         fmt = self.XYZ._fmt
 
@@ -192,6 +199,7 @@ class _SYSTEM(_CORE):
                 self.mol_map = _topo['mol_map']
 
     def center_molecule(self, index, **kwargs):
+        '''Center the selected molecule inside the simulation cell.'''
         weights = kwargs.pop('weights', self.weights)
 
         if self.mol_map is None:
@@ -205,6 +213,7 @@ class _SYSTEM(_CORE):
         self.wrap_molecules()
 
     def wrap_molecules(self, **kwargs):
+        '''Wrap molecules into the current cell using ``mol_map``.'''
         weights = kwargs.pop('weights', self.weights)
         if self.mol_map is None:
             raise AttributeError('Wrap molecules requires a topology '
@@ -250,6 +259,7 @@ class _SYSTEM(_CORE):
         self._sync_class(tag='repeat', **kwargs)
 
     def wrap(self, **kwargs):
+        '''Wrap atomic coordinates into the current unit cell.'''
         self.XYZ.wrap(**kwargs)
 
     def extract_molecules(self, mols):
@@ -340,6 +350,7 @@ class _SYSTEM(_CORE):
         self._sync_class(tag='sort_atoms')
 
     def print_info(self):
+        '''Print a short summary of the current system state.'''
         # Todo: use self._print_info = [print_info.print_header]
         print_info.print_header(self)
         print('%12d Atoms\n%12s' %
@@ -385,10 +396,16 @@ class _SYSTEM(_CORE):
 
 
 class Molecule(_SYSTEM):
+    '''Single-frame molecular system wrapper.'''
+
     def _XYZ(self, *args, **kwargs):
+        '''Create the coordinate reader for a single structure.'''
         return XYZ(*args, range=(0, 1, 1), **kwargs)
 
 
 class Supercell(_SYSTEM):
+    '''Periodic system wrapper with full trajectory support.'''
+
     def _XYZ(self, *args, **kwargs):
+        '''Create the coordinate reader for a supercell or trajectory.'''
         return XYZ(*args, **kwargs)

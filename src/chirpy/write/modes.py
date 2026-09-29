@@ -28,6 +28,8 @@
 #
 # ----------------------------------------------------------------------
 
+'''Writer for vibrational mode files.'''
+
 
 def xvibsWriter(filename, n_atoms, numbers, pos_aa, freqs, modes):
     '''Write an XVIBS file with Cartesian displacements in angstrom'''

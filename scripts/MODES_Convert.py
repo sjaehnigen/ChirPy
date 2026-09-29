@@ -29,6 +29,7 @@
 #
 # ----------------------------------------------------------------------
 
+'''Convert vibrational mode files between supported formats.'''
 
 import argparse
 from chirpy.classes import system

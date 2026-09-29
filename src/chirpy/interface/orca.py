@@ -28,6 +28,8 @@
 #
 # ----------------------------------------------------------------------
 
+'''Readers for selected ORCA output and Hessian files.'''
+
 
 import numpy as np
 import warnings

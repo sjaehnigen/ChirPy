@@ -29,6 +29,8 @@
 #
 # ----------------------------------------------------------------------
 
+'''Inspect a trajectory for duplicate frames.'''
+
 import argparse
 import warnings
 

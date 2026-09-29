@@ -1,4 +1,6 @@
 # vim: set fileencoding=utf-8
+"""Process-based producer and consumer implementations."""
+
 from __future__ import absolute_import, division, unicode_literals
 
 import itertools
@@ -32,6 +34,7 @@ class Producer(IProducer):
     """
 
     def __init__(self, iterable, maxsize=100, chunksize=1):
+        """Start a worker process for the given iterable."""
         assert chunksize > 0
         assert maxsize >= chunksize
 
@@ -50,6 +53,7 @@ class Producer(IProducer):
         self._process.start()
 
     def __next__(self):
+        """Return the next buffered value from the worker process."""
         if self._current_chunk:
             pass
         elif not self._queue:
@@ -80,10 +84,12 @@ class Producer(IProducer):
         return item
 
     def next(self):
+        """Return the next buffered value from the worker process."""
         return self.__next__()
 
     @staticmethod
     def _run(iterator, queue, chunksize):
+        """Feed chunks from an iterator into a multiprocessing queue."""
         chunk = []
         try:
             while True:
@@ -108,6 +114,7 @@ class Consumer(IConsumer):
     """Feeds the given coroutine in a separate process."""
 
     def __init__(self, coroutine, maxsize=1):
+        """Start a worker process for the given coroutine."""
         self._coroutine = coroutine
 
         self._closed = False
@@ -120,6 +127,7 @@ class Consumer(IConsumer):
 
     @check_open
     def send(self, value, timeout=0):
+        """Queue a value for the worker process."""
         try:
             self._queue.put(value, block=(timeout != 0), timeout=timeout)
         except Full:
@@ -127,16 +135,19 @@ class Consumer(IConsumer):
 
     @check_open
     def close(self):
+        """Stop the worker process after pending values are consumed."""
         self._closed = True
         self._queue.put(StopIterationSentinel)
         self._process.join()
 
     @property
     def closed(self):
+        """Whether the consumer has been closed."""
         return self._closed
 
     @staticmethod
     def _run(coroutine, queue):
+        """Drain queued values into the coroutine."""
         for value in iter(queue.get, StopIterationSentinel):
             coroutine.send(value)
         coroutine.close()

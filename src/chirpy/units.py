@@ -29,6 +29,8 @@
 # ----------------------------------------------------------------------
 
 
+'''Default physical units used throughout ChirPy (CP2K convention).'''
+
 import warnings as _warnings
 
 from . import config

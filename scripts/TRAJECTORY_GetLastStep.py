@@ -29,6 +29,8 @@
 #
 # ----------------------------------------------------------------------
 
+'''Extract the last frame from a trajectory.'''
+
 
 import argparse
 import numpy as np
@@ -37,6 +39,7 @@ from chirpy.classes import system
 
 
 def create_name(F):
+    '''Return the default output name for the last frame.'''
     return F.split('.')[0] + '_last_step' + '.xyz'
 
 

@@ -29,6 +29,7 @@
 #
 # ----------------------------------------------------------------------
 
+'''Plot IR or VCD spectra from vibrational mode files.'''
 
 import argparse
 import numpy as np

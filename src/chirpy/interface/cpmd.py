@@ -28,6 +28,9 @@
 #
 # ----------------------------------------------------------------------
 
+'''Readers and writers for CPMD files and input sections.'''
+
+
 import os
 import numpy as np
 import tempfile
@@ -229,6 +232,8 @@ def cpmdWriter(fn, data, selection=None, append=False, **kwargs):
 
 # ToDo: OLD CODE
 def write_molvib(filename, n_atoms, numbers, coordinates, masses, hessian):
+    '''Write a simple CPMD MOLVIB file.'''
+
     obuffer = '&CART\n'
     for n, r, m in zip(numbers, coordinates, masses):
         obuffer += ' %d  %16.12f  %16.12f  %16.12f  %16.12f\n' % tuple(
@@ -243,6 +248,8 @@ def write_molvib(filename, n_atoms, numbers, coordinates, masses, hessian):
 
 
 def write_atomic_tensor(at_filename, atomic_tensor):
+    '''Write an atomic tensor array in CPMD block format.'''
+
     (dim1, dim2) = atomic_tensor.shape
     if dim2 != 9:
         raise Exception('Invalid format of at!')
@@ -276,7 +283,11 @@ def cpmd_kinds_from_file(fn):
 
 
 def _nextline_parser(SEC, KEY, ARG, section_input):
+    '''Parse CPMD keyword data that continues on the next line.'''
+
     def _fmt(s):
+        '''Format numeric section data for CPMD input.'''
+
         return '%10.5f' % float(s)
     if SEC == 'SYSTEM':
         if KEY == 'CELL':
@@ -341,6 +352,8 @@ _cpmd_keyword_logic = {
 
 
 class CPMDinput():
+    '''Container namespace for CPMD input section classes.'''
+
     class _SECTION():
         '''This is a universal class that parses any possible keyword input.
            Each derived class may contain a test routine that checks on
@@ -348,6 +361,8 @@ class CPMDinput():
            ALPHA'''
 
         def __init__(self, **kwargs):
+            '''Initialise a CPMD input section from keyword arguments.'''
+
             self.__dict__.update(kwargs)
             self._dict = _cpmd_keyword_logic[self.__class__.__name__]
             self.options = {}
@@ -355,6 +370,8 @@ class CPMDinput():
     #            setattr(self, _i, kwargs[_i])
 
         def write_section(self, *args, **kwargs):
+            '''Write this section to a file or stream.'''
+
             fmt = kwargs.get('fmt', 'angstrom')
             append = kwargs.get('append', False)
 
@@ -371,6 +388,8 @@ class CPMDinput():
             self.print_section(file=_outstream, fmt=fmt)
 
         def print_section(self, file=sys.stdout, **kwargs):
+            '''Print this section in CPMD input format.'''
+
             print("&%s" % self.__class__.__name__, file=file)
 
             for _o in self.options:
@@ -388,10 +407,14 @@ class CPMDinput():
             print("&END", file=file)
 
         def print_options(self):
+            '''Print known keywords for this section.'''
+
             for _k in self._dict:
                 print('%s: ' % _k, self._dict[_k])
 
         def set_keyword(self, keyword, *args, **kwargs):
+            '''Set a keyword entry for this section.'''
+
             if keyword not in self._dict:
                 raise AttributeError('Unknown keyword %s!' % keyword)
             _arglist, _nextline = self._dict[keyword]
@@ -417,6 +440,8 @@ class CPMDinput():
 
         @staticmethod
         def _parse_keyword_input(section, line):
+            '''Parse one CPMD keyword line for a section.'''
+
             _section_keys = _cpmd_keyword_logic[section]
 
             _key = [_k for _k in _section_keys if _k in line[:len(_k)]]
@@ -469,31 +494,45 @@ class CPMDinput():
             return out
 
     class INFO(_SECTION):
+        '''INFO section of a CPMD input file.'''
+
         def set_keyword(self, name):
             '''No keywords in this section.'''
             self.set_name(name)
 
         def set_name(self, name):
+            '''Store the free-form INFO section label.'''
+
             self.options = {str(name): ([], None)}
 
         @staticmethod
         def _parse_keyword_input(section, line):
+            '''Parse the free-form INFO section line.'''
+
             return line.strip(), [], None
 
     class CPMD(_SECTION):
+        '''CPMD control section.'''
         pass
 
     class RESP(_SECTION):
+        '''Linear-response section.'''
         pass
 
     class DFT(_SECTION):
+        '''DFT setup section.'''
         pass
 
     class SYSTEM(_SECTION):
+        '''System definition section.'''
         pass
 
     class ATOMS(_SECTION):
+        '''Atomic coordinates and pseudopotential section.'''
+
         def print_section(self, fmt='angstrom', file=sys.stdout):
+            '''Print the ATOMS section in CPMD format.'''
+
             print("&%s" % self.__class__.__name__, file=file)
 
             format = '%20.10f' * 3
@@ -548,6 +587,8 @@ class CPMDinput():
 
         @classmethod
         def from_data(cls, symbols, pos_aa, pp='MT_BLYP KLEINMAN-BYLANDER'):
+            '''Build an ATOMS section from symbols and positions.'''
+
             pos_au = pos_aa * constants.l_aa2au
             elements = sorted(set(symbols))
             symbols = np.array(symbols)
@@ -585,6 +626,8 @@ class CPMDjob():
        '''
 
     def __init__(self, **kwargs):
+        '''Create a CPMD job from section objects or defaults.'''
+
         # mandatory
         self.INFO = CPMDinput.INFO(options={'CPMD DEFAULT JOB': ([], None)})
         for _sec in [
@@ -611,6 +654,8 @@ class CPMDjob():
         pass
 
     def _check_consistency(self):
+        '''Check section combinations for obvious inconsistencies.'''
+
         pass
 
     @classmethod
@@ -618,6 +663,8 @@ class CPMDjob():
         '''CPMD 4'''
 
         def _parse_file(_iter):
+            '''Collect one raw section from a CPMD input stream.'''
+
             _l = next(_iter)
             _c = []
             while "&END" not in _l:
@@ -659,18 +706,24 @@ class CPMDjob():
         return np.vstack(self.ATOMS.data)
 
     def get_symbols(self):
+        '''Return atom symbols in ATOMS order.'''
+
         symbols = []
         for _s, _n in zip(self.ATOMS.kinds, self.ATOMS.n_kinds):
             symbols += _s.split('_')[0][1:] * _n
         return np.array(symbols)
 
     def get_kinds(self):
+        '''Return CPMD kind labels in ATOMS order.'''
+
         kinds = []
         for _s, _n in zip(self.ATOMS.kinds, self.ATOMS.n_kinds):
             kinds += [_s] * _n
         return np.array(kinds)
 
     def get_channels(self):
+        '''Return pseudopotential channel labels in ATOMS order.'''
+
         channels = []
         for _s, _n in zip(self.ATOMS.channels, self.ATOMS.n_kinds):
             channels += [_s] * _n
@@ -683,6 +736,8 @@ class CPMDjob():
             (can be anything str, int, float, ...).
             '''
         def _dec(_P):
+            '''Split a per-atom sequence into fragments defined by ids.'''
+
             return [[_P[_k] for _k, _jd in enumerate(ids) if _jd == _id]
                     for _id in sorted(set(ids))]
 

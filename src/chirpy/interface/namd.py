@@ -28,6 +28,8 @@
 #
 # ----------------------------------------------------------------------
 
+'''Helpers for reading selected data from NAMD output files.'''
+
 
 import subprocess
 import numpy as np
@@ -36,6 +38,8 @@ import numpy as np
 
 
 def read_output_file(fn_out, clean=False):
+    '''Read energies, temperature, pressure, and volume from NAMD output.'''
+
     fn = " ".join(fn_out)
     p = subprocess.Popen("egrep 'ENERGY:' %s | grep -v 'IMPRECISION'" % fn,
                          stdout=subprocess.PIPE,

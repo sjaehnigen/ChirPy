@@ -28,6 +28,8 @@
 #
 # ----------------------------------------------------------------------
 
+'''Readers for Tinker dipole and moment files.'''
+
 import warnings
 import numpy as np
 
@@ -91,6 +93,8 @@ def tinkermomentsReader(*args, gauge_origin_aa=[0., 0., 0.], columns='imddd',
     # default['dip'] = np.array(3*[0.])
 
     def _get(_dict, key):
+        '''Return a file name from the mapping or emit a warning.'''
+
         value = _dict.get(key)
         if value is None:
             warnings.warn(f"missing tinker file *.{filetypes[key]}",

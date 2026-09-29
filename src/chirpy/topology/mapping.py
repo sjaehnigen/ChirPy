@@ -29,6 +29,9 @@
 # ----------------------------------------------------------------------
 
 
+'''Topology mapping utilities for periodic cells and molecular geometry.'''
+
+
 import numpy as np
 import copy
 import warnings as _warnings
@@ -159,6 +162,7 @@ def cell_vec(cell, n_fields=3, priority=(0, 1, 2)):
 
 
 def cell_volume(cell, n_fields=3):
+    '''Return the unit-cell volume from cell parameters.'''
     _cell_vec = cell_vec(cell, n_fields=n_fields)
 
     return np.dot(_cell_vec[0], np.cross(_cell_vec[1], _cell_vec[2]))
@@ -302,6 +306,7 @@ def unwrap_pbc(positions, reference=None, cell=None, axis=0, mode='naive'):
 
 # --- backward compatibility
 def distance_pbc(*args, **kwargs):
+    '''Alias for vector_pbc.'''
     return vector_pbc(*args, **kwargs)
 
 
@@ -496,6 +501,7 @@ def neighbour_matrix(pos_aa, symbols, cell_aa_deg=None,
 
 def nearest_neighbour(p0, p1=None, cell=None, ignore=None,
                       return_distances=False):
+    '''Return indices of the nearest neighbours for each position in p0.'''
     if p1 is None:
         p1 = p0
     _dists = distance_matrix(p0, p1, cell=cell)
@@ -508,6 +514,7 @@ def nearest_neighbour(p0, p1=None, cell=None, ignore=None,
 
 
 def close_neighbours(p0, cell=None, crit=None, symbols=None):
+    '''List atom pairs that are closer than the chosen distance criterion.'''
     _dM = distance_matrix(p0, cell=cell)
     if crit is None:
         if symbols is None:
@@ -740,6 +747,7 @@ def join_molecules(pos_aa, mol_map, cell_aa_deg,
 
 
 def get_atom_spread(pos):
+    '''Return the coordinate range along each Cartesian axis.'''
     return np.array([np.amax(_p) - np.amin(_p)
                      for _p in np.moveaxis(pos, -1, 0)])
 
@@ -841,6 +849,7 @@ def find_methyl_groups(pos, symbols, hetatm=False, cell_aa_deg=None):
 
 
 def isHB(*args, **kwargs):
+    '''Alias for ishydrogenbond.'''
     return ishydrogenbond(*args, **kwargs)
 
 
@@ -991,6 +1000,7 @@ def guess_atom_types(pos_aa,
                           for _ch, _s in zip(_character, _core)]
 
         def _kernel(x, y):
+            '''Compare two local atom descriptors for equality.'''
             return x == y
 
     elif similarity == 'SOAP':

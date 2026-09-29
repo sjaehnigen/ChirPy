@@ -1,4 +1,6 @@
 # vim: set fileencoding=utf-8
+"""Interfaces and sentinels for concurrent iterator helpers."""
+
 from abc import ABCMeta, abstractmethod, abstractproperty
 from collections.abc import Iterator
 
@@ -10,6 +12,7 @@ class ExceptionInUserIterable(object):
     """User-provided iterable raises an exception."""
 
     def __init__(self, exception):
+        """Store the original user exception."""
         self.exception = exception
 
 class IProducer(Iterator):
@@ -24,6 +27,7 @@ class IProducer(Iterator):
 
     @abstractmethod
     def __next__(self):
+        """Return the next produced value."""
         pass
 
 

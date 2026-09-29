@@ -29,6 +29,8 @@
 #
 # ----------------------------------------------------------------------
 
+'''Create a topology file from an input structure.'''
+
 
 import argparse
 import chirpy as cp

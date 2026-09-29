@@ -29,6 +29,8 @@
 #
 # ----------------------------------------------------------------------
 
+'''Map and reorder atoms between matching molecules.'''
+
 
 import argparse
 from chirpy.classes import system

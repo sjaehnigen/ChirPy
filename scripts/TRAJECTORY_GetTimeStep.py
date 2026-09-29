@@ -29,6 +29,8 @@
 #
 # ----------------------------------------------------------------------
 
+'''Extract a selected time step from a trajectory.'''
+
 
 import argparse
 import numpy as np

@@ -29,6 +29,9 @@
 # ----------------------------------------------------------------------
 
 
+'''Topology-based analyses of linear, angular, and hydrogen-bond motion.'''
+
+
 import numpy as np
 from ..mathematics.algebra import cross
 from ..classes.core import PALARRAY
@@ -84,6 +87,7 @@ def _func0(p,
            angle_crit,
            cell,
            ):
+    '''Evaluate hydrogen-bond presence for one frame.'''
 
     return ishydrogenbond(
                     p,
@@ -115,6 +119,7 @@ def _cumulate_hydrogen_bonding_events(_H):
 
 
 def _acf_c(h):
+    '''Return the continuous hydrogen-bond autocorrelation function.'''
     segments = _cumulate_hydrogen_bonding_events(h)
     if len(segments) == 0:
         return np.zeros_like(h)
@@ -125,6 +130,7 @@ def _acf_c(h):
 
 
 def _acf_i(h):
+    '''Return the intermittent hydrogen-bond autocorrelation function.'''
     B = tcf(h, mode='A')
     return B / B[0]
 

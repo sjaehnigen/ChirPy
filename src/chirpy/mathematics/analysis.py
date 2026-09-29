@@ -28,6 +28,7 @@
 #
 # ----------------------------------------------------------------------
 
+'''Analysis functions for gridded vector fields and time series.'''
 
 import numpy as np
 from ..constants import eijk
@@ -52,14 +53,18 @@ def divrot(data, cell_vec):
 
 
 def avg(x):
+    '''Average of x along the first axis.'''
     return np.mean(x, axis=0)
 
 
 def cumavg(data):
+    '''Cumulative (running) average of data along the first axis.'''
     return np.cumsum(data, axis=0)/np.arange(1, len(data)+1)
 
 
 def movavg(a, n=3, axis=0):
+    '''Moving average of a over a window of n along the given axis
+       (adaptive at the edges, keeps the input size).'''
     ret = np.cumsum(a, dtype=float, axis=axis)
     ret[n:] = ret[n:] - ret[:-n]
 

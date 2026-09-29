@@ -29,6 +29,7 @@
 #
 # ----------------------------------------------------------------------
 
+'''Plot particle temperatures from a CP2K log file.'''
 
 import sys
 import argparse
@@ -37,6 +38,7 @@ from chirpy.visualise import timeline
 
 
 def main():
+    '''Plot particle temperatures from a CP2K log file.'''
     sys.path = sys.path[1:]
     parser = argparse.ArgumentParser()
     parser.add_argument(

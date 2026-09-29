@@ -28,6 +28,8 @@
 #
 # ----------------------------------------------------------------------
 
+'''Core utility classes for ChirPy objects and iterators.'''
+
 import pickle
 import itertools
 import warnings
@@ -89,6 +91,7 @@ class PALARRAY():
             self.array = product(*self.data, repeat=repeat)
 
     def run(self, verbose=config.__verbose__):
+        '''Execute the configured parallel calculation and return the result.'''
         try:
             _dtype = float
             if self.multiple_returns:
@@ -122,40 +125,52 @@ class PALARRAY():
 
 
 class CORE():
+    '''Base class with shared helpers for serialising ChirPy objects.'''
+
     def __init__(self, *args, **kwargs):
+        '''Initialise shared bookkeeping for derived classes.'''
         self._print_info = []
 
     def __radd__(self, other):
+        '''Delegate reflected addition to ``__add__``.'''
         return self.__add__(other)
 
     def __iadd__(self, other):
+        '''Update the object using ``__add__`` semantics.'''
         self = self.__add__(other)
         return self
 
     def __rsub__(self, other):
+        '''Delegate reflected subtraction to ``__sub__``.'''
         return self.__sub__(other)
 
     def __isub__(self, other):
+        '''Update the object using ``__sub__`` semantics.'''
         self = self.__sub__(other)
         return self
 
     def __rmul__(self, other):
+        '''Delegate reflected multiplication to ``__mul__``.'''
         return self.__mul__(other)
 
     def __imul__(self, other):
+        '''Update the object using ``__mul__`` semantics.'''
         self = self.__mul__(other)
         return self
 
     def __ipow__(self, other):
+        '''Update the object using ``__pow__`` semantics.'''
         self = self.__pow__(other)
         return self
 
     def dump(self, FN):
+        '''Serialise the object to ``FN`` using pickle.'''
         with open(FN, "wb") as f:
             pickle.dump(self, f)
 
     @classmethod
     def load(cls, FN):
+        '''Load a pickled object from ``FN`` and coerce it to ``cls``.'''
         with open(FN, "rb") as f:
             _load = pickle.load(f)
         if not isinstance(_load, cls):
@@ -173,6 +188,7 @@ class CORE():
         return _load
 
     def print_info(self):
+        '''Print registered information blocks for the object.'''
         print('')
         print(77 * '–')
         print('%-12s' % self.__class__.__name__)
@@ -187,7 +203,10 @@ class CORE():
 
 
 class ITERATOR():
+    '''Base iterator wrapper for frame-based ChirPy objects.'''
+
     def __init__(self, *args, **kwargs):
+        '''Prepare iterator state and cache the first frame.'''
         self._kernel = CORE
         # self._gen_init = iter([])
         self._gen = iter([])
@@ -206,9 +225,11 @@ class ITERATOR():
         self._kwargs['_skip'] = self._kwargs['skip'].copy()
 
     def __iter__(self):
+        '''Return the iterator instance itself.'''
         return self
 
     def __next__(self):
+        '''Advance to the next frame and update the cached object.'''
         frame = next(self._gen)
 
         out = {'data': frame}
@@ -231,6 +252,7 @@ class ITERATOR():
 
     @classmethod
     def _from_list(cls, LIST, **kwargs):
+        '''Build an iterator by concatenating items from ``LIST``.'''
         a = cls(LIST[0], **kwargs)
         for _f in LIST[1:]:
             b = cls(_f, **kwargs)
@@ -250,6 +272,7 @@ class ITERATOR():
         return new
 
     def __add__(self, other):
+        '''Concatenate two compatible iterators along the frame axis.'''
         new = self._copy()
         if self._frame._is_similar(other._frame)[0] == 1:
             new._gen = itertools.chain(self._gen, other._gen)
@@ -365,6 +388,7 @@ class ITERATOR():
             return obj1
 
         def _func(obj1, obj2):
+            '''Advance obj2 and merge it into obj1, or signal exhaustion.'''
             # --- next(obj1) is called before loading mask
             try:
                 next(obj2)
@@ -386,6 +410,7 @@ class ITERATOR():
            i.e. adding the number of frame 0, but not the stored mask
            '''
         def split_comment(comment):
+            '''Extract the frame/timestep number from a comment line.'''
             # ---- cp2k comment syntax, add more if required
             if 'i = ' in comment:
                 return int(comment.split()[2].rstrip(','))
@@ -395,6 +420,7 @@ class ITERATOR():
                 raise TypeError('Cannot get frame info from comments!')
 
         def _func(obj, **kwargs):
+            '''Skip duplicate/repeated timesteps based on frame comments.'''
             _skip = obj._kwargs.get('skip', [])
             _timesteps = obj._kwargs.get('_timesteps', [])
             _ts = split_comment(obj._frame.comments)
@@ -460,6 +486,7 @@ class ITERATOR():
 class AttrDict(dict):
     '''Converts dictionary keys into attributes'''
     def __init__(self, *args, **kwargs):
+        '''Initialise the dictionary and expose keys as attributes.'''
         super(AttrDict, self).__init__(*args, **kwargs)
         # --- protect built-in namespace of dict
         for _k in self:
@@ -469,6 +496,7 @@ class AttrDict(dict):
         self.__dict__ = self
 
     def __setitem__(self, key, value):
+        '''Store ``key`` while protecting the built-in ``dict`` namespace.'''
         if key in dir(self):
             raise NameError("Trying to alter namespace of built-in "
                             "dict method!", key)

@@ -27,5 +27,8 @@
 #   If not, see <https://www.gnu.org/licenses/>.
 #
 # ----------------------------------------------------------------------
+
+'''Mathematical utilities: vector/matrix algebra and time-series analysis.'''
+
 from . import analysis
 from . import algebra

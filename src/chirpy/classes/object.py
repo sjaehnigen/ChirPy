@@ -28,6 +28,8 @@
 #
 # ----------------------------------------------------------------------
 
+'''Geometric helper objects used to mask or select data.'''
+
 from functools import partial
 import numpy as np
 import copy
@@ -38,6 +40,8 @@ from ..topology.mapping import vector_pbc
 
 
 class Sphere(_CORE):
+    '''Spherical clipping object with hard or soft edges.'''
+
     def __init__(self, position=None, radius=None, edge='hard', D=0.23622):
         '''Define a sphere at position, radius and edge (soft/hard).
            D=0.23622 bohr corresponds to 0.125 angstrom (soft sphere only)
@@ -77,6 +81,7 @@ class Sphere(_CORE):
            '''
 
         def get_d(orig, _pos):
+            '''Distance from orig to _pos under periodic boundary conditions.'''
             return np.linalg.norm(vector_pbc(orig, _pos, cell=cell), axis=-1)
 
         # --- never manipulate input
