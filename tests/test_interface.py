@@ -39,7 +39,7 @@ from chirpy.interface import cpmd, tinker
 from chirpy import constants
 from chirpy.config import ChirPyWarning
 
-_test_dir = os.path.dirname(os.path.abspath(__file__)) + '/.test_files'
+_test_dir = os.path.dirname(os.path.abspath(__file__)) + '/test_files'
 
 
 class TestCPMD(unittest.TestCase):

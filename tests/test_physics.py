@@ -40,7 +40,7 @@ from chirpy.physics import statistical_mechanics, spectroscopy, \
 from chirpy.classes import trajectory
 # kspace, modern_theory_of_magnetisation
 
-_test_dir = os.path.dirname(os.path.abspath(__file__)) + '/.test_files'
+_test_dir = os.path.dirname(os.path.abspath(__file__)) + '/test_files'
 
 
 class TestConstants(unittest.TestCase):

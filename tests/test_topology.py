@@ -38,7 +38,7 @@ from chirpy.topology import mapping, dissection, motion, grid  # , distribution
 from chirpy.read import coordinates
 from chirpy import constants
 
-_test_dir = os.path.dirname(os.path.abspath(__file__)) + '/.test_files'
+_test_dir = os.path.dirname(os.path.abspath(__file__)) + '/test_files'
 
 
 class TestMapping(unittest.TestCase):

@@ -41,7 +41,7 @@ from chirpy.read import generators
 from chirpy import constants
 from chirpy.config import ChirPyWarning
 
-_test_dir = os.path.dirname(os.path.abspath(__file__)) + '/.test_files'
+_test_dir = os.path.dirname(os.path.abspath(__file__)) + '/test_files'
 
 
 class TestModes(unittest.TestCase):

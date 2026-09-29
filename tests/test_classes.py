@@ -39,7 +39,7 @@ from chirpy.config import ChirPyWarning
 
 # volume, field, domain
 
-_test_dir = os.path.dirname(os.path.abspath(__file__)) + '/.test_files'
+_test_dir = os.path.dirname(os.path.abspath(__file__)) + '/test_files'
 
 
 def _func(x0, x1):

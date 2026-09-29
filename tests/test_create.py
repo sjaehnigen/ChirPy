@@ -34,7 +34,7 @@ import filecmp
 
 from chirpy.create import supercell
 
-_test_dir = os.path.dirname(os.path.abspath(__file__)) + '/.test_files'
+_test_dir = os.path.dirname(os.path.abspath(__file__)) + '/test_files'
 
 
 class TestSupercell(unittest.TestCase):

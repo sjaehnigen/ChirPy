@@ -86,6 +86,45 @@ class TestAlgebra(unittest.TestCase):
                             [R @ _v1, _v1]
                             ))
 
+    def test_rotation_matrix_axis_angle(self):
+        # --- rotation by 90 degrees about the z-axis maps x --> y
+        R = algebra.rotation_matrix([0., 0., 1.], angle=np.pi / 2)
+        self.assertListEqual(
+                np.around(R @ np.array([1., 0., 0.]), decimals=9).tolist(),
+                [0., 1., 0.]
+                )
+
+        # --- zero angle is the identity, independent of the axis
+        for _n in [[1., 0., 0.], [0.123, -1.2, 7.5]]:
+            R0 = algebra.rotation_matrix(_n, angle=0.0)
+            self.assertListEqual(np.around(R0, decimals=9).tolist(),
+                                 np.identity(3).tolist())
+
+        # --- a full turn (2*pi) about any axis is also the identity
+        R_full = algebra.rotation_matrix([0.3, -1.1, 2.4], angle=2 * np.pi)
+        self.assertListEqual(np.around(R_full, decimals=7).tolist(),
+                             np.identity(3).tolist())
+
+        # --- rotation preserves the vector norm and the axis itself
+        _n = np.array([0.4, -0.9, 3.2])
+        _v = np.array([1.5, -2.3, 0.7])
+        R = algebra.rotation_matrix(_n, angle=1.234)
+        self.assertAlmostEqual(np.linalg.norm(R @ _v), np.linalg.norm(_v), 9)
+        self.assertListEqual(np.around(R @ _n, decimals=7).tolist(),
+                             np.around(_n, decimals=7).tolist())
+
+        # --- consistent with the two-vector form: rotating v1 onto v2 by
+        # the axis-angle form (axis = v1 x v2, angle = angle(v1, v2)) must
+        # give the same result as the two-vector form
+        _v1 = np.array([0.123, -123.923, 7.219])
+        _v2 = np.array([-13., 11., 0.1289])
+        _axis = algebra.cross(_v1, _v2)
+        _angle = algebra.angle(_v1, _v2)
+        R_2v = algebra.rotation_matrix(_v1, _v2)
+        R_aa = algebra.rotation_matrix(_axis, angle=_angle)
+        self.assertListEqual(np.around(R_2v, decimals=7).tolist(),
+                             np.around(R_aa, decimals=7).tolist())
+
     def test_change_euclidean_basis(self):
         # --- insufficiently tested (because method will be extended to modes)
         eb = algebra.change_euclidean_basis(
