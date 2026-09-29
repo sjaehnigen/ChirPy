@@ -94,6 +94,39 @@ class TestStatisticalMechanics(unittest.TestCase):
     def tearDown(self):
         pass
 
+    def test_time_correlation_function(self):
+        n = 200
+        t = np.arange(n)
+        signal = np.cos(2 * np.pi * t / 20.0)
+
+        tcf = statistical_mechanics.time_correlation_function(
+                signal, finite_size_correction=False)
+
+        # --- shape: full convolution of two length-n signals
+        self.assertEqual(tcf.shape, (2 * n - 1,))
+
+        # --- zero-lag value equals the (biased) signal energy
+        self.assertAlmostEqual(tcf[0], np.sum(signal**2), places=6)
+
+        # --- symmetric about zero lag (tcf[+k] == tcf[-k])
+        self.assertTrue(np.allclose(tcf[1:], tcf[1:][::-1], atol=1e-6))
+
+        # --- explicit auto-correlation (1 arg) matches cross-correlation
+        #     of the signal with itself (2 args)
+        tcf_cross = statistical_mechanics.time_correlation_function(
+                signal, signal, finite_size_correction=False)
+        self.assertTrue(np.allclose(tcf, tcf_cross))
+
+        # --- mismatched shapes raise
+        with self.assertRaises(ValueError):
+            statistical_mechanics.time_correlation_function(
+                    signal, signal[:-1])
+
+        # --- too many arguments raise
+        with self.assertRaises(TypeError):
+            statistical_mechanics.time_correlation_function(
+                    signal, signal, signal)
+
     def test_temperature_from_energies(self):
         E = statistical_mechanics.kinetic_energies([
                   [0.001, 0.0230, 0.000],

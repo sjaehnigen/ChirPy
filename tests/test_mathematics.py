@@ -71,6 +71,32 @@ class TestAlgebra(unittest.TestCase):
         ang = algebra.angle_from_points([0, 0, 0], [2, 0, 1], [2, 2, 1])
         self.assertEqual(ang, 90 * np.pi / 180)
 
+    def test_dihedral(self):
+        # --- vectors derived from the same geometry as
+        #     test_dihedral_from_points, dihedral() should give the same
+        #     angle since dihedral_from_points() internally calls dihedral()
+        p0, p1, p2, p3 = [0, 0, 0], [0, 0.5, 0], [0, 0.5, 0.5], \
+            [-0.2, 0.3, 0.5]
+        v0 = np.array(p0) - np.array(p1)
+        v1 = np.array(p2) - np.array(p1)
+        v2 = np.array(p3) - np.array(p2)
+
+        dih = algebra.dihedral(v0, v1, v2)
+        self.assertEqual(np.round(dih * 180 / np.pi, decimals=6), -45)
+
+        # --- single tuple-of-3 argument form gives an identical result
+        dih_tuple = algebra.dihedral((v0, v1, v2))
+        self.assertEqual(dih, dih_tuple)
+
+        # --- sign flips when the rotational sense is reversed
+        dih_flipped = algebra.dihedral(-v0, v1, v2)
+        self.assertEqual(np.round(dih_flipped * 180 / np.pi, decimals=6),
+                         135)
+
+        # --- wrong number of arguments raises
+        with self.assertRaises(TypeError):
+            algebra.dihedral(v0, v1)
+
     def test_dihedral_from_points(self):
         dih = algebra.dihedral_from_points(
                 [0, 0, 0],

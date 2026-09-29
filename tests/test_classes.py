@@ -34,10 +34,8 @@ import warnings
 import filecmp
 import numpy as np
 
-from chirpy.classes import system, quantum, trajectory, core
+from chirpy.classes import system, quantum, trajectory, core, volume
 from chirpy.config import ChirPyWarning
-
-# volume, field, domain
 
 _test_dir = os.path.dirname(os.path.abspath(__file__)) + '/test_files'
 
@@ -119,6 +117,35 @@ class TestTrajectory(unittest.TestCase):
         traj_e = traj.expand()
         self.assertTrue(traj_e._is_similar(ref)[0] == 1)
         self.assertTrue(np.allclose(traj_e.data, ref.data))
+
+    def test_expand_batch(self):
+        # --- reading the full trajectory in fixed-size batches should
+        #     reproduce the same data as reading it in one go
+        full = trajectory.XYZ(self.dir + '/trajectory.xyz').expand()
+        n_frames = full.data.shape[0]
+
+        traj = trajectory.XYZ(self.dir + '/trajectory.xyz')
+        batches = []
+        while True:
+            _b = traj.expand(batch=4, ignore_warning=True)
+            if _b is None:
+                break
+            batches.append(_b.data)
+
+        # --- batches of size 4 over 10 frames: 4, 4, 2
+        self.assertListEqual([_b.shape[0] for _b in batches], [4, 4, 2])
+        self.assertTrue(np.allclose(
+                            np.concatenate(batches, axis=0),
+                            full.data,
+                            ))
+        self.assertEqual(sum(_b.shape[0] for _b in batches), n_frames)
+
+        # --- an exhausted iterator returns None (with a warning) instead
+        #     of raising
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            self.assertIsNone(traj.expand(batch=4))
+            self.assertTrue(any('exhausted' in str(_w.message) for _w in w))
 
     def test_alignment(self):
         _ref = self.dir + '/trajectory_aligned.xyz'
@@ -374,3 +401,171 @@ class TestQuantum(unittest.TestCase):
         system.j = system.j.sparse(2)
         system.rho.write(self.dir + "/out.cube")
         os.remove(self.dir + "/out.cube")
+
+
+class TestVibrationalModes(unittest.TestCase):
+    '''VibrationalModes/_MODES was previously completely untested (no test
+       file referenced these classes at all).'''
+
+    def setUp(self):
+        self.dir = _test_dir + '/read_write'
+
+    def tearDown(self):
+        pass
+
+    def test_load_and_orthonormality_check(self):
+        # --- the shipped fixture is a real-world xvibs file whose
+        #     eigenvectors are known to be not perfectly orthonormal;
+        #     loading it must succeed and the built-in orthonormality
+        #     check must warn about this instead of silently ignoring it
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            vib = trajectory.VibrationalModes(self.dir + '/test.xvibs')
+            _msgs = [str(_w.message) for _w in w]
+
+        self.assertEqual(vib.n_modes, 3 * vib.n_atoms)
+        self.assertEqual(vib.eival_cgs.shape, (vib.n_modes, ))
+        self.assertEqual(vib.eivec.shape, (vib.n_modes, vib.n_atoms, 3))
+        self.assertTrue(any('not orthonormal' in _m for _m in _msgs))
+
+        # --- units: no IR intensities given --> defaults to one and warns
+        self.assertTrue(any('IR intensities' in _m for _m in _msgs))
+        self.assertTrue(np.allclose(vib.IR_kmpmol, 1.0))
+
+    def test_select_modes(self):
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore', category=ChirPyWarning)
+            vib = trajectory.VibrationalModes(self.dir + '/test.xvibs')
+
+        sub = vib.select_modes([6, 7, 8])
+        self.assertEqual(sub.n_modes, 3)
+        self.assertTrue(np.allclose(sub.data, vib.data[[6, 7, 8]]))
+        # --- original object remains unaffected (deep copy)
+        self.assertEqual(vib.n_modes, 39)
+
+        # --- a single integer is also accepted
+        single = vib.select_modes(6)
+        self.assertEqual(single.n_modes, 1)
+
+        with self.assertRaises(TypeError):
+            vib.select_modes('6')
+
+    def test_repeat(self):
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore', category=ChirPyWarning)
+            vib = trajectory.VibrationalModes(self.dir + '/test.xvibs')
+
+        n_atoms = vib.n_atoms
+        n_modes = vib.n_modes
+        vib.repeat(2)
+
+        # --- 2x2x2 = 8-fold duplication of atoms, mode count unchanged
+        self.assertEqual(vib.n_atoms, 8 * n_atoms)
+        self.assertEqual(vib.n_modes, n_modes)
+        self.assertTupleEqual(vib.data.shape, (n_modes, 8 * n_atoms, 9))
+
+
+class TestVolume(unittest.TestCase):
+    '''ScalarField/VectorField had no dedicated unit tests.'''
+
+    def setUp(self):
+        self.cell_vec_aa = np.diag([1.0, 1.0, 1.0])
+
+    def tearDown(self):
+        pass
+
+    def test_crop(self):
+        n = 10
+        data = np.zeros((n, n, n))
+        data[3:7, 3:7, 3:7] = 1.0
+
+        sf = volume.ScalarField.from_data(data.copy(), self.cell_vec_aa)
+        sf.crop([(2, 8), (2, 8), (2, 8)], dims='xyz')
+
+        self.assertTupleEqual(sf.data.shape, (6, 6, 6))
+        self.assertTrue(np.allclose(sf.data, data[2:8, 2:8, 2:8]))
+        # --- origin shifts by the cropped-away lower bound
+        self.assertTrue(np.allclose(sf.origin_aa, [2., 2., 2.]))
+
+    def test_auto_crop(self):
+        n = 10
+        data = np.zeros((n, n, n))
+        data[3:7, 3:7, 3:7] = 1.0
+
+        sf = volume.ScalarField.from_data(data.copy(), self.cell_vec_aa)
+        _r = sf.auto_crop(thresh=0.5, dry_run=True)
+        self.assertEqual(_r, ((3, 6), (3, 6), (3, 6)))
+
+        # --- data unaffected by dry_run
+        self.assertTupleEqual(sf.data.shape, (n, n, n))
+
+        sf.auto_crop(thresh=0.5)
+        self.assertTupleEqual(sf.data.shape, (3, 3, 3))
+        self.assertTrue(np.all(sf.data > 0.5))
+
+    def test_normalise(self):
+        n = 6
+        data = np.full((n, n, n), 4.0)
+
+        # --- normalise by a constant float divides all grid points by it
+        sf = volume.ScalarField.from_data(data.copy(), self.cell_vec_aa)
+        sf.normalise(norm=2.0)
+        self.assertTrue(np.allclose(sf.data, 2.0))
+
+        # --- with no norm given, a VectorField is normalised to unit
+        #     vectors using np.linalg.norm along the given axis
+        vx = np.full((n, n, n), 3.0)
+        vy = np.zeros((n, n, n))
+        vz = np.zeros((n, n, n))
+        vf = volume.VectorField.from_data(np.array([vx, vy, vz]),
+                                          self.cell_vec_aa)
+        vf.normalise(axis=0)
+        self.assertTrue(np.allclose(vf.data[:, 0, 0, 0], [1., 0., 0.]))
+
+        # --- grid points where the norm is below threshold are set to
+        #     zero instead of causing a division by zero
+        sf_zero = volume.ScalarField.from_data(
+                np.full((n, n, n), 5.0), self.cell_vec_aa)
+        sf_zero.normalise(norm=0.0, thresh=1e-8)
+        self.assertTrue(np.allclose(sf_zero.data, 0.0))
+
+    def test_add_with_different_grids(self):
+        # --- add() interpolates the second field onto the first field's
+        #     grid, so grids of disparate resolution/spacing can be summed
+        data_a = np.zeros((10, 10, 10))
+        data_a[5, 5, 5] = 1.0
+        sf_a = volume.ScalarField.from_data(data_a, np.diag([1.0, 1.0, 1.0]))
+
+        data_b = np.ones((20, 20, 20)) * 0.1
+        sf_b = volume.ScalarField.from_data(data_b, np.diag([0.5, 0.5, 0.5]))
+
+        sf_sum = sf_a + sf_b
+        # --- keeps the grid/shape of the left-hand operand
+        self.assertTupleEqual(sf_sum.data.shape, data_a.shape)
+        self.assertAlmostEqual(sf_sum.data.min(), 0.1, places=6)
+        self.assertAlmostEqual(sf_sum.data.max(), 1.1, places=6)
+
+        # --- subtraction is the inverse operation
+        sf_diff = sf_sum - sf_b
+        self.assertTrue(np.allclose(sf_diff.data, sf_a.data, atol=1e-6))
+
+    def test_streamlines(self):
+        # --- uniform flow field along +x: a particle released anywhere
+        #     should be advected in a straight line along x only
+        n = 10
+        vx = np.ones((n, n, n))
+        vy = np.zeros((n, n, n))
+        vz = np.zeros((n, n, n))
+        vf = volume.VectorField.from_data(np.array([vx, vy, vz]),
+                                          self.cell_vec_aa)
+
+        start = np.array([[2.0, 5.0, 5.0]])
+        out = vf.streamlines(start, sparse=1, length=10, timestep_fs=50.0,
+                             forward=True, backward=False)
+
+        _path = out['streamlines'][:, 0, :3]
+        # --- x-coordinate increases monotonically
+        self.assertTrue(np.all(np.diff(_path[:, 0]) > 0))
+        # --- y/z stay fixed (flow is purely along x)
+        self.assertTrue(np.allclose(_path[:, 1], 5.0))
+        self.assertTrue(np.allclose(_path[:, 2], 5.0))
