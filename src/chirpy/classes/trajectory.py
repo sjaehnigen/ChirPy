@@ -1074,7 +1074,10 @@ class _XYZ():
             else:
                 algorithm = 'connectivity'
                 _loc.wrap_molecules(mask, weights=weights, algorithm=algorithm)
-                cowt_aa = _loc.mol_com_aa
+                if weights is None:
+                    cowt_aa = _loc.mol_cog_aa
+                else:
+                    cowt_aa = _loc.mol_com_aa
         else:
             if wrap:
                 _loc.wrap()

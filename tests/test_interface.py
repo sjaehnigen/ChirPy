@@ -35,7 +35,7 @@ import warnings
 import filecmp
 import copy
 
-from chirpy.interface import cpmd, tinker
+from chirpy.interface import cpmd, tinker, cp2k
 from chirpy import constants
 from chirpy.config import ChirPyWarning
 
@@ -206,3 +206,32 @@ class TestTinker(unittest.TestCase):
                         ('s_0881_broken.dip', 's_0881.magdip', 's_0881.ddip')],
                       columns='imddd'
                       )))
+
+
+class TestCP2K(unittest.TestCase):
+
+    def setUp(self):
+        self.dir = _test_dir + '/read_write'
+
+    def tearDown(self):
+        pass
+
+    def test_parse_restart_file(self):
+        _d = cp2k.parse_restart_file(self.dir + '/test.restart')
+
+        self.assertIsInstance(_d, dict)
+        self.assertIn('GLOBAL', _d)
+        self.assertIn('FORCE_EVAL', _d)
+        self.assertListEqual(_d['GLOBAL']['KEYWORDS'],
+                             ['PROJECT test', 'RUN_TYPE MD'])
+
+        # --- nested sections are parsed recursively
+        _subsys = _d['FORCE_EVAL']['SUBSYS']
+        self.assertIn('CELL', _subsys)
+        self.assertIn('COORD', _subsys)
+        self.assertListEqual(_subsys['CELL']['KEYWORDS'],
+                             ['A 10.0 0.0 0.0',
+                              'B 0.0 10.0 0.0',
+                              'C 0.0 0.0 10.0'])
+        self.assertListEqual(_subsys['COORD']['KEYWORDS'],
+                             ['O 0.0 0.0 0.0', 'H 1.0 0.0 0.0'])

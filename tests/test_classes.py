@@ -176,6 +176,34 @@ class TestTrajectory(unittest.TestCase):
                )
         os.remove(_out)
 
+    def test_center_of_weight_with_mask(self):
+        _fn = self.dir + '/two_waters.xyz'
+        masses = np.array([15.999, 1.008, 1.008])
+        pos0 = np.array([[0., 0., 0.],
+                         [0.958, 0., 0.],
+                         [-0.240, 0.927, 0.]])
+        ref_com0 = (pos0 * masses[:, None]).sum(axis=0) / masses.sum()
+        ref_cog0 = pos0.mean(axis=0)
+        mask = [0, 0, 0, 1, 1, 1]
+
+        traj = trajectory.XYZ(_fn)
+        traj.center_of_mass(mask=mask)
+        self.assertTupleEqual(traj.mol_com_aa.shape, (2, 3))
+        self.assertTrue(np.allclose(traj.mol_com_aa[0], ref_com0))
+
+        # --- center_of_geometry (unweighted) with mask+join_molecules
+        # (previously crashed with AttributeError, cf. _center_of_weight)
+        traj_g = trajectory.XYZ(_fn)
+        traj_g.center_of_geometry(mask=mask)
+        self.assertTupleEqual(traj_g.mol_cog_aa.shape, (2, 3))
+        self.assertTrue(np.allclose(traj_g.mol_cog_aa[0], ref_cog0))
+
+        # --- without molecule joining, cowt is computed directly (no
+        # wrap_molecules side effect required)
+        traj_nj = trajectory.XYZ(_fn)
+        traj_nj.center_of_mass(mask=mask, join_molecules=False)
+        self.assertTrue(np.allclose(traj_nj.mol_com_aa[0], ref_com0))
+
 
 class TestSystem(unittest.TestCase):
     # --- insufficiently tested
@@ -268,6 +296,48 @@ class TestSystem(unittest.TestCase):
                 _load.symbols,
                 'system sort inconsistent'
                 )
+
+    def test_repeat(self):
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore', category=ChirPyWarning)
+            _load = system.Supercell(self.dir + '/input_sort.xyz', sort=False)
+
+        n_atoms = len(_load.XYZ.symbols)
+        _load.repeat(2)
+
+        # --- 2x2x2 = 8 -fold duplication of atoms and symbols
+        self.assertEqual(len(_load.XYZ.symbols), 8 * n_atoms)
+        self.assertEqual(len(_load.symbols), 8 * n_atoms)
+        self.assertTupleEqual(_load.XYZ.pos_aa.shape, (8 * n_atoms, 3))
+
+        # --- non-cubic repeat: only duplicate along x (fresh instance,
+        # since system._copy() is a shallow [BETA] copy not suited for
+        # independent mutation of the same loaded system)
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore', category=ChirPyWarning)
+            _load_x = system.Supercell(self.dir + '/input_sort.xyz',
+                                       sort=False)
+        _load_x.repeat((2, 1, 1))
+        self.assertEqual(len(_load_x.XYZ.symbols), 2 * n_atoms)
+
+    def test_add(self):
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore', category=ChirPyWarning)
+            _load1 = system.Supercell(self.dir + '/input_sort.xyz',
+                                      sort=False)
+            _load2 = system.Supercell(self.dir + '/input_sort.xyz',
+                                      sort=False)
+
+        n_atoms = len(_load1.XYZ.symbols)
+        _added = _load1 + _load2
+
+        self.assertEqual(len(_added.symbols), 2 * n_atoms)
+        self.assertTupleEqual(_added.symbols[:n_atoms], _load1.symbols)
+        self.assertTupleEqual(_added.symbols[n_atoms:], _load2.symbols)
+        self.assertTrue(np.allclose(_added.XYZ.pos_aa[:n_atoms],
+                                    _load1.XYZ.pos_aa))
+        self.assertTrue(np.allclose(_added.XYZ.pos_aa[n_atoms:],
+                                    _load2.XYZ.pos_aa))
 
 
 class TestQuantum(unittest.TestCase):

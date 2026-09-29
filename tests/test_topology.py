@@ -34,7 +34,7 @@ import numpy as np
 from functools import partial
 from itertools import product
 
-from chirpy.topology import mapping, dissection, motion, grid  # , distribution
+from chirpy.topology import mapping, dissection, motion, grid, distribution
 from chirpy.read import coordinates
 from chirpy import constants
 
@@ -584,7 +584,26 @@ class TestDistribution(unittest.TestCase):
     def tearDown(self):
         pass
 
-    # rdf
+    def test_radial_distribution_function(self):
+        # --- a spatially uniform ("ideal gas") distribution of particles
+        # has a flat RDF equal to 1 (no structure)
+        np.random.seed(42)
+        n_frames = 5
+        n_particles = 2000
+        length = 20.0
+        cell = np.array([length, length, length, 90., 90., 90.])
+
+        positions = np.random.uniform(0, length,
+                                      size=(n_frames, n_particles, 3))
+        origins = np.random.uniform(0, length, size=(n_frames, 1, 3))
+
+        r, rdf = distribution.radial_distribution_function(
+                positions, origins, cell=cell, rng=(0.5, 8.0), bins=40)
+
+        self.assertTupleEqual(r.shape, (40,))
+        self.assertTupleEqual(rdf.shape, (40,))
+        # --- averaged over many bins/frames, RDF should fluctuate around 1
+        self.assertAlmostEqual(rdf.mean(), 1.0, delta=0.1)
 
 
 class TestMotion(unittest.TestCase):
