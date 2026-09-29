@@ -29,7 +29,7 @@
 #
 # ----------------------------------------------------------------------
 
-'''Convert and process trajectory data.'''
+"""Convert and process trajectory data."""
 
 import sys
 import argparse
@@ -41,7 +41,7 @@ from chirpy import config
 
 
 def main():
-    '''Convert and process trajectory'''
+    """Convert and process trajectory"""
     parser = argparse.ArgumentParser(
             description="Convert and process trajectory",
             formatter_class=argparse.ArgumentDefaultsHelpFormatter

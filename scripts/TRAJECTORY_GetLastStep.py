@@ -29,7 +29,7 @@
 #
 # ----------------------------------------------------------------------
 
-'''Extract the last frame from a trajectory.'''
+"""Extract the last frame from a trajectory."""
 
 
 import argparse
@@ -39,12 +39,12 @@ from chirpy.classes import system
 
 
 def create_name(F):
-    '''Return the default output name for the last frame.'''
+    """Return the default output name for the last frame."""
     return F.split('.')[0] + '_last_step' + '.xyz'
 
 
 def main():
-    '''Extract last frame from a trajectory.'''
+    """Extract last frame from a trajectory."""
     parser = argparse.ArgumentParser(
             description="Extract last frame from a trajectory.",
             formatter_class=argparse.ArgumentDefaultsHelpFormatter

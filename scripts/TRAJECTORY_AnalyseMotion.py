@@ -29,7 +29,7 @@
 #
 # ----------------------------------------------------------------------
 
-'''Analyse atomic motion in a trajectory and plot the results.'''
+"""Analyse atomic motion in a trajectory and plot the results."""
 
 import argparse
 import numpy as np
@@ -42,7 +42,7 @@ from chirpy import constants
 
 
 def main():
-    '''Analyse atomic motion in a trajectory and plot the results.'''
+    """Analyse atomic motion in a trajectory and plot the results."""
     parser = argparse.ArgumentParser(
          description="Analyse motion of atoms in trajectory and plot results.",
          formatter_class=argparse.ArgumentDefaultsHelpFormatter
@@ -105,7 +105,7 @@ def main():
     _w = _load.XYZ.masses_amu * constants.m_amu_au
 
     def get_p_and_v():
-        '''Yield positions and velocities for each trajectory frame.'''
+        """Yield positions and velocities for each trajectory frame."""
         try:
             while True:
                 next(_load.XYZ)
@@ -119,7 +119,7 @@ def main():
     subset = largs.get('subset', slice(None))
 
     def get_results():
-        '''Yield centre of mass, linear/angular momenta per frame.'''
+        """Yield centre of mass, linear/angular momenta per frame."""
         _it = get_p_and_v()
         try:
             while True:

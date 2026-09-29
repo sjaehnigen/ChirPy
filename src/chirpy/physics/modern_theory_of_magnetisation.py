@@ -29,7 +29,7 @@
 # ----------------------------------------------------------------------
 
 
-'''Utilities for modern-theory-of-magnetisation response terms.'''
+"""Utilities for modern-theory-of-magnetisation response terms."""
 
 
 import numpy as np
@@ -43,7 +43,7 @@ eijk[0, 2, 1] = eijk[2, 1, 0] = eijk[1, 0, 2] = -1
 
 
 def calculate_mic(e0, r1_pert, sw_c, n_states, r_wc_aa, box_vec_aa):
-    '''Return rotational and translational MIC contributions.'''
+    """Return rotational and translational MIC contributions."""
     sw_m_ic_r = calculate_mic_rotation(e0, r1_pert, n_states, r_wc_aa, box_vec_aa)
     sw_m_ic_t = calculate_mic_translation(sw_c, n_states, r_wc_aa, box_vec_aa)
 
@@ -51,7 +51,7 @@ def calculate_mic(e0, r1_pert, sw_c, n_states, r_wc_aa, box_vec_aa):
 
 
 def calculate_mic_rotation(e0, r1_pert, n_states, r_wc_aa, box_vec_aa):
-    '''Return the rotational MIC contribution between states.'''
+    """Return the rotational MIC contribution between states."""
     # case 0 if states interact within box (M_LC), +1 if state in column is
     # considered +R with respect to state in line, et VV.
     case = np.abs(r_wc_aa[:, None, :] - r_wc_aa[:, :])
@@ -78,7 +78,7 @@ def calculate_mic_rotation(e0, r1_pert, n_states, r_wc_aa, box_vec_aa):
 
 
 def calculate_mic_translation(sw_p_pert, n_states, r_wc_aa, box_vec_aa):
-    '''Return the translational MIC contribution between states.'''
+    """Return the translational MIC contribution between states."""
     sw_m_ic_t = np.zeros((n_states, 3))
     t = sw_p_pert
 #    for m in range(3):

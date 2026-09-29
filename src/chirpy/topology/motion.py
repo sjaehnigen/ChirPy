@@ -29,7 +29,7 @@
 # ----------------------------------------------------------------------
 
 
-'''Topology-based analyses of linear, angular, and hydrogen-bond motion.'''
+"""Topology-based analyses of linear, angular, and hydrogen-bond motion."""
 
 
 import numpy as np
@@ -40,9 +40,9 @@ from .mapping import ishydrogenbond
 
 
 def linear_momenta(velocities, wt, subset=slice(None), axis=-2):
-    '''sum(velocities * wt)
+    """sum(velocities * wt)
        Use subset= to select atoms
-       '''
+       """
     _wt = np.array(wt)[subset]
     _v = np.moveaxis(velocities, axis, 0)[subset]
     # _slc = (_sub,) + (len(_v.shape)-1) * (None,)
@@ -56,9 +56,9 @@ def linear_momenta(velocities, wt, subset=slice(None), axis=-2):
 
 def angular_momenta(positions, velocities, wt, subset=slice(None), axis=-2,
                     origin=np.zeros((3)), moI=False):
-    '''sum(positions x velocities * wt)
+    """sum(positions x velocities * wt)
        Use subset= to select atoms
-       '''
+       """
     _wt = np.array(wt)[subset]
     _p = np.moveaxis(positions, axis, 0)[subset] - origin
     _v = np.moveaxis(velocities, axis, 0)[subset]
@@ -87,7 +87,7 @@ def _func0(p,
            angle_crit,
            cell,
            ):
-    '''Evaluate hydrogen-bond presence for one frame.'''
+    """Evaluate hydrogen-bond presence for one frame."""
 
     return ishydrogenbond(
                     p,
@@ -101,11 +101,11 @@ def _func0(p,
 
 
 def _cumulate_hydrogen_bonding_events(_H):
-    '''Split timeline into individual HB events and move them to t=0
+    """Split timeline into individual HB events and move them to t=0
        (zero padding).
 
        min_length:       minimum period in frames to count HB connection
-       '''
+       """
     n_frames = _H.shape[0]
     _diff = np.diff(_H, axis=0, prepend=0)
     _edges = np.argwhere(_diff == 1).flatten()
@@ -119,7 +119,7 @@ def _cumulate_hydrogen_bonding_events(_H):
 
 
 def _acf_c(h):
-    '''Return the continuous hydrogen-bond autocorrelation function.'''
+    """Return the continuous hydrogen-bond autocorrelation function."""
     segments = _cumulate_hydrogen_bonding_events(h)
     if len(segments) == 0:
         return np.zeros_like(h)
@@ -130,7 +130,7 @@ def _acf_c(h):
 
 
 def _acf_i(h):
-    '''Return the intermittent hydrogen-bond autocorrelation function.'''
+    """Return the intermittent hydrogen-bond autocorrelation function."""
     B = tcf(h, mode='A')
     return B / B[0]
 
@@ -141,7 +141,7 @@ def hydrogen_bond_lifetime_analysis(positions, donor, acceptor, hydrogen,
                                     cell=None,
                                     mode='intermittent',
                                     no_average=False):
-    '''Compute auto-correlation function of hydrogen bond occurrence between
+    """Compute auto-correlation function of hydrogen bond occurrence between
        donor and acceptor (heavy atoms).
 
        positions:        position array of shape (n_frames, n_atoms, 3)
@@ -157,7 +157,7 @@ def hydrogen_bond_lifetime_analysis(positions, donor, acceptor, hydrogen,
        time correlation function (numpy array) averaged over all HB pairs
        found in the donor-acceptor-hydrogen pool (no_average=True: resolve
        individual pairs with shape (n_donors, n_acceptors)).
-       '''
+       """
 
     # --- generate HB occurence trajectory (parallel run)
     # H = PALARRAY(_func0, positions).run()

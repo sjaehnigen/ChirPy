@@ -28,7 +28,7 @@
 #
 # ----------------------------------------------------------------------
 
-'''Mathematical utilities: vector/matrix algebra and time-series analysis.'''
+"""Mathematical utilities: vector/matrix algebra and time-series analysis."""
 
 from . import analysis
 from . import algebra

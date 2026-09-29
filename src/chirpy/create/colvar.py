@@ -28,7 +28,7 @@
 #
 # ----------------------------------------------------------------------
 
-'''Collective variables and internal-coordinate helpers.'''
+"""Collective variables and internal-coordinate helpers."""
 
 import numpy as _np
 # import copy as _copy
@@ -41,39 +41,39 @@ from ..mathematics.algebra import cross, dot, angle
 
 
 class _COLVAR(_CORE):
-    '''Base class for collective variables.'''
+    """Base class for collective variables."""
 
     def __repr__(self):
-        '''Return the variable label.'''
+        """Return the variable label."""
         return self.label
 
     def __mul__(self, other):
-        '''Scale the collective variable by a number.'''
+        """Scale the collective variable by a number."""
         if not isinstance(other, (int, float, complex)):
             raise TypeError('unsupported operand type(s) for *: '
                             f'{type(other).__name__}')
         return Combination([self], weights=[other])
 
     def __add__(self, other):
-        '''Combine two collective variables with unit weights.'''
+        """Combine two collective variables with unit weights."""
         self._isinstance(other, info='*')
         return Combination([self, other], weights=(1., 1.))
 
     def __sub__(self, other):
-        '''Subtract one collective variable from another.'''
+        """Subtract one collective variable from another."""
         self._isinstance(other, info='*')
         return Combination([self, other], weights=(1., -1.))
 
     @staticmethod
     def _isinstance(item, info='operation'):
-        '''Check whether item is a collective variable.'''
+        """Check whether item is a collective variable."""
         if not item.__class__.__mro__[1].__name__ == '_COLVAR':
             # if not isinstance(item, _COLVAR):
             raise TypeError('unsupported type(s) for {info}: '
                             f'{type(item).__name__}')
 
     def value(self, configuration, cell=None):
-        '''Evaluate collective variable for given configuration.
+        """Evaluate collective variable for given configuration.
 
            arguments:
                configuration ... input positions,
@@ -83,12 +83,12 @@ class _COLVAR(_CORE):
 
            returns:
                colvar value or array shape (n_frames,)
-           '''
+           """
 
         return self._eval(configuration, cell=cell)
 
     def derivative(self,  configuration, cell=None):
-        '''Evaluate collective variable derivative with respect to
+        """Evaluate collective variable derivative with respect to
            atomic displacements in the given configuration.
 
            arguments:
@@ -99,21 +99,21 @@ class _COLVAR(_CORE):
 
            returns:
                colvar derivative, array of shape ([n_frames], n_atoms, 3)
-           '''
+           """
 
         return self._eval_der(configuration, cell=cell)
 
 
 class Bond(_COLVAR):
-    '''i0 --> i1'''
+    """i0 --> i1"""
     def __init__(self, i0, i1):
-        '''Define a bond distance between two atoms.'''
+        """Define a bond distance between two atoms."""
         self.label = f'{self.__class__.__name__}({i0}, {i1})'
         self.i0 = i0
         self.i1 = i1
 
     def _eval(self, configuration, cell=None):
-        '''Return the bond length.'''
+        """Return the bond length."""
         vector = vector_pbc(
                 configuration[..., self.i0, :],
                 configuration[..., self.i1, :],
@@ -123,7 +123,7 @@ class Bond(_COLVAR):
         return norm
 
     def _eval_der(self, configuration, cell=None):
-        '''Return the bond-length derivative.'''
+        """Return the bond-length derivative."""
         vector = vector_pbc(
                 configuration[..., self.i0, :],
                 configuration[..., self.i1, :],
@@ -139,16 +139,16 @@ class Bond(_COLVAR):
 
 
 class Angle(_COLVAR):
-    '''i0 <-- i1 --> i2'''
+    """i0 <-- i1 --> i2"""
     def __init__(self, i0, i1, i2):
-        '''Define a bond angle for three atoms.'''
+        """Define a bond angle for three atoms."""
         self.label = f'{self.__class__.__name__}({i0}, {i1}, {i2})'
         self.i0 = i0
         self.i1 = i1
         self.i2 = i2
 
     def _eval(self, configuration, cell=None):
-        '''Return the bond angle.'''
+        """Return the bond angle."""
         angle = angle_pbc(
                 configuration[..., self.i0, :],
                 configuration[..., self.i1, :],
@@ -158,7 +158,7 @@ class Angle(_COLVAR):
         return angle
 
     def _eval_der(self, configuration, cell=None):
-        '''Return the bond-angle derivative.'''
+        """Return the bond-angle derivative."""
         vector0 = vector_pbc(
                 configuration[..., self.i1, :],
                 configuration[..., self.i0, :],
@@ -192,9 +192,9 @@ class Angle(_COLVAR):
 
 
 class Dihedral(_COLVAR):
-    '''i0 <-- i1 --> i2 --> i3'''
+    """i0 <-- i1 --> i2 --> i3"""
     def __init__(self, i0, i1, i2, i3):
-        '''Define a dihedral angle for four atoms.'''
+        """Define a dihedral angle for four atoms."""
         self.label = f'{self.__class__.__name__}({i0}, {i1}, {i2}, {i3})'
         self.i0 = i0
         self.i1 = i1
@@ -202,7 +202,7 @@ class Dihedral(_COLVAR):
         self.i3 = i3
 
     def _eval(self, configuration, cell=None):
-        '''Return the dihedral angle.'''
+        """Return the dihedral angle."""
         dihedral = dihedral_pbc(
                 configuration[..., self.i0, :],
                 configuration[..., self.i1, :],
@@ -213,7 +213,7 @@ class Dihedral(_COLVAR):
         return dihedral
 
     def _eval_der(self, configuration, cell=None):
-        '''Return the dihedral-angle derivative.'''
+        """Return the dihedral-angle derivative."""
         # see also: https://salilab.org/modeller/9v6/manual/node436.html
         vector0 = vector_pbc(
                 configuration[..., self.i1, :],
@@ -256,13 +256,13 @@ class Dihedral(_COLVAR):
 
 
 class Outplane(_COLVAR):
-    '''
+    """
     i0 <-- i3 --> i2
            ¦
            V
-           i1'''
+           i1"""
     def __init__(self, i0, i1, i2, i3):
-        '''Define an out-of-plane angle for four atoms.'''
+        """Define an out-of-plane angle for four atoms."""
         self.label = f'{self.__class__.__name__}({i0}, {i1}, {i2}, {i3})'
         self.i0 = i0
         self.i1 = i1
@@ -270,7 +270,7 @@ class Outplane(_COLVAR):
         self.i3 = i3
 
     def _eval(self, configuration, cell=None):
-        '''Return the out-of-plane angle.'''
+        """Return the out-of-plane angle."""
         vector0 = vector_pbc(
                 configuration[..., self.i3, :],
                 configuration[..., self.i0, :],
@@ -303,7 +303,7 @@ class Outplane(_COLVAR):
         return _np.arcsin(scalar)
 
     def _eval_der(self, configuration, cell=None):
-        '''Return the out-of-plane derivative.'''
+        """Return the out-of-plane derivative."""
         vector0 = vector_pbc(
                 configuration[..., self.i3, :],
                 configuration[..., self.i0, :],
@@ -360,29 +360,29 @@ class Outplane(_COLVAR):
 
 
 class Coord(_COLVAR):
-    '''i0 along axis'''
+    """i0 along axis"""
     def __init__(self, i0, axis):
-        '''Define one Cartesian coordinate of an atom.'''
+        """Define one Cartesian coordinate of an atom."""
         self.label = f'{self.__class__.__name__}({i0}[{axis}])'
         self.i0 = i0
         self.axis = axis
 
     def _eval(self, configuration, cell=None):
-        '''Return the selected Cartesian coordinate.'''
+        """Return the selected Cartesian coordinate."""
         return configuration[..., self.i0, self.axis]
 
     def _eval_der(self, configuration, cell=None):
-        '''Return the coordinate derivative.'''
+        """Return the coordinate derivative."""
         derivative = _np.zeros_like(configuration)
         derivative[..., self.i0, self.axis] = 1.0
         return derivative
 
 
 class Combination(_COLVAR):
-    '''Collective variable as linear combination of other collective
-       variables with optional weights'''
+    """Collective variable as linear combination of other collective
+       variables with optional weights"""
     def __init__(self, colvar_array, weights=None, label=None):
-        '''Build a linear combination of collective variables.'''
+        """Build a linear combination of collective variables."""
         n_colvars = len(colvar_array)
         if weights is None:
             weights = n_colvars * (1.,)
@@ -392,7 +392,7 @@ class Combination(_COLVAR):
         self._clean()
 
     def _clean(self):
-        '''Flatten nested combinations and rebuild the label.'''
+        """Flatten nested combinations and rebuild the label."""
         colvar_array = ()
         weights = ()
         for _c, _w in zip(self.colvar_array, self.weights):
@@ -410,54 +410,54 @@ class Combination(_COLVAR):
         self.weights = weights
 
     def _eval(self, configuration, cell=None):
-        '''Return the weighted sum of values.'''
+        """Return the weighted sum of values."""
         return _np.sum([_w * _c._eval(configuration, cell=None)
                         for _c, _w in zip(self.colvar_array, self.weights)],
                        axis=0)
 
     def _eval_der(self, configuration, cell=None):
-        '''Return the weighted sum of derivatives.'''
+        """Return the weighted sum of derivatives."""
         return _np.sum([_w * _c._eval_der(configuration, cell=None)
                         for _c, _w in zip(self.colvar_array, self.weights)],
                        axis=0)
 
 
 class InternalCoordinates(list):
-    '''List of collective variables used as internal coordinates.'''
+    """List of collective variables used as internal coordinates."""
 
     def __init__(self, items, *args):
-        '''Initialise the internal-coordinate list.'''
+        """Initialise the internal-coordinate list."""
         [_COLVAR._isinstance(_a, info='InternalCoordinates') for _a in items]
         super().__init__(items, *args)
 
     def __repr__(self):
-        '''Return the list representation.'''
+        """Return the list representation."""
         return 'InternalCoordinates: ' \
                 + super().__repr__()
 
     def __setitem__(self, index, value):
-        '''Replace one coordinate after type checking.'''
+        """Replace one coordinate after type checking."""
         _COLVAR._isinstance(value, info='InternalCoordinates')
         super().__setitem__(index, value)
 
     def __add__(self, other, *args):
-        '''Append another iterable of collective variables.'''
+        """Append another iterable of collective variables."""
         [_COLVAR._isinstance(_a, info='InternalCoordinates') for _a in other]
         super().__iadd__(other, *args)
         return self
 
     def append(self, value):
-        '''Append one collective variable.'''
+        """Append one collective variable."""
         _COLVAR._isinstance(value, info='InternalCoordinates')
         super().append(value)
 
     def extend(self, items, *args):
-        '''Extend with collective variables after type checking.'''
+        """Extend with collective variables after type checking."""
         [_COLVAR._isinstance(_a, info='InternalCoordinates') for _a in items]
         super().extend(items, *args)
 
     def convert(self, positions, cell=None):
-        '''Convert Cartesian data into Internal Coordinates.
+        """Convert Cartesian data into Internal Coordinates.
 
            arguments:
                positions ... Cartesian positions,
@@ -467,14 +467,14 @@ class InternalCoordinates(list):
 
            returns:
                data array shape ([n_frames,], n_colvars)
-            '''
+            """
 
         data = _np.array([_colvar.value(positions, cell=cell)
                           for _colvar in self])
         return data.T
 
     def Bmatrix_test(self, positions, cell=None):
-        '''Return Jacobi matrix of the derivatives of all collective variables
+        """Return Jacobi matrix of the derivatives of all collective variables
            with respect to the Cartesian degrees of freedom given in
            configuration.
 
@@ -485,7 +485,7 @@ class InternalCoordinates(list):
                         (optional)
            returns:
                array of shape ([n_frames,], n_colvars, n_atoms*3)
-            '''
+            """
 
         n_atoms, three = positions.shape[-2:]
         n_colvars = len(self)

@@ -28,7 +28,7 @@
 #
 # ----------------------------------------------------------------------
 
-'''Helpers for transforming electromagnetic moment data.'''
+"""Helpers for transforming electromagnetic moment data."""
 
 import numpy as _np
 import copy as _copy
@@ -40,13 +40,13 @@ from .. import constants
 
 
 class OriginGauge(_CORE):
-    '''Object that processes moment trajectories from classes and
+    """Object that processes moment trajectories from classes and
        converts between origin gauges.
 
        Data are numpy arrays of shape ([n_frames], n_units, dim).
 
        All data is in atomic units (position input in angstrom).
-       '''
+       """
     def __init__(self,
                  origin_aa=None,
                  current_dipole_au=None,
@@ -55,7 +55,7 @@ class OriginGauge(_CORE):
                  charge_au=None,
                  cell_aa_deg=None,
                  ):
-        '''Initialise the moment set and gauge metadata.'''
+        """Initialise the moment set and gauge metadata."""
 
         # --- parse moments
         self.c_au = _copy.deepcopy(current_dipole_au)
@@ -102,7 +102,7 @@ class OriginGauge(_CORE):
             self.cell_au_deg[:3] *= constants.l_aa2au
 
     def __add__(self, other):
-        '''Concatenate two origin-gauge data sets.'''
+        """Concatenate two origin-gauge data sets."""
         # if not _np.allclose(self.cell_au_deg, other.cell_au_deg):
         #     raise ValueError('the objects do not agree in cell')
         new = _copy.deepcopy(self)
@@ -118,16 +118,16 @@ class OriginGauge(_CORE):
 
     @staticmethod
     def time_derivative(data, dt=1.):
-        '''data array of shape (n_frames, [n_units, 3])'''
+        """data array of shape (n_frames, [n_units, 3])"""
         return _np.gradient(data, axis=0) / dt
 
     def shift_origin_gauge(self, origins_aa, assignment=None,
                            number_of_types=None):
-        '''Shift the moments to a new set of origins.
+        """Shift the moments to a new set of origins.
 
            origins_aa is given in angstrom with shape ([n_frames], n_origins, 3).
            assignment maps units to origins when their counts differ.
-           '''
+           """
 
         if len(origins_aa.shape) < 2:
             raise ValueError('origins_aa must have at least two dimensions')

@@ -28,7 +28,7 @@
 #
 # ----------------------------------------------------------------------
 
-'''Tools for building boxes, crystals, and simple solution models.'''
+"""Tools for building boxes, crystals, and simple solution models."""
 
 import os as _os
 import copy as _copy
@@ -49,7 +49,7 @@ from ..config import ChirPyWarning as _ChirPyWarning
 
 
 class _BoxObject(_CORE):
-    '''Base class for collections of molecules in a simulation box.'''
+    """Base class for collections of molecules in a simulation box."""
 
     # --- DEV log
     # volume is determined by _cell_vec_aa() / cell_vec_aa()
@@ -61,7 +61,7 @@ class _BoxObject(_CORE):
     # --- END
 
     def __init__(self, *args, **kwargs):
-        '''Initialise the box from members or an input structure.'''
+        """Initialise the box from members or an input structure."""
         self.members = kwargs.get("members", [])
         self.member_set = kwargs.get("members", [])
         self.origin_aa = kwargs.get('origin_aa', _np.zeros((3)).astype(float))
@@ -77,7 +77,7 @@ class _BoxObject(_CORE):
 
     @classmethod
     def read(cls, *args, **kwargs):
-        '''Read a structure and convert it into box members.'''
+        """Read a structure and convert it into box members."""
         if kwargs.get('define_molecules') is not None:
             kwargs['wrap_molecules'] = True
         else:
@@ -102,11 +102,11 @@ class _BoxObject(_CORE):
                        **nargs)
 
     def _cell_vec_aa(self, **kwargs):
-        '''Return cell vectors in angstrom.'''
+        """Return cell vectors in angstrom."""
         return _cell_vec(self.cell_aa_deg)
 
     def _cell_aa_deg(self):
-        '''Return cell lengths and angles in angstrom and degrees.'''
+        """Return cell lengths and angles in angstrom and degrees."""
         if hasattr(self, 'cell_aa_deg'):
             if _get_symmetry(self.cell_aa_deg) not in [
                     None, 'void']:
@@ -115,12 +115,12 @@ class _BoxObject(_CORE):
             return _get_cell_aa_deg(self.cell_vec_aa)
 
     def _volume_aa3(self):
-        '''Return the box volume in cubic angstrom.'''
+        """Return the box volume in cubic angstrom."""
         return _np.dot(self.cell_vec_aa[0],
                        _np.cross(self.cell_vec_aa[1], self.cell_vec_aa[2]))
 
     def _sync_class(self):
-        '''Calculates intensive properties only'''
+        """Calculates intensive properties only"""
         self.n_members = len(self.members)
         self.mass_amu = sum([_n * sum(_m.masses_amu)
                              for _n, _m in self.member_set])
@@ -134,7 +134,7 @@ class _BoxObject(_CORE):
     # def routine: check all xx attributes against _xx() methods
 
     def split_members(self):
-        '''Split composite members into separate molecular entries.'''
+        """Split composite members into separate molecular entries."""
         new_members = []
         for _ii, (_i, _m) in enumerate(self.members):
             mol_map = tuple(_define_molecules(
@@ -149,7 +149,7 @@ class _BoxObject(_CORE):
         self._clean_members()
 
     def _clean_members(self):
-        '''Merge equivalent members into the member set.'''
+        """Merge equivalent members into the member set."""
         if self.n_members == 0:
             return None
         _eq = _np.zeros((self.n_members,) * 2)
@@ -181,7 +181,7 @@ class _BoxObject(_CORE):
         self._sync_class()
 
     def __add__(self, other):
-        '''Combine members of different systems'''
+        """Combine members of different systems"""
         if not isinstance(other, _BoxObject):
             raise TypeError('unsupported operand type(s) for +: '
                             '\'%s\' and \'%s\''
@@ -198,7 +198,7 @@ class _BoxObject(_CORE):
         # Later: choose largest cell param and lowest symmetry
 
     def __mul__(self, other):
-        '''Multiply system keeping box size constant'''
+        """Multiply system keeping box size constant"""
         new = _copy.deepcopy(self)
         if isinstance(other, int):
             for _i in range(other-1):
@@ -211,7 +211,7 @@ class _BoxObject(_CORE):
         return new
 
     def __pow__(self, other):
-        '''Multiply system and scale box accordingly'''
+        """Multiply system and scale box accordingly"""
         _warnings.warn('pow() in beta state. Proceed with care!',
                        _ChirPyWarning,
                        stacklevel=2)
@@ -231,7 +231,7 @@ class _BoxObject(_CORE):
         return new
 
     def _mol_map(self):
-        '''Return the molecule map for the current member set.'''
+        """Return the molecule map for the current member set."""
         _imol = 0
         mol_map = []
         for _m in self.member_set:
@@ -241,7 +241,7 @@ class _BoxObject(_CORE):
         return _np.array(mol_map)
 
     def print_info(self) -> None:
-        '''Print a short summary of the box contents.'''
+        """Print a short summary of the box contents."""
         # ToDo: use self._print_info = [print_info.XXX]
         print_info.print_header(self)
         print('%-12s %s' % ('Periodic', self.pbc))
@@ -259,13 +259,13 @@ class _BoxObject(_CORE):
         print(77 * '–')
 
     def create(self, **kwargs):
-        '''Create a system object from the stored members.'''
+        """Create a system object from the stored members."""
         # most important class (must not be adapted within derived classes)
         # work in progress... # creates a system object (Supercell)
         pass
 
     def write(self, fn, **kwargs):
-        '''Create and write the box structure to file.'''
+        """Create and write the box structure to file."""
         wrap_molecules = kwargs.pop("wrap_molecules", False)
         _SC = self.create(**kwargs)
         _SC.wrap()
@@ -276,10 +276,10 @@ class _BoxObject(_CORE):
 
 
 class MolecularCrystal(_BoxObject):
-    '''Periodic crystal assembled from molecular members.'''
+    """Periodic crystal assembled from molecular members."""
 
     def _sync_class(self):
-        '''Validate crystal cell data and update properties.'''
+        """Validate crystal cell data and update properties."""
         if _np.any(self.cell_aa_deg == 0.) or self.cell_aa_deg is None:
             raise ValueError('%s requires valid cell dimensions!'
                              % self.__class__.__name__)
@@ -288,7 +288,7 @@ class MolecularCrystal(_BoxObject):
         _BoxObject._sync_class(self)
 
     def propagate(self, frame, multiply=(1, 1, 1), priority=(0, 1, 2)):
-        '''Convolute FRAME object with unitcell.'''
+        """Convolute FRAME object with unitcell."""
         frame.cell_aa_deg = self.cell_aa_deg
         frame.repeat(multiply, priority=priority)
         self.cell_aa_deg = frame.cell_aa_deg
@@ -296,7 +296,7 @@ class MolecularCrystal(_BoxObject):
         return frame
 
     def create(self, verbose=True, **kwargs):
-        '''Build the crystal structure from the stored members.'''
+        """Build the crystal structure from the stored members."""
         _SC = self.members[0][1]
         _SC._axis_pointer = -2
         # _mol = 0
@@ -335,10 +335,10 @@ _solvents = {}
 
 
 class Solution(_BoxObject):
-    '''Box model for a molecular solution of solutes in a solvent.'''
+    """Box model for a molecular solution of solutes in a solvent."""
 
     def __init__(self, *args, **kwargs):
-        '''Initialise the solution composition and intensive properties.'''
+        """Initialise the solution composition and intensive properties."""
         self.solvent = kwargs.get("solvent")
         self.rho_g_cm3 = kwargs.get("rho_g_cm3", 1.0)
         self.solutes = kwargs.get("solutes", [])
@@ -377,7 +377,7 @@ class Solution(_BoxObject):
         _n = (self.c_mol_L + [_c_slv_mol_L]) / _c_min_mol_L
 
         def _dev_warning(_d, _id):
-            '''Warn if the relative deviation _d for member _id exceeds 1%.'''
+            """Warn if the relative deviation _d for member _id exceeds 1%."""
             with _warnings.catch_warnings():
                 if _d > 0.01:
                     _warnings.warn('Member counts differ from input value by '
@@ -410,7 +410,7 @@ class Solution(_BoxObject):
 
     @classmethod
     def read(cls, fn, **kwargs):
-        '''Read a solution-like box from file.'''
+        """Read a solution-like box from file."""
         _tmp = _BoxObject.read(fn, **kwargs)
         _out = cls.__new__(cls)
         for _key in _tmp.__dict__:
@@ -419,7 +419,7 @@ class Solution(_BoxObject):
         return _out
 
     def _cell_vec_aa(self, **kwargs):
-        '''Return the orthorhombic box vectors from the target density.'''
+        """Return the orthorhombic box vectors from the target density."""
         # ToDo: what to do if cell_aa argument given here?
         # ==> check if total volume is the same;
         # if yes use the given cell values, otherwise raise Exception
@@ -429,33 +429,33 @@ class Solution(_BoxObject):
                                  (constants.avog * 1E-24)) ** (1/3)])
 
     def _c_mol_L(self):
-        '''Return component concentrations in mol/L.'''
+        """Return component concentrations in mol/L."""
         return [_m[0] / (constants.avog * 1E-27) / self.volume_aa3
                 for _m in self.member_set]
 
     def _rho_g_cm3(self):
-        '''Return the mass density in g/cm³.'''
+        """Return the mass density in g/cm³."""
         return self.mass_amu / (constants.avog * 1E-24) / self.volume_aa3
 
     def _sync_class(self):
-        '''Update derived solution properties.'''
+        """Update derived solution properties."""
         _BoxObject._sync_class(self)
         self.c_mol_L = self._c_mol_L()
         self.rho_g_cm3 = self._rho_g_cm3()
 
     def print_info(self):
-        '''Print a short summary of the solution composition.'''
+        """Print a short summary of the solution composition."""
         _BoxObject.print_info(self)
         print('%12.4f g / cm³' % self.rho_g_cm3)
         print('\n'.join(map('{:12.4f} mol / L'.format, self.c_mol_L)))
 
     def create(self, **kwargs):
-        '''Create a packed solution box.'''
+        """Create a packed solution box."""
         return self._fill_box(**kwargs)
 
     def _fill_box(self, verbose=False, sort_atoms=False, write_pdb=True):
-        '''requires packmol
-           sort_atoms ... sort atoms alphabetically (False: sorted by resid)'''
+        """requires packmol
+           sort_atoms ... sort atoms alphabetically (False: sorted by resid)"""
         # --- calculate packmol box
         _box_aa = _np.concatenate((self.origin_aa, _np.dot(_np.ones((3)),
                                   self.cell_vec_aa)))

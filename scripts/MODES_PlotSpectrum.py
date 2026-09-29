@@ -29,7 +29,7 @@
 #
 # ----------------------------------------------------------------------
 
-'''Plot IR or VCD spectra from vibrational mode files.'''
+"""Plot IR or VCD spectra from vibrational mode files."""
 
 import argparse
 import numpy as np
@@ -40,7 +40,7 @@ from chirpy.topology import grid
 
 
 def main():
-    '''Plots vibrational modes.'''
+    """Plots vibrational modes."""
     parser = argparse.ArgumentParser(
         description="Plots vibrational modes as IR spectrum (optional: VCD).",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter

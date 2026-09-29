@@ -29,7 +29,7 @@
 #
 # ----------------------------------------------------------------------
 
-'''Map and reorder atoms between matching molecules.'''
+"""Map and reorder atoms between matching molecules."""
 
 
 import argparse
@@ -37,7 +37,7 @@ from chirpy.classes import system
 
 
 def main():
-    '''Unit Cell parametres are taken from fn1 if needed'''
+    """Unit Cell parametres are taken from fn1 if needed"""
     parser = argparse.ArgumentParser(
             description="Map and reorder atoms of equal molecules.",
             formatter_class=argparse.ArgumentDefaultsHelpFormatter

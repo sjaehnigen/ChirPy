@@ -28,7 +28,7 @@
 #
 # ----------------------------------------------------------------------
 
-'''Writers for coordinates, grids, and vibrational modes.'''
+"""Writers for coordinates, grids, and vibrational modes."""
 from . import coordinates
 from . import grid
 from . import modes

@@ -27,7 +27,7 @@
 #   If not, see <https://www.gnu.org/licenses/>.
 #
 # ----------------------------------------------------------------------
-'''Physics modules for fields, spectra, and statistical mechanics.'''
+"""Physics modules for fields, spectra, and statistical mechanics."""
 
 from . import modern_theory_of_magnetisation
 from . import kspace

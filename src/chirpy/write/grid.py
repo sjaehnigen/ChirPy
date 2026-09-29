@@ -28,7 +28,7 @@
 #
 # ----------------------------------------------------------------------
 
-'''Writer for Gaussian cube grid data.'''
+"""Writer for Gaussian cube grid data."""
 
 # outbuffer method may result in memory outage ==> Replace it
 
@@ -38,12 +38,12 @@ from .. import constants
 def cubeWriter(fn, comments, numbers, pos_aa, cell_vec_aa, data,
                append=False,
                origin_aa=[0.0, 0.0, 0.0]):
-    '''Write grid/volume data into a Gaussian Cube file.
+    """Write grid/volume data into a Gaussian Cube file.
        cell_vec_aa specifies the three cell vectors A, B, C in atomic units
        numbers is a lits or tuple of atomic numbers (or any numbers).
        Expects a single cube frame and does not support direct
        output of cube trajectories (use an iterator and append=True for this).
-       '''
+       """
     pos_au = pos_aa * constants.l_aa2au
     cell_vec_au = cell_vec_aa * constants.l_aa2au
     origin_au = origin_aa * constants.l_aa2au
@@ -71,7 +71,7 @@ def _assemble_cube_file(comment1,
                         data,
                         origin
                         ):
-    '''Old code but stil in use. Revised and corrected in Dec 2019.'''
+    """Old code but stil in use. Revised and corrected in Dec 2019."""
     obuffer = ''
     obuffer += comment1.rstrip('\n').replace('\n', '')+'\n'
     obuffer += comment2.rstrip('\n').replace('\n', '')+'\n'

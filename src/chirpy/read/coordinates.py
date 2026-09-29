@@ -29,7 +29,7 @@
 # ----------------------------------------------------------------------
 
 
-'''Readers for coordinate and trajectory file formats.'''
+"""Readers for coordinate and trajectory file formats."""
 
 
 import numpy as np
@@ -51,7 +51,7 @@ if config.__os__ == 'Linux':
 # --- kernels
 
 def _xyz(frame, convert=1, n_lines=1):
-    '''Kernel for processing xyz frame.'''
+    """Kernel for processing xyz frame."""
 
     # --- frame never starts with blank line --> EOF
     #     (+treatment of blank lines at EOF)
@@ -81,7 +81,7 @@ def _xyz(frame, convert=1, n_lines=1):
 
 
 def _cpmd(frame, convert=1, n_lines=1, filetype='TRAJECTORY'):
-    '''Kernel for processing cpmd frame.'''
+    """Kernel for processing cpmd frame."""
 
     # --- generator needs one+ call next() to allow for StopIteration
     data = []
@@ -118,14 +118,14 @@ def _cpmd(frame, convert=1, n_lines=1, filetype='TRAJECTORY'):
 
 
 def _free(frame, columns='iddd', headlines=0, convert=1, n_lines=1):
-    '''Kernel for processing free format frame.
+    """Kernel for processing free format frame.
        Column support: i s m d
        i ... iterations/frames
        s ... symbols/numbers
-       d ... data'''
+       d ... data"""
 
     def _parse_columns(line):
-        '''Parse one free-format line according to the column specifier.'''
+        """Parse one free-format line according to the column specifier."""
         content = {}
         # --- ToDo: is this slowing down the generator?
         for _c, _l in zip(columns, line.strip().split()):
@@ -174,7 +174,7 @@ def _free(frame, columns='iddd', headlines=0, convert=1, n_lines=1):
 
 
 def _arc(frame, convert=1, n_lines=1, cell_line=False):
-    '''Kernel for processing arc frame.'''
+    """Kernel for processing arc frame."""
 
     CELL = cell_line
     # --- frame never starts with blank line --> EOF
@@ -226,12 +226,12 @@ def _arc(frame, convert=1, n_lines=1, cell_line=False):
 
 
 def _pdb(frame, convert=1., n_lines=1):
-    '''Kernel for processing PDB frame'''
+    """Kernel for processing PDB frame"""
     names, resns, resids, data, symbols, cell_aa_deg, title = \
         [], [], [], [], [], None, None
 
     def mk_int(s):
-        '''Convert a residue field to int, defaulting blank entries to zero.'''
+        """Convert a residue field to int, defaulting blank entries to zero."""
         return int(s) if s.strip() else 0
 
     # --- explict for loop for adpated handling StopIteration
@@ -306,9 +306,9 @@ def _pdb(frame, convert=1., n_lines=1):
 
 
 def xyzIterator(FN, **kwargs):
-    '''Iterator for xyzReader
+    """Iterator for xyzReader
        Usage: next() returns data, symbols, comments of
-       current frame'''
+       current frame"""
     _kernel = _xyz
 
     with _open(FN, 'r', **kwargs) as _f:
@@ -334,10 +334,10 @@ def xyzIterator(FN, **kwargs):
 
 
 def cpmdIterator(FN, **kwargs):
-    '''Iterator for  cpmdReader
+    """Iterator for  cpmdReader
        Known types: GEOMETRY, TRAJECTORY, MOMENTS
        Usually expects additional metadata of the system
-       through kwargs.'''
+       through kwargs."""
     _kernel = _cpmd
     symbols = kwargs.pop('symbols', None)
     if (filetype := kwargs.get('filetype')) is None:
@@ -389,9 +389,9 @@ def cpmdIterator(FN, **kwargs):
 
 
 def arcIterator(FN, **kwargs):
-    '''Iterator for arcReader
+    """Iterator for arcReader
        Usage: next() returns data, symbols, numbers, types, and connectivity
-       of current frame'''
+       of current frame"""
     _kernel = _arc
 
     with _open(FN, 'r', **kwargs) as _f:
@@ -415,7 +415,7 @@ def arcIterator(FN, **kwargs):
 
 def freeIterator(FN, columns='iddd', nlines=None, units=1, headlines=0,
                  **kwargs):
-    '''Iterator for free data of the format:
+    """Iterator for free data of the format:
          i(frame) [m s ... (additional columns)] x0 x1 x2 ... (coordinate)
 
        columns: custom format (one letter per column)
@@ -432,7 +432,7 @@ def freeIterator(FN, columns='iddd', nlines=None, units=1, headlines=0,
        units: conversion set with one item per data coloumn (\'d\')
        headlines: number of lines preceeding data block in each frame
                   (the content of headlines is ignored)
-       '''
+       """
     _kernel = _free
     kwargs['columns'] = columns
     if 'd' not in columns:
@@ -471,9 +471,9 @@ def freeIterator(FN, columns='iddd', nlines=None, units=1, headlines=0,
 
 
 def pdbIterator(FN, **kwargs):
-    '''Iterator for PDB files
+    """Iterator for PDB files
        Usage: next() returns data, names, symbols, residues, cell_aa_deg, title
-       '''
+       """
     _kernel = _pdb
 
     with open(FN) as _f:
@@ -492,12 +492,12 @@ def pdbIterator(FN, **kwargs):
 
 
 def _coordContainer(*args, iterator=xyzIterator, **kwargs):
-    '''Iterate over multiple trajectory files. The files have to
+    """Iterate over multiple trajectory files. The files have to
        agree in the number of atoms and frames.
        The output has the form of the first given file.
        iterator ... file reader or list of readers (mixed format case)
 
-       '''
+       """
     # --- works for all iterators with data at return position 0
     if isinstance(iterator, list):
         _iterators = iterator
@@ -528,14 +528,14 @@ def _coordContainer(*args, iterator=xyzIterator, **kwargs):
 
 
 def xyzContainer(*args, **kwargs):
-    '''Iterate over multiple XYZ trajectory files. The files have to
-       agree in the number of atoms and frames'''
+    """Iterate over multiple XYZ trajectory files. The files have to
+       agree in the number of atoms and frames"""
     return _coordContainer(*args, iterator=xyzIterator, **kwargs)
 
 
 def arcContainer(*args, **kwargs):
-    '''Iterate over multiple ARC trajectory files. The files have to
-       agree in the number of atoms and frames'''
+    """Iterate over multiple ARC trajectory files. The files have to
+       agree in the number of atoms and frames"""
     return _coordContainer(*args, iterator=arcIterator, **kwargs)
 
 
@@ -543,16 +543,16 @@ def arcContainer(*args, **kwargs):
 
 
 def xyzReader(FN, **kwargs):
-    '''Read complete XYZ file at once.
-       Returns data, symbols, comments of current frame'''
+    """Read complete XYZ file at once.
+       Returns data, symbols, comments of current frame"""
     data, symbols, comments = zip(*xyzIterator(FN, **kwargs))
     return np.array(data), symbols[0], list(comments)
 
 
 def arcReader(FN, **kwargs):
-    '''Read complete ARC file at once.
+    """Read complete ARC file at once.
        Returns data, symbols, numbers, types, and connectivity
-       of current frame'''
+       of current frame"""
     buf = list(zip(*arcIterator(FN, **kwargs)))
 
     data, symbols, numbers, types, connectivity, comments = buf[:6]
@@ -571,11 +571,11 @@ def arcReader(FN, **kwargs):
 
 
 def pdbReader(FN, **kwargs):
-    '''Read a complete PDB file at once.
+    """Read a complete PDB file at once.
        Returns data, names, symbols, res, cell_aa_deg, title
        of current frame.
        Does not support variable cell size, use iterator for this.
-       '''
+       """
     buf = list(zip(*pdbIterator(FN, **kwargs)))
 
     data, names, symbols, res, cell_aa_deg, title = buf[:6]
@@ -588,12 +588,12 @@ def pdbReader(FN, **kwargs):
 
 
 def cifReader(FN, fill_unit_cell=True):
-    '''Read CIF file and return a filled unit cell.
-       '''
+    """Read CIF file and return a filled unit cell.
+       """
     def _measurement2float(number):
-        '''Convert CIF numeric fields with uncertainties to floats.'''
+        """Convert CIF numeric fields with uncertainties to floats."""
         def _convert(st):
-            '''Strip CIF uncertainty markers before float conversion.'''
+            """Strip CIF uncertainty markers before float conversion."""
             return float(st.replace('(', '').replace(')', ''))
         if isinstance(number, str):
             return _convert(number)
@@ -601,7 +601,7 @@ def cifReader(FN, fill_unit_cell=True):
             return [_convert(_st) for _st in number]
 
     def get_label(_list):
-        '''Return the first available CIF entry from a list of keys.'''
+        """Return the first available CIF entry from a list of keys."""
         _label = None
         for _l in _list:
             _label = _load.get(_l, _label)

@@ -28,7 +28,7 @@
 #
 # ----------------------------------------------------------------------
 
-'''Readers for selected ORCA output and Hessian files.'''
+"""Readers for selected ORCA output and Hessian files."""
 
 
 import numpy as np
@@ -38,9 +38,9 @@ from .. import constants, config
 
 
 def orcaReader(fn):
-    '''Reads ORCA 4.3 files. Currently supported:
+    """Reads ORCA 4.3 files. Currently supported:
         *.hess
-        '''
+        """
     fmt = fn.split('.')[-1]
     if fmt == "hess":
         return read_hessian_file(fn)
@@ -49,7 +49,7 @@ def orcaReader(fn):
 
 
 def read_hessian_file(fn):
-    '''This is an antiquated reader for Orca .hess files'''
+    """This is an antiquated reader for Orca .hess files"""
 
     with open(fn, 'r') as f:
         inbuffer = f.read()

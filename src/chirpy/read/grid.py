@@ -29,7 +29,7 @@
 # ----------------------------------------------------------------------
 
 
-'''Readers for volumetric grid data files.'''
+"""Readers for volumetric grid data files."""
 
 
 import numpy as np
@@ -42,7 +42,7 @@ if config.__os__ == 'Linux':
 
 
 def _cube(frame, **kwargs):
-    '''Kernel for processing cube frame.'''
+    """Kernel for processing cube frame."""
     comments = (next(frame).strip(), next(frame).strip())
 
     _cellinfo = list(zip(*[_l.strip().split() for _l in islice(frame, 4)]))
@@ -84,11 +84,11 @@ def _cube(frame, **kwargs):
 
 
 def cubeIterator(FN, **kwargs):
-    '''Iterate over CUBE frames.
+    """Iterate over CUBE frames.
 
        Usage: next() returns grid data, origin, cell, coordinates,
        numbers, and comments of the current frame.
-       '''
+       """
     _kernel = _cube
 
     with _open(FN, 'r', **kwargs) as _f:
@@ -111,7 +111,7 @@ def cubeIterator(FN, **kwargs):
 
 
 def cubeReader(FN, **kwargs):
-    '''Read a complete CUBE file at once.'''
+    """Read a complete CUBE file at once."""
     data, origin_aa, cell_vec_aa, pos_aa, numbers, comments = \
         zip(*cubeIterator(FN, verbose=False, **kwargs))
 

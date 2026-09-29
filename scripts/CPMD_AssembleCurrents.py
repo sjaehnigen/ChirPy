@@ -29,7 +29,7 @@
 #
 # ----------------------------------------------------------------------
 
-'''Assemble CPMD current and state data into ChirPy objects.'''
+"""Assemble CPMD current and state data into ChirPy objects."""
 
 import argparse
 import sys
@@ -40,7 +40,7 @@ from chirpy.classes import quantum
 
 
 def main():
-    '''Post-process CPMD currents and write the assembled objects.'''
+    """Post-process CPMD currents and write the assembled objects."""
     parser = argparse.ArgumentParser(
             description="Post-process CPMD CURRENTS output and write objects to\
                          disc. All files have to have the same grid and a \
@@ -146,14 +146,14 @@ def main():
     def _assemble_file(fn,
                        fmt=args.format,
                        compression=args.compression):
-        '''Build the output file name for the given base name.'''
+        """Build the output file name for the given base name."""
         _FN = os.path.join(WDIR, fn) + '.' + fmt
         if compression is not None:
             _FN += '.' + compression
         return _FN
 
     def _recurse_states():
-        '''Assemble currents for all found time-dependent electronic states.'''
+        """Assemble currents for all found time-dependent electronic states."""
         print('Recursing time-dependent electronic states ...')
         _n = 1
         while os.path.isfile(_assemble_file(args.state0 % _n)):
@@ -186,7 +186,7 @@ def main():
             _n += 1
 
     def _recurse_fragments():
-        '''Assemble currents for all found molecular fragments.'''
+        """Assemble currents for all found molecular fragments."""
         print('Recursing fragments ...')
         _n = 0
         _fdir = os.path.join(args.dir, 'fragment_%03d' % _n)

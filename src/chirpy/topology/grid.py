@@ -29,7 +29,7 @@
 # ----------------------------------------------------------------------
 
 
-'''Grid-based regularisation kernels for topology-related data.'''
+"""Grid-based regularisation kernels for topology-related data."""
 
 
 import numpy as np
@@ -43,7 +43,7 @@ from ..config import ChirPyWarning as _ChirPyWarning
 
 
 def _gaussian(r, sigma, dim=1):
-    '''Convolution with a normalised Gaussian function. Integrates to one.'''
+    """Convolution with a normalised Gaussian function. Integrates to one."""
     _N = 1 / (2.*np.pi * sigma**2) ** (dim/2)
     _E = -r**2 / (2 * sigma**2)
 
@@ -51,8 +51,8 @@ def _gaussian(r, sigma, dim=1):
 
 
 def _gaussian_std(r, width, dim=1):
-    '''Convolution with a standardised Gaussian function
-       with maximum value at 1 and FWHM=width.'''
+    """Convolution with a standardised Gaussian function
+       with maximum value at 1 and FWHM=width."""
 
     _x = r / (width/2)
 
@@ -60,7 +60,7 @@ def _gaussian_std(r, width, dim=1):
 
 
 def _lorentzian(r, gamma, dim=1):
-    '''Convolution with a normalised Lorentzian function. Integrates to one.'''
+    """Convolution with a normalised Lorentzian function. Integrates to one."""
 
     if dim != 1:
         warnings.warn("Lorentzian distribution not normalised for dim > 1!",
@@ -72,8 +72,8 @@ def _lorentzian(r, gamma, dim=1):
 
 
 def _lorentzian_std(r, width, dim=1):
-    '''Convolution with a standardised Lorentzian function
-       with maximum value at 1 and FWHM=width.'''
+    """Convolution with a standardised Lorentzian function
+       with maximum value at 1 and FWHM=width."""
 
     _x = r / (width/2)
 
@@ -82,7 +82,7 @@ def _lorentzian_std(r, width, dim=1):
 
 def regularisation(positions, grid, *args,
                    weights=None, mode='gaussian', cell_l_deg=None):
-    '''Regularisation of singularities on a grid.
+    """Regularisation of singularities on a grid.
        Default mode uses Gaussian functions.
        Requires *args according to chosen function.
 
@@ -92,7 +92,7 @@ def regularisation(positions, grid, *args,
                 Explicit dim axis can be omitted for dim=1.
 
        Optional weights of length N.
-       '''
+       """
     if mode == 'gaussian':
         _F = _gaussian
     elif mode == 'lorentzian':

@@ -29,7 +29,7 @@
 #
 # ----------------------------------------------------------------------
 
-'''Trace streamlines through a vector field.'''
+"""Trace streamlines through a vector field."""
 
 
 import argparse
@@ -39,7 +39,7 @@ from chirpy.classes import volume, trajectory
 
 
 def main():
-    '''Trace streamlines through a vector field.'''
+    """Trace streamlines through a vector field."""
     parser = argparse.ArgumentParser(
             description="Trace vector field with seeded particles. Optional\
                         streamlines export to VMD.",

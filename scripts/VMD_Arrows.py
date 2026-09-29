@@ -29,7 +29,7 @@
 #
 # ----------------------------------------------------------------------
 
-'''Create VMD arrows from trajectory or vector data.'''
+"""Create VMD arrows from trajectory or vector data."""
 
 
 import argparse
@@ -40,7 +40,7 @@ from chirpy import constants
 
 
 def main():
-    '''Create VMD arrows from trajectory or vector data.'''
+    """Create VMD arrows from trajectory or vector data."""
     parser = argparse.ArgumentParser(
             description="Create VMD arrows from input. For advanced options,\
                          please use the VMDPaths object itnterface directly.",

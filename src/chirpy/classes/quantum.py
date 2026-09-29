@@ -28,7 +28,7 @@
 #
 # ----------------------------------------------------------------------
 
-'''Quantum-mechanical scalar and vector field container classes.'''
+"""Quantum-mechanical scalar and vector field container classes."""
 
 import numpy as _np
 import copy
@@ -46,22 +46,22 @@ from ..read.coordinates import xyzReader as _xyzReader
 
 
 class WaveFunction(_ScalarField):
-    '''Scalar field representation of an electronic wavefunction.'''
+    """Scalar field representation of an electronic wavefunction."""
 
     pass
 
 
 class WannierFunction(_ScalarField):
-    '''Scalar field representation of a Wannier function.'''
+    """Scalar field representation of a Wannier function."""
 
     def auto_crop(self, thresh=1.0):
-        '''crop all after threshold'''
+        """crop all after threshold"""
         r = self.auto_crop(thresh=thresh)
 
         return r
 
     def extrema(self, **kwargs):
-        '''Return positions of local extrema in the filtered field.'''
+        """Return positions of local extrema in the filtered field."""
         data = _ndimage.filters.gaussian_filter(self.data, 4.0)
         neighborhood = _ndimage.morphology.generate_binary_structure(3, 3)
         local_max = _ndimage.filters.maximum_filter(
@@ -88,22 +88,22 @@ class WannierFunction(_ScalarField):
 
 
 class ElectronDensity(_ScalarField):
-    '''Scalar field representation of an electron density.'''
+    """Scalar field representation of an electron density."""
 
     def integral(self):
-        '''Store the integrated electron count and default threshold.'''
+        """Store the integrated electron count and default threshold."""
         self.n_electrons = self.voxel*self.data.sum()
         self.threshold = 1.E-3
 
     def aim(self, verbose=True):
-        '''Min Yu and Dallas R. Trinkle, Accurate and efficient algorithm for
-           Bader charge integration, J. Chem. Phys. 134, 064111 (2011)'''
+        """Min Yu and Dallas R. Trinkle, Accurate and efficient algorithm for
+           Bader charge integration, J. Chem. Phys. 134, 064111 (2011)"""
         def pbc(a, dim):
-            '''Wrap index a into the grid along dimension dim (periodic).'''
+            """Wrap index a into the grid along dimension dim (periodic)."""
             return _np.remainder(a, self.data.shape[dim])
 
         def env_basin(f, x, y, z):
-            '''Values of f at (x, y, z) and its six periodic neighbours.'''
+            """Values of f at (x, y, z) and its six periodic neighbours."""
             return _np.array([
                         f[x,           y,           z],
                         f[pbc(x+1, 0), y,           z],
@@ -212,16 +212,16 @@ class ElectronDensity(_ScalarField):
 
     @staticmethod
     def integrate_volume(data):
-        '''Integrate ``data`` over the grid by summation.'''
+        """Integrate ``data`` over the grid by summation."""
         # return simps(simps(simps(data)))
         return data.sum()
 
 
 class AIMAtom(_Domain3D):
-    '''Bader basin domain associated with one atom.'''
+    """Bader basin domain associated with one atom."""
 
     def __init__(self, basin, **transfer):
-        '''Use transfer dict to hand over metadata (e.g. for cube output)'''
+        """Use transfer dict to hand over metadata (e.g. for cube output)"""
         self._print_info = []
         self.__dict__.update(transfer)
         self.grid_shape = basin.shape
@@ -229,7 +229,7 @@ class AIMAtom(_Domain3D):
         self.weights = basin[self.indices]
 
     def attach_gain_and_loss(self, gain, loss):
-        '''Attach gain and loss grids stored on the basin support.'''
+        """Attach gain and loss grids stored on the basin support."""
         self.j_grid_shape = gain.shape
         self.gain_indices = _np.where(gain != 0)
         self.loss_indices = _np.where(loss != 0)
@@ -237,7 +237,7 @@ class AIMAtom(_Domain3D):
         self.loss_weights = loss[self.loss_indices]
 
     def expand_gain_and_loss(self):
-        '''Expand stored gain and loss weights back to full grids.'''
+        """Expand stored gain and loss weights back to full grids."""
         tmp_gain = _np.zeros(self.j_grid_shape)
         tmp_loss = _np.zeros(self.j_grid_shape)
         tmp_gain[self.gain_indices] = self.gain_weights
@@ -245,24 +245,24 @@ class AIMAtom(_Domain3D):
         return tmp_gain, tmp_loss
 
     def charge(self, rho):
-        '''Return the atomic charge obtained from density ``rho``.'''
+        """Return the atomic charge obtained from density ``rho``."""
         def func(inds):
-            '''Charge contained in the voxels given by inds.'''
+            """Charge contained in the voxels given by inds."""
             return rho.data[inds] * rho.voxel
         return self.numbers.sum() - self.integrate_volume(func)
 
 
 class CurrentDensity(_VectorField):
-    '''Vector field representation of an electronic current density.'''
+    """Vector field representation of an electronic current density."""
 
     pass
 
 
 class TDElectronicState(_CORE):
-    '''Time-dependent electronic state with wavefunction and current.'''
+    """Time-dependent electronic state with wavefunction and current."""
 
     def __init__(self, *args, psi1=None, **kwargs):
-        '''psi1 - imaginary part from linear response calculation'''
+        """psi1 - imaginary part from linear response calculation"""
         if len(args) == 4:
             self.psi = WaveFunction(args[0], **kwargs)
             self.j = CurrentDensity(*args[1:], **kwargs)
@@ -285,29 +285,29 @@ class TDElectronicState(_CORE):
         self.j._sync_class()
 
     def _sync_class(self):
-        '''Synchronise all contained field objects.'''
+        """Synchronise all contained field objects."""
         self.psi._sync_class()
         self.j._sync_class()
         if hasattr(self, 'psi1'):
             self.psi1._sync_class()
 
     def grid(self):
-        '''Return an empty grid matching the wavefunction.'''
+        """Return an empty grid matching the wavefunction."""
         return self.psi.grid()
 
     def pos_grid(self):
-        '''Return the wavefunction grid coordinates.'''
+        """Return the wavefunction grid coordinates."""
         return self.psi.pos_grid()
 
     def auto_crop(self, thresh=1.0):
-        '''crop all after threshold'''
+        """crop all after threshold"""
         r = self.psi.auto_crop(thresh=thresh, dry_run=True)
         self.crop(r)
 
         return r
 
     def crop(self, r, **kwargs):
-        '''Crop all contained fields to the given grid ranges.'''
+        """Crop all contained fields to the given grid ranges."""
         self.psi.crop(r)
         self.psi.integral()
         self.j.crop(r)
@@ -318,16 +318,16 @@ class TDElectronicState(_CORE):
             self.psi1._sync_class()
 
     def calculate_velocity_field(self, rho, thresh=1.E-8):
-        '''Requires total density rho'''
+        """Requires total density rho"""
         self.v = _VectorField.from_object(self.j)
         self.v.normalise(norm=rho, thresh=thresh)
 
 
 class TDElectronDensity(_CORE):
-    '''Time-dependent electron density with associated current field.'''
+    """Time-dependent electron density with associated current field."""
 
     def __init__(self, *args, **kwargs):
-        '''Load or build a time-dependent density/current pair.'''
+        """Load or build a time-dependent density/current pair."""
         if len(args) == 4:
             self.rho = ElectronDensity(args[0], **kwargs)
             self.j = CurrentDensity(*args[1:], **kwargs)
@@ -343,20 +343,20 @@ class TDElectronDensity(_CORE):
         self.j._sync_class()
 
     def _sync_class(self):
-        '''Synchronise the density and current objects.'''
+        """Synchronise the density and current objects."""
         self.rho._sync_class()
         self.j._sync_class()
 
     def grid(self):
-        '''Return an empty grid matching the density.'''
+        """Return an empty grid matching the density."""
         return self.rho.grid()
 
     def pos_grid(self):
-        '''Return the density grid coordinates.'''
+        """Return the density grid coordinates."""
         return self.rho.pos_grid()
 
     def crop(self, r, **kwargs):
-        '''Crop density and current fields to the given grid ranges.'''
+        """Crop density and current fields to the given grid ranges."""
         self.rho.crop(r, **kwargs)
         self.rho.integral()
         self.j.crop(r, **kwargs)
@@ -364,19 +364,19 @@ class TDElectronDensity(_CORE):
         self.j._sync_class()
 
     def auto_crop(self, thresh=5.E-4):
-        '''crop all after density threshold'''
+        """crop all after density threshold"""
         r = self.rho.auto_crop(thresh=thresh, dry_run=True)
         self.crop(r)
 
         return r
 
     def calculate_velocity_field(self, thresh=1.E-8):
-        '''Calculate the velocity field from current and density.'''
+        """Calculate the velocity field from current and density."""
         self.v = _VectorField.from_object(self.j)
         self.v.normalise(norm=self.rho, thresh=thresh)
 
     def propagate_density(self, dt=8.0):
-        '''dt in atomic units'''
+        """dt in atomic units"""
         rho2 = copy.deepcopy(self.rho)
 
         self.j.divergence_and_rotation()
@@ -385,7 +385,7 @@ class TDElectronDensity(_CORE):
         return rho2
 
     def read_nuclear_velocities(self, fn):
-        '''Has to be in shape n_frames,n_atoms, 3'''
+        """Has to be in shape n_frames,n_atoms, 3"""
         self.nuc_vel_au,\
             self.nuc_symbols,\
             self.nuc_vel_comments = _xyzReader(fn)
@@ -395,7 +395,7 @@ class TDElectronDensity(_CORE):
                             'Electronic System!')
 
     def calculate_aim_differential_current(self):
-        '''Map vector of nuclear velocity on atom domain'''
+        """Map vector of nuclear velocity on atom domain"""
         self.v_diff = copy.deepcopy(self.v)
         for i in range(self.rho.n_atoms):
             field = self.rho.aim_atoms[i].map_vector(self.nuc_vel_au[0, i, :])
@@ -406,9 +406,9 @@ class TDElectronDensity(_CORE):
         self.j_diff.data = self.v_diff.data*self.rho.data[_np.newaxis]
 
     def calculate_interatomic_flux(self, rho_dt, dt):
-        '''rho_dt ... ElectronicDensity object with aim_atoms list'''
+        """rho_dt ... ElectronicDensity object with aim_atoms list"""
         def rec_grid(grid):
-            '''Elementwise reciprocal of grid, leaving zeros unchanged.'''
+            """Elementwise reciprocal of grid, leaving zeros unchanged."""
             r_grid = _np.zeros(grid.shape)
             r_grid[grid != 0] = _np.reciprocal(grid[grid != 0])
             return r_grid
@@ -538,8 +538,8 @@ class TDElectronDensity(_CORE):
 
     @staticmethod
     def time_integral(dt, n='auto', n_thresh=0.1):
-        '''propagates rho by dt n times and calculates gain,loss,and balance
+        """propagates rho by dt n times and calculates gain,loss,and balance
            between atoms at each step
            n=auto ... propagate until interatomic flux (i.e., the norm of the
-           balance matrix) vanishes (n_thresh)'''
+           balance matrix) vanishes (n_thresh)"""
         pass

@@ -28,6 +28,6 @@
 #
 # ----------------------------------------------------------------------
 
-'''Interfaces to external programs and file formats.'''
+"""Interfaces to external programs and file formats."""
 
 from . import cp2k, cpmd, gaussian, molden, namd, orca, pymol, vmd

@@ -28,7 +28,7 @@
 #
 # ----------------------------------------------------------------------
 
-'''Classes for frames, trajectories, and vibrational modes.'''
+"""Classes for frames, trajectories, and vibrational modes."""
 
 import copy as _copy
 import numpy as _np
@@ -77,26 +77,26 @@ from ..mathematics import algebra as _algebra
 
 
 class _FRAME(_CORE):
-    '''Base class for atom-resolved single-frame data.'''
+    """Base class for atom-resolved single-frame data."""
 
     def _labels(self):
-        '''Initialise axis labels for a single frame.'''
+        """Initialise axis labels for a single frame."""
         self._type = 'frame'
         self._labels = ('symbols',  None)
 
     def __init__(self, *args, **kwargs):
-        '''Initialise a frame from data and metadata.'''
+        """Initialise a frame from data and metadata."""
         self._labels()
         self._import_frame(*args, **kwargs)
         self._sync_class()
 
     def _import_frame(self,  *args, **kwargs):
-        '''Load symbols and raw frame data from keyword arguments.'''
+        """Load symbols and raw frame data from keyword arguments."""
         self.symbols = kwargs.get('symbols', ())
         self.data = kwargs.get('data', _np.zeros((0, 0)))
 
     def _sync_class(self):
-        '''Validate frame data and refresh cached dimensions.'''
+        """Validate frame data and refresh cached dimensions."""
         self._axis_pointer = -2
 
         if not isinstance(self.symbols, tuple):
@@ -116,7 +116,7 @@ class _FRAME(_CORE):
                              f'{len(self.symbols)} = {self.symbols}')
 
     def __add__(self, other):
-        '''Concatenate compatible frame data along the object axis.'''
+        """Concatenate compatible frame data along the object axis."""
         new = _copy.deepcopy(self)
         new.data = _np.concatenate((self.data, other.data),
                                    axis=self._axis_pointer)
@@ -136,7 +136,7 @@ class _FRAME(_CORE):
         return new
 
     def tail(self, n, **kwargs):
-        '''Return a copy containing the last n entries along an axis.'''
+        """Return a copy containing the last n entries along an axis."""
         axis = kwargs.get("axis", self._axis_pointer)
         new = _copy.deepcopy(self)
         new.data = self.data.swapaxes(axis, 0)[-n:].swapaxes(0, axis)
@@ -149,7 +149,7 @@ class _FRAME(_CORE):
         return new
 
     def sort(self, *args):
-        '''sort atoms by symbols in order of appearance'''
+        """sort atoms by symbols in order of appearance"""
         _symbols = _np.array(self.symbols)
 
         # --- scratch for in-depth sort that includes data
@@ -161,7 +161,7 @@ class _FRAME(_CORE):
         #     return [i for k in sorted(elem) for i in elem[k]]
 
         def get_slist():
-            '''Indices that sort atoms by element symbol.'''
+            """Indices that sort atoms by element symbol."""
             elem = {s: _np.where(_symbols == s)[0]
                     for s in _np.unique(_symbols)}
             return [i for k in sorted(elem) for i in elem[k]]
@@ -185,7 +185,7 @@ class _FRAME(_CORE):
         return _slist
 
     def _is_similar(self, other):
-        '''Check whether another object has matching shape metadata.'''
+        """Check whether another object has matching shape metadata."""
         ie = list(map(lambda a: getattr(self, a) == getattr(other, a),
                       ['_type', 'n_atoms', 'n_fields']))
         ie.append(bool(_np.prod([a == b
@@ -194,13 +194,13 @@ class _FRAME(_CORE):
         return _np.prod(ie), ie
 
     def split(self, mask, select=None):
-        '''Split atoms set according to given mask and
+        """Split atoms set according to given mask and
            optionally select mask entry (overwrites input object).
            If select is None, returns a list of new objects.
            Slow; for simple atom selection in the output use
            selection keyword in write().
 
-           select ... list or tuple of ids'''
+           select ... list or tuple of ids"""
         _data = mapping.dec(self.data, mask, axis=-2)
         _symbols = mapping.dec(self.symbols, mask)
 
@@ -215,8 +215,8 @@ class _FRAME(_CORE):
                 _DEC += (_dl,)
 
         def create_obj(_d, _s, *optargs):
-            '''Build a new object of this class from data, symbols and
-               optional attributes.'''
+            """Build a new object of this class from data, symbols and
+               optional attributes."""
             nargs = {}
             nargs.update(self.__dict__)
             nargs.update({'data': _d, 'symbols': _s})
@@ -251,11 +251,11 @@ class _FRAME(_CORE):
             self._sync_class()
 
     def repeat(self, times, unwrap_ref=None, priority=(0, 1, 2)):
-        '''Propagate kinds using cell tensor, duplicate if cell is not defined.
+        """Propagate kinds using cell tensor, duplicate if cell is not defined.
            times ... integer or tuple of integers for each Cartesian dimension
            unwrap_ref ... frame to check against for PBC jumps
            priority ... (see chirpy.topology.mapping.cell_vec)
-           '''
+           """
         if isinstance(times, int):
             times = 3 * (times,)
         elif not isinstance(times, tuple):
@@ -297,9 +297,9 @@ class _FRAME(_CORE):
     @staticmethod
     def map_frame(obj1, obj2, congruence_threshold_aa=0.1,
                   shift_centers_of_mass=False, **kwargs):
-        '''obj1, obj2 ... Frame objects.
+        """obj1, obj2 ... Frame objects.
            Returns indices that would sort obj2 to match obj1.
-           '''
+           """
         ie, tmp = obj1._is_similar(obj2)
         if not tmp[1] * tmp[3]:
             # --- only n_atoms (1) and symbols (3)
@@ -353,20 +353,20 @@ class _FRAME(_CORE):
 
     @classmethod
     def _from_data(cls, **kwargs):
-        '''Create an instance from raw keyword data.'''
+        """Create an instance from raw keyword data."""
         return cls(**kwargs)
 
 
 class _TRAJECTORY(_FRAME):
-    '''Base class for fully loaded trajectories.'''
+    """Base class for fully loaded trajectories."""
 
     def _labels(self):
-        '''Initialise labels for trajectory-like objects.'''
+        """Initialise labels for trajectory-like objects."""
         self._type = 'trajectory'
         self._labels = ('comments', 'symbols', None)
 
     def _sync_class(self):
-        '''Validate trajectory dimensions and refresh cached sizes.'''
+        """Validate trajectory dimensions and refresh cached sizes."""
         self.n_frames, self.n_atoms, self.n_fields = self.data.shape
         if self.n_atoms != len(self.symbols):
             raise ValueError('Data shape inconsistent '
@@ -382,15 +382,15 @@ class _TRAJECTORY(_FRAME):
 
 
 class _MODES(_FRAME):
-    '''Base class for collections of vibrational modes.'''
+    """Base class for collections of vibrational modes."""
 
     def _labels(self):
-        '''Initialise labels for vibrational mode objects.'''
+        """Initialise labels for vibrational mode objects."""
         self._type = 'modes'
         self._labels = ('comments', 'symbols', None)
 
     def _sync_class(self, check_orthonormality=True):
-        '''Validate mode data and derive mode-related attributes.'''
+        """Validate mode data and derive mode-related attributes."""
         self.n_modes, self.n_atoms, self.n_fields = self.data.shape
         if self.n_atoms != len(self.symbols):
             raise ValueError('Data shape inconsistent '
@@ -443,7 +443,7 @@ class _MODES(_FRAME):
             self._check_orthonormality()
 
     def select_modes(self, modelist):
-        '''Return a copy containing only the selected modes.'''
+        """Return a copy containing only the selected modes."""
         if not isinstance(modelist, list):
             if isinstance(modelist, int):
                 modelist = [modelist]
@@ -461,7 +461,7 @@ class _MODES(_FRAME):
         return loc_self
 
     def _modes(self, *args):
-        '''Update normal-mode displacements.'''
+        """Update normal-mode displacements."""
         if len(args) == 0:
             self.modes = _np.take(self.data, [6, 7, 8], axis=-1)
             self._eivec()
@@ -476,7 +476,7 @@ class _MODES(_FRAME):
                             % self._modes.__name__)
 
     def _eivec(self):
-        '''Build mass-weighted eigenvectors from the stored modes.'''
+        """Build mass-weighted eigenvectors from the stored modes."""
         self.eivec = self.modes * _np.sqrt(self.masses_amu)[None, :, None]
         norm = _np.linalg.norm(self.eivec, axis=(1, 2))
 
@@ -486,7 +486,7 @@ class _MODES(_FRAME):
         self.eivec /= norm[:, None, None]
 
     def _check_orthonormality(self):
-        '''Warn if the mode vectors do not look orthonormal.'''
+        """Warn if the mode vectors do not look orthonormal."""
         atol = 5.E-5
         com_motion = _np.linalg.norm(mapping.cowt(self.modes,
                                                   self.masses_amu,
@@ -536,8 +536,8 @@ class _MODES(_FRAME):
         _np.set_printoptions(precision=8)
 
     def _source_APT(self, fn):
-        '''Requires file of APT in atomic units.
-           '''
+        """Requires file of APT in atomic units.
+           """
         self.APT_au = _np.loadtxt(fn).astype(float).reshape(self.n_atoms, 3, 3)
 
         # ToDo: this into check_sumrules / sunc_class
@@ -549,8 +549,8 @@ class _MODES(_FRAME):
         self._sync_class(check_orthonormality=False)
 
     def _source_AAT(self, fn):
-        '''Requires file of AAT in atomic units.
-           '''
+        """Requires file of AAT in atomic units.
+           """
         self.AAT_au = _np.loadtxt(fn).astype(float).reshape(self.n_atoms, 3, 3)
 
         # ToDo: this into check_sumrules / sunc_class
@@ -576,12 +576,12 @@ class _MODES(_FRAME):
                             attribute='IR_kmpmol',
                             mode='gaussian_std',
                             width_cgs=10):
-        '''Generate a continuous spectrum from discrete vibrational modes.
+        """Generate a continuous spectrum from discrete vibrational modes.
            Sample points in 1/cm define the frequencies of the continuous
            spectrum.
            width (in 1/cm) corresponds to FWHM of the standard smoothing
            function (with constant height), or sigma/gamma if a normalised
-           Gaussian/Lorentzian function (with constant integral) is used.'''
+           Gaussian/Lorentzian function (with constant integral) is used."""
 
         return _np.vstack((
                  sample_points_cgs,
@@ -598,13 +598,13 @@ class _MODES(_FRAME):
 
 
 class _XYZ():
-    '''Convention (at the moment) of data attribute:
+    """Convention (at the moment) of data attribute:
        col 1-3: pos in aa; col 4-6: vel in au.
        pos_aa/vel_au attributes are protected, use underscored
-       attributes for changes.'''
+       attributes for changes."""
 
     def _import_frame(self, *args, **kwargs):
-        '''Load XYZ-like data from file input or keyword data.'''
+        """Load XYZ-like data from file input or keyword data."""
         clean_velocities = kwargs.pop('clean_velocities', False)
         align_coords = kwargs.pop('align_coords', False)
         center_coords = kwargs.pop('center_coords', False)
@@ -819,8 +819,8 @@ class _XYZ():
         #     wins over fn, but not in the case of data, raises Warning for
         #     cell and symbols
         def _check_file_vs_argument(key, value_file, value_argument):
-            '''Warn if a value read from file disagrees with the given
-               argument.'''
+            """Warn if a value read from file disagrees with the given
+               argument."""
             if (_diff := '\n'.join([
                        f'{_is}: {_f} != {_a}'
                        for _is, (_f, _a) in enumerate(zip(value_file,
@@ -906,7 +906,7 @@ class _XYZ():
             self.clean_velocities(weights=weights)
 
     def _pos_aa(self, *args):
-        '''Update positions'''
+        """Update positions"""
         if len(args) == 0:
             self.pos_aa = _np.take(self.data, [0, 1, 2], axis=-1)
         elif len(args) == 1:
@@ -920,7 +920,7 @@ class _XYZ():
                             % self._pos_aa.__name__)
 
     def _vel_au(self, *args):
-        '''Update velocities'''
+        """Update velocities"""
         if len(args) == 0:
             self.vel_au = _np.take(self.data, [3, 4, 5], axis=-1)
         elif len(args) == 1:
@@ -934,11 +934,11 @@ class _XYZ():
                             % self._vel_au.__name__)
 
     def _cell_aa_deg(self, cell_aa_deg):
-        '''Update cell parameters.'''
+        """Update cell parameters."""
         self.cell_aa_deg = cell_aa_deg
 
     def _sync_class(self, **kwargs):
-        '''Refresh position, velocity, and mass-related attributes.'''
+        """Refresh position, velocity, and mass-related attributes."""
         # kwargs for consistency with Modes
         try:
             # --- clean symbols
@@ -953,7 +953,7 @@ class _XYZ():
         self.cell_aa_deg = _np.array(self.cell_aa_deg)
 
     def _check_distances(self, clean=False):
-        '''current frame only'''
+        """current frame only"""
         if self._type == 'trajectory':
             _warnings.warn('can only check distance for single frame',
                            _ChirPyWarning, stacklevel=2)
@@ -988,11 +988,11 @@ class _XYZ():
             self.split(mask, select=[1])
 
     def _is_equal(self, other, atol=1e-08, noh=True):
-        '''atol adds up to dist_crit_aa from vdw radii'''
+        """atol adds up to dist_crit_aa from vdw radii"""
         _p, ie = self._is_similar(other)
 
         def f(a):
-            '''Compare attribute a of self and other for similarity.'''
+            """Compare attribute a of self and other for similarity."""
             if self._type == 'trajectory':
                 raise TypeError('Trajectories cannot be tested for equality '
                                 '(only similarity)!')
@@ -1024,7 +1024,7 @@ class _XYZ():
 
     # --- join the next two methods?
     def wrap(self):
-        '''Wrap coordinates back into the simulation cell.'''
+        """Wrap coordinates back into the simulation cell."""
         if self._type == 'frame':
             self._pos_aa(mapping.wrap_pbc(
                                    self.pos_aa.reshape(1, self.n_atoms, 3),
@@ -1035,7 +1035,7 @@ class _XYZ():
 
     def wrap_molecules(self, mol_map, weights='masses',
                        algorithm='connectivity', reference=None):
-        '''Join molecules across PBCs and wrap their positions.'''
+        """Join molecules across PBCs and wrap their positions."""
         if weights is None:
             w = _np.ones((self.n_atoms))
         elif weights == 'masses':
@@ -1095,7 +1095,7 @@ class _XYZ():
 
     def _center_of_weight(self, mask=None, weights=None,
                           wrap=False, join_molecules=False):
-        '''Return centers of mass or geometry for the given selection.'''
+        """Return centers of mass or geometry for the given selection."""
         _loc = _copy.deepcopy(self)
         if weights is None:
             w = _np.ones((_loc.n_atoms))
@@ -1120,7 +1120,7 @@ class _XYZ():
         return cowt_aa
 
     def center_of_mass(self, mask=None, join_molecules=True):
-        '''Calculate center(s) of mass.'''
+        """Calculate center(s) of mass."""
         if mask is None:
             self.com_aa = self._center_of_weight(
                                     mask=None,
@@ -1137,7 +1137,7 @@ class _XYZ():
             return self.mol_com_aa
 
     def center_of_geometry(self, mask=None, join_molecules=True):
-        '''Calculate center(s) of geometry.'''
+        """Calculate center(s) of geometry."""
         if mask is None:
             self.cog_aa = self._center_of_weight(
                                     mask=None,
@@ -1156,15 +1156,15 @@ class _XYZ():
 
     # --- backward compatibility
     def get_center_of_mass(self, *args, **kwargs):
-        '''Backward-compatible alias for center_of_mass.'''
+        """Backward-compatible alias for center_of_mass."""
         self.center_of_mass(*args, **kwargs)
 
     def align_coordinates(self, selection=None, weights='masses',
                           align_ref=None,
                           force_centering=False):
-        '''Aligns positions and rotates (but does not correct)
+        """Aligns positions and rotates (but does not correct)
            velocities.
-           '''
+           """
         if not isinstance(selection, list):
             if selection is None:
                 selection = slice(None)
@@ -1213,7 +1213,7 @@ class _XYZ():
             self.center_position(_ref, self.cell_aa_deg)
 
     def center_coordinates(self, selection=None, weights='masses', wrap=False):
-        '''Center coordinates using the selected atoms as reference.'''
+        """Center coordinates using the selected atoms as reference."""
         if not isinstance(selection, list):
             if selection is None:
                 selection = slice(None)
@@ -1250,7 +1250,7 @@ class _XYZ():
         self.center_position(_ref, self.cell_aa_deg)
 
     def center_position(self, pos, cell_aa_deg, wrap=True):
-        '''pos reference in shape (n_frames, three)'''
+        """pos reference in shape (n_frames, three)"""
         cell_vec_aa = mapping.cell_vec(cell_aa_deg)
         if self._type == 'frame':
             self._pos_aa(self.pos_aa + cell_vec_aa.sum(axis=0) / 2
@@ -1263,9 +1263,9 @@ class _XYZ():
             self.wrap()
 
     def rotate(self, R, origin_aa=_np.zeros(3)):
-        '''Rotate atomic positions and velocities
+        """Rotate atomic positions and velocities
            R ... rotation matrix of shape (3, 3)
-           '''
+           """
         if self._type == 'frame':
             _pos = _algebra.rotate_vector(self.pos_aa, R, origin=origin_aa)
             _vel = _algebra.rotate_vector(self.vel_au, R)  # no origin needed
@@ -1292,9 +1292,9 @@ class _XYZ():
         self._vel_au(_vel)
 
     def align_to_vector(self, i0, i1, vec):
-        '''
+        """
         Align a reference line pos[i1]-pos[i0] to vec (no pbc support)
-        Center of rotation is  pos[i0]. '''
+        Center of rotation is  pos[i0]. """
 
         if self._type == 'frame':
             _ref = self.pos_aa - self.pos_aa[i0, None]
@@ -1333,9 +1333,9 @@ class _XYZ():
         self._pos_aa(_pos)
 
     def clean_velocities(self, weights='masses', rotation=True):
-        '''Remove spurious linear and angular momenta from trajectory.
+        """Remove spurious linear and angular momenta from trajectory.
            Positions are not changed.
-          '''
+          """
         wt = _np.ones((self.n_atoms))
         if weights == 'masses':
             wt = self.masses_amu
@@ -1369,9 +1369,9 @@ class _XYZ():
 
     def write(self, fn, selection=None, attribute='data', units='default',
               **kwargs):
-        '''Write frame(s) to file.
+        """Write frame(s) to file.
            selection ... write only list of atom ids
-           '''
+           """
         factor = kwargs.pop('factor', 1.0)  # for velocities
         fmt = kwargs.pop('fmt', fn.split('.')[-1])
 
@@ -1491,7 +1491,7 @@ class _XYZ():
             raise ValueError('Unknown format for TRAJECTORY: %s.' % fmt)
 
     def get_atom_spread(self):
-        '''pos_aa: np.array of shape ([n_frames,] n_atoms, 3)'''
+        """pos_aa: np.array of shape ([n_frames,] n_atoms, 3)"""
         dim_qm = _np.zeros((3))
         for i in range(3):
             imin = _np.min(_np.moveaxis(self.pos_aa, -1, 0)[i])
@@ -1509,11 +1509,11 @@ class _XYZ():
 
 
 class _MOMENTS():
-    '''Object that contains position and moment data very similar
+    """Object that contains position and moment data very similar
        to _XYZ but more general.
-       '''
+       """
     def _import_frame(self, *args, **kwargs):
-        '''Load moment data from keyword arguments.'''
+        """Load moment data from keyword arguments."""
         self.style = kwargs.get('style', 'CPMD 4.1')
         if self.style != 'CPMD 4.1':
             raise NotImplementedError('ChirPy supports only the CPMD 4.1 '
@@ -1569,7 +1569,7 @@ class _MOMENTS():
             self.wrap()
 
     def _sync_class(self):
-        '''Refresh cached position and moment arrays.'''
+        """Refresh cached position and moment arrays."""
         self._pos_aa()
         self.pos_au = self.pos_aa * constants.l_aa2au
         self._c_au()
@@ -1582,7 +1582,7 @@ class _MOMENTS():
         # self.cell_aa_deg = _np.array(self.cell_aa_deg)
 
     def wrap(self):
-        '''Wrap positions back into the simulation cell.'''
+        """Wrap positions back into the simulation cell."""
         if self._type == 'frame':
             self._pos_aa(mapping.wrap_pbc(
                                  self.pos_aa.reshape(1, self.n_atoms, 3),
@@ -1592,7 +1592,7 @@ class _MOMENTS():
             self._pos_aa(mapping.wrap_pbc(self.pos_aa, self.cell_aa_deg))
 
     def center_position(self, pos, cell_aa_deg, wrap=True):
-        '''pos reference in shape (n_frames, three)'''
+        """pos reference in shape (n_frames, three)"""
         if self._type == 'frame':
             self._pos_aa(self.pos_aa + cell_aa_deg[None, :3] / 2
                          - pos[None, :])
@@ -1604,7 +1604,7 @@ class _MOMENTS():
             self.wrap()
 
     def write(self, fn, selection=None, **kwargs):
-        '''Write moment data to file.'''
+        """Write moment data to file."""
         attr = kwargs.get('attr', 'data')
         # loc_self = _copy.deepcopy(self)
         try:
@@ -1638,7 +1638,7 @@ class _MOMENTS():
             raise ValueError('Unknown format for MOMENTS: %s.' % fmt)
 
     def _pos_aa(self, *args):
-        '''Update positions.'''
+        """Update positions."""
         if len(args) == 0:
             self.pos_aa = _np.take(self.data, [0, 1, 2], axis=-1)
         elif len(args) == 1:
@@ -1652,7 +1652,7 @@ class _MOMENTS():
                             % self._pos_aa.__name__)
 
     def _c_au(self, *args):
-        '''Current dipole moments'''
+        """Current dipole moments"""
         if len(args) == 0:
             self.c_au = _np.take(self.data, [3, 4, 5], axis=-1)
         elif len(args) == 1:
@@ -1666,7 +1666,7 @@ class _MOMENTS():
                             % self._c_au.__name__)
 
     def _m_au(self, *args):
-        '''Magnetic dipole moments'''
+        """Magnetic dipole moments"""
         if len(args) == 0:
             self.m_au = _np.take(self.data, [6, 7, 8], axis=-1)
         elif len(args) == 1:
@@ -1680,7 +1680,7 @@ class _MOMENTS():
                             % self._m_au.__name__)
 
     def _d_au(self, *args):
-        '''Electric dipole moments (optional)'''
+        """Electric dipole moments (optional)"""
         if len(args) == 0:
             self.d_au = _np.take(self.data, [9, 10, 11], axis=-1)
         elif len(args) == 1:
@@ -1696,16 +1696,16 @@ class _MOMENTS():
 
 
 class XYZFrame(_XYZ, _FRAME):
-    '''Single XYZ-like frame held in memory.'''
+    """Single XYZ-like frame held in memory."""
 
     def _sync_class(self, **kwargs):
-        '''Run frame and XYZ synchronisation hooks.'''
+        """Run frame and XYZ synchronisation hooks."""
         _FRAME._sync_class(self)
         _XYZ._sync_class(self, **kwargs)
 
     def make_trajectory(self, n_images=3, ts_fs=1):
-        '''Create a XYZTrajectory object with <n_images>
-           frames from velocities and a timestep ts.'''
+        """Create a XYZTrajectory object with <n_images>
+           frames from velocities and a timestep ts."""
 
         if n_images % 2 == 0:
             _img = _np.arange(-(n_images // 2), n_images // 2)
@@ -1724,16 +1724,16 @@ class XYZFrame(_XYZ, _FRAME):
 
 
 class MOMENTSFrame(_MOMENTS, _FRAME):
-    '''Single moment frame held in memory.'''
+    """Single moment frame held in memory."""
 
     def _sync_class(self):
-        '''Run frame and moment synchronisation hooks.'''
+        """Run frame and moment synchronisation hooks."""
         _FRAME._sync_class(self)
         _MOMENTS._sync_class(self)
 
     @classmethod
     def from_classical_nuclei(cls, obj, **kwargs):
-        '''Convert XYZFrame into _MOMENTS'''
+        """Convert XYZFrame into _MOMENTS"""
         _pos = obj.data[:, :3]
         _vel = obj.data[:, 3:6]
         ZV = _np.array(constants.symbols_to_valence_charges(obj.symbols))
@@ -1748,9 +1748,9 @@ class MOMENTSFrame(_MOMENTS, _FRAME):
 
 
 class XYZ(_XYZ, _ITERATOR, _FRAME):
-    '''A generator of XYZ frames.'''
+    """A generator of XYZ frames."""
     def __init__(self, *args, **kwargs):
-        '''Initialise an XYZ iterator or import from file(s).'''
+        """Initialise an XYZ iterator or import from file(s)."""
         self._kernel = XYZFrame
         self._kwargs = {}
         # --- initialise list of masks
@@ -1856,11 +1856,11 @@ class XYZ(_XYZ, _ITERATOR, _FRAME):
                             % self.__class__.__name__)
 
     def __next__(self):
-        '''Advance the iterator and update the current frame.'''
+        """Advance the iterator and update the current frame."""
         frame = next(self._gen)
 
         def check_topo(k, f):
-            '''Return kwarg k or fall back to the bound topology's attribute.'''
+            """Return kwarg k or fall back to the bound topology's attribute."""
             if self._fr < self._kwargs['range'][0] \
               or not hasattr(self, '_topology'):
                 return self._kwargs.get(k, f)
@@ -1932,9 +1932,9 @@ class XYZ(_XYZ, _ITERATOR, _FRAME):
         return self._fr
 
     def expand(self, batch=None, ignore_warning=False):
-        '''Perform iteration on remaining iterator and load
+        """Perform iteration on remaining iterator and load
            entire (<batch> frames) trajectory into memory.
-           '''
+           """
         try:
             if batch is not None:
                 data, symbols, comments = zip(*[
@@ -1965,7 +1965,7 @@ class XYZ(_XYZ, _ITERATOR, _FRAME):
                 return None
 
     def write(self, fn, **kwargs):
-        '''Write all remaining frames to file.'''
+        """Write all remaining frames to file."""
         self._unwind(fn,
                      func='write',
                      events={0: {'append': True}},
@@ -1978,13 +1978,13 @@ class XYZ(_XYZ, _ITERATOR, _FRAME):
     # does not support call of function name from within that function)
 
     def _cell_aa_deg(self,  *args, **kwargs):
-        '''Update cell parameters for current and future frames.'''
+        """Update cell parameters for current and future frames."""
         self._frame._cell_aa_deg(*args, **kwargs)
         self.__dict__.update(self._frame.__dict__)
         self._mask(self, '_cell_aa_deg',  *args, **kwargs)
 
     def align_coordinates(self, *args, **kwargs):
-        '''Align current and future frames.'''
+        """Align current and future frames."""
         self._frame.align_coordinates(*args, **kwargs)
         self.__dict__.update(self._frame.__dict__)
         # remember reference
@@ -1992,25 +1992,25 @@ class XYZ(_XYZ, _ITERATOR, _FRAME):
         self._mask(self, 'align_coordinates', *args, **kwargs)
 
     def clean_velocities(self, *args, **kwargs):
-        '''Clean velocities for current and future frames.'''
+        """Clean velocities for current and future frames."""
         self._frame.clean_velocities(*args, **kwargs)
         self.__dict__.update(self._frame.__dict__)
         self._mask(self, 'clean_velocities', *args, **kwargs)
 
     def center_coordinates(self, *args, **kwargs):
-        '''Center coordinates for current and future frames.'''
+        """Center coordinates for current and future frames."""
         self._frame.center_coordinates(*args, **kwargs)
         self.__dict__.update(self._frame.__dict__)
         self._mask(self, 'center_coordinates', *args, **kwargs)
 
     def center_position(self, *args, **kwargs):
-        '''Center positions for current and future frames.'''
+        """Center positions for current and future frames."""
         self._frame.center_position(*args, **kwargs)
         self.__dict__.update(self._frame.__dict__)
         self._mask(self, 'center_position', *args, **kwargs)
 
     def wrap_molecules(self, *args, **kwargs):
-        '''Wrap molecules for current and future frames.'''
+        """Wrap molecules for current and future frames."""
         self._frame.wrap_molecules(*args, **kwargs)
         self.__dict__.update(self._frame.__dict__)
         # --- if call already in mask, just unwrap relative atom positions
@@ -2021,13 +2021,13 @@ class XYZ(_XYZ, _ITERATOR, _FRAME):
         self._mask(self, 'wrap_molecules', *args, **kwargs)
 
     def wrap(self, *args, **kwargs):
-        '''Wrap current and future frames.'''
+        """Wrap current and future frames."""
         self._frame.wrap(*args, **kwargs)
         self.__dict__.update(self._frame.__dict__)
         self._mask(self, 'wrap', *args, **kwargs)
 
     def sort(self, *args, **kwargs):
-        '''Sort atoms in current and future frames.'''
+        """Sort atoms in current and future frames."""
         slist = self._frame.sort(*args, **kwargs)
         self.__dict__.update(self._frame.__dict__)
         # self._mask(self, 'sort', *args, **kwargs)
@@ -2036,30 +2036,30 @@ class XYZ(_XYZ, _ITERATOR, _FRAME):
         return slist
 
     def get_center_of_mass(self, *args, **kwargs):
-        '''Backward-compatible alias for center_of_mass.'''
+        """Backward-compatible alias for center_of_mass."""
         self.center_of_mass(*args, **kwargs)
 
     def center_of_mass(self, *args, **kwargs):
-        '''Calculate centers of mass for current and future frames.'''
+        """Calculate centers of mass for current and future frames."""
         self._frame.center_of_mass(*args, **kwargs)
         self.__dict__.update(self._frame.__dict__)
         self._mask(self, 'center_of_mass', *args, **kwargs)
 
     def center_of_geometry(self, *args, **kwargs):
-        '''Calculate centers of geometry for current and future frames.'''
+        """Calculate centers of geometry for current and future frames."""
         self._frame.center_of_geometry(*args, **kwargs)
         self.__dict__.update(self._frame.__dict__)
         self._mask(self, 'center_of_geometry', *args, **kwargs)
 
     def repeat(self, *args, **kwargs):
-        '''Repeat the current cell for current and future frames.'''
+        """Repeat the current cell for current and future frames."""
         self._frame.repeat(*args, **kwargs)
         self.__dict__.update(self._frame.__dict__)
         kwargs.update({'unwrap_ref': self._frame._unwrap_ref})
         self._mask(self, 'repeat', *args, **kwargs)
 
     def split(self, *args, **kwargs):
-        '''split is faster with fully loaded trajectory'''
+        """split is faster with fully loaded trajectory"""
         if 'select' not in kwargs:
             _warnings.warn('Splitting iterator without select argument has '
                            'no effect!', _ChirPyWarning, stacklevel=2)
@@ -2069,9 +2069,9 @@ class XYZ(_XYZ, _ITERATOR, _FRAME):
 
 
 class MOMENTS(_MOMENTS, _ITERATOR, _FRAME):
-    '''A generator of MOMENT frames.'''
+    """A generator of MOMENT frames."""
     def __init__(self, *args, **kwargs):
-        '''Initialise a MOMENTS iterator from file input.'''
+        """Initialise a MOMENTS iterator from file input."""
         self._kernel = MOMENTSFrame
 
         # --- keep kwargs for iterations
@@ -2143,9 +2143,9 @@ class MOMENTS(_MOMENTS, _ITERATOR, _FRAME):
             self._kwargs['_skip'] = self._kwargs['skip'].copy()
 
     def expand(self, batch=None, ignore_warning=False):
-        '''Perform iteration on remaining iterator and load
+        """Perform iteration on remaining iterator and load
            entire (<batch> frames) trajectory into memory.
-           '''
+           """
         try:
             if batch is not None:
                 data = [self.data for _fr in itertools.islice(self, batch)]
@@ -2169,7 +2169,7 @@ class MOMENTS(_MOMENTS, _ITERATOR, _FRAME):
                 return None
 
     def write(self, fn, **kwargs):
-        '''Write all remaining moment frames to file.'''
+        """Write all remaining moment frames to file."""
         self._unwind(fn,
                      func='write',
                      events={0: {'append': True}},
@@ -2179,34 +2179,34 @@ class MOMENTS(_MOMENTS, _ITERATOR, _FRAME):
             self.rewind()
 
     def wrap(self, *args, **kwargs):
-        '''Wrap current and future frames.'''
+        """Wrap current and future frames."""
         self._frame.wrap(*args, **kwargs)
         self.__dict__.update(self._frame.__dict__)
         self._mask(self, 'wrap', *args, **kwargs)
 
     def center_position(self, *args, **kwargs):
-        '''Center positions for current and future frames.'''
+        """Center positions for current and future frames."""
         self._frame.center_position(*args, **kwargs)
         self.__dict__.update(self._frame.__dict__)
         self._mask(self, 'center_position', *args, **kwargs)
 
     def repeat(self, *args, **kwargs):
-        '''Repeat the current cell for current and future frames.'''
+        """Repeat the current cell for current and future frames."""
         self._frame.repeat(*args, **kwargs)
         self.__dict__.update(self._frame.__dict__)
         self._mask(self, 'repeat', *args, **kwargs)
 
 
 class _XYZTrajectory(_XYZ, _TRAJECTORY):
-    '''Load full XYZ trajectory into memory'''
+    """Load full XYZ trajectory into memory"""
 
     def _sync_class(self, **kwargs):
-        '''Run trajectory and XYZ synchronisation hooks.'''
+        """Run trajectory and XYZ synchronisation hooks."""
         _TRAJECTORY._sync_class(self)
         _XYZ._sync_class(self)
 
     def calculate_nuclear_velocities(self, ts=0.5):
-        '''finite diff, linear (frame1-frame0, frame2-frame1, etc.)'''
+        """finite diff, linear (frame1-frame0, frame2-frame1, etc.)"""
         if _np.linalg.norm(self.vel_au) != 0:
             _warnings.warn('Overwriting existing velocities in object!',
                            _ChirPyWarning, stacklevel=2)
@@ -2215,26 +2215,26 @@ class _XYZTrajectory(_XYZ, _TRAJECTORY):
 
 
 class _MOMENTSTrajectory(_MOMENTS, _TRAJECTORY):
-    '''Load full MOMENTS trajectory into memory'''
+    """Load full MOMENTS trajectory into memory"""
 
     def _sync_class(self, **kwargs):
-        '''Run trajectory and moment synchronisation hooks.'''
+        """Run trajectory and moment synchronisation hooks."""
         _TRAJECTORY._sync_class(self)
         _MOMENTS._sync_class(self)
 
 
 class VibrationalModes(_XYZ, _MODES):
-    '''Vibrational mode set with XYZ-like coordinates and metadata.'''
+    """Vibrational mode set with XYZ-like coordinates and metadata."""
 
     def _sync_class(self, **kwargs):
-        '''Run XYZ and mode synchronisation hooks.'''
+        """Run XYZ and mode synchronisation hooks."""
         # --- keep order for APT/AAT calculation
         _XYZ._sync_class(self)
         _MODES._sync_class(self, **kwargs)
 
     def calculate_nuclear_velocities(self, occupation='single',
                                      temperature=300):
-        '''Occupation can be single, average, or random.'''
+        """Occupation can be single, average, or random."""
         beta_au = 1./(temperature*constants.k_B_au)
         print('Calculating velocities for {} K.'.format(temperature))
 
@@ -2278,7 +2278,7 @@ class VibrationalModes(_XYZ, _MODES):
         self._vel_au(_VEL)
 
     def get_mode(self, mode, **kwargs):
-        '''Returns a XYZFrame of given mode'''
+        """Returns a XYZFrame of given mode"""
 
         return XYZFrame(data=self.data[mode],
                         symbols=self.symbols,
@@ -2289,6 +2289,6 @@ class VibrationalModes(_XYZ, _MODES):
 
 
 class NormalModes(VibrationalModes):
-    '''Alias for vibrational modes interpreted as normal modes.'''
+    """Alias for vibrational modes interpreted as normal modes."""
 
     pass

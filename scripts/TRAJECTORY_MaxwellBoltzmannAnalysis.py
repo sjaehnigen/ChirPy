@@ -29,7 +29,7 @@
 #
 # ----------------------------------------------------------------------
 
-'''Analyse trajectory velocities with Maxwell-Boltzmann statistics.'''
+"""Analyse trajectory velocities with Maxwell-Boltzmann statistics."""
 
 import argparse
 import numpy as np
@@ -41,7 +41,7 @@ from chirpy.classes import system
 
 
 def main():
-    '''Analyse trajectory velocities with Maxwell-Boltzmann statistics.'''
+    """Analyse trajectory velocities with Maxwell-Boltzmann statistics."""
     parser = argparse.ArgumentParser(
          description="Analyse motion of atoms in trajectory and plot results.",
          formatter_class=argparse.ArgumentDefaultsHelpFormatter
@@ -127,7 +127,7 @@ def main():
     _load = system.Supercell(args.fn, **largs).XYZ
 
     def get_v():
-        '''Yield the selected velocity component for each trajectory frame.'''
+        """Yield the selected velocity component for each trajectory frame."""
         try:
             while True:
                 next(_load)

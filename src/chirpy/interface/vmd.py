@@ -28,7 +28,7 @@
 #
 # ----------------------------------------------------------------------
 
-'''Utilities for writing simple VMD drawing scripts.'''
+"""Utilities for writing simple VMD drawing scripts."""
 
 
 import numpy as np
@@ -38,11 +38,11 @@ from scipy.interpolate import UnivariateSpline
 
 
 class VMDPaths():
-    '''Represent one or more paths for VMD drawing commands.'''
+    """Represent one or more paths for VMD drawing commands."""
 
     def __init__(self, positions_aa, auto_smooth=True):
-        '''Read a set of paths defines by node positions in angstrom with
-           shape (n_points p. path[, n_paths], 3)'''
+        """Read a set of paths defines by node positions in angstrom with
+           shape (n_points p. path[, n_paths], 3)"""
 
         if len(positions_aa.shape) == 2:
             self.pos_aa = np.array(positions_aa[:, None])
@@ -59,9 +59,9 @@ class VMDPaths():
         print(self.pos_aa.shape)
 
     def smooth(self):
-        '''Smoothing with k=3 spline'''
+        """Smoothing with k=3 spline"""
         def spline(points):
-            '''Smooth one path with cubic splines.'''
+            """Smooth one path with cubic splines."""
 
             x = np.arange(points.shape[0])
             spl0 = UnivariateSpline(x, points[:, 0])
@@ -74,7 +74,7 @@ class VMDPaths():
                 ).swapaxes(0, 1)
 
     def reduce(self, cutoff_aa=0.0):
-        '''Keep paths whose length is above given cutoff'''
+        """Keep paths whose length is above given cutoff"""
         ind = np.linalg.norm(np.abs(
                                 np.diff(self.pos_aa[:, :, :3], axis=0)
                                 ).sum(axis=0),
@@ -86,13 +86,13 @@ class VMDPaths():
                     scale=1,
                     thresh=0.0
                     ):
-        '''Generate VMD object from vector array
+        """Generate VMD object from vector array
            origins_aa/vectors_aa ... numpy arrays of shape (n_vectors, 3)
            scale ... int or numpy array of shape (n_vectors) to multiply
                      vectors with
            thresh ... exclude regions of where vector norm is smaller than
                       value (before scaling)
-           '''
+           """
         _ind = np.linalg.norm(vectors_aa, axis=-1) > thresh
         _p0 = origins_aa.T
         _p1 = _p0 + vectors_aa.T * scale
@@ -110,11 +110,11 @@ class VMDPaths():
                           thresh=0.0,
                           verbose=False
                           ):
-        '''Generate VMD object from VectorField object
+        """Generate VMD object from VectorField object
            normalise ... None/max/local
            thresh ... exclude regions of where vector norm is smaller than
                       value (before normalisation)
-           '''
+           """
 
         # -- apply sparse and thresh
         _obj = obj.sparse(sparse)
@@ -144,7 +144,7 @@ class VMDPaths():
 
     @staticmethod
     def _draw_bit(p0, p1, tool='line', options='', overlap=0.0):
-        '''p0, p1 ... path bits of shape (n_paths, 3)'''
+        """p0, p1 ... path bits of shape (n_paths, 3)"""
         return ''.join([
             f"draw {tool} " +
             "{%16.9f %16.9f %16.9f} " % tuple(t0) +
@@ -154,7 +154,7 @@ class VMDPaths():
             for t0, t1 in zip(p0, p1)])
 
     def _draw(self, sparse=5, **kwargs):
-        '''Generate draw commands for the stored paths.'''
+        """Generate draw commands for the stored paths."""
 
         block = ''
         p0 = None
@@ -169,13 +169,13 @@ class VMDPaths():
                         radius=0.075,
                         length=None,
                         resolution=30):
-        '''Add cone to the ends of paths given through positions of
-        shape (n_points p. path[, n_paths], 3)'''
+        """Add cone to the ends of paths given through positions of
+        shape (n_points p. path[, n_paths], 3)"""
         if length is None:
             length = 8 * radius
 
         def arr_head_sense(p, depth):
-            '''unit vector of pointing cone'''
+            """unit vector of pointing cone"""
             backtrace = p[-1, None] - p[-depth:-1]
             with np.errstate(divide='ignore'):
                 _N = np.linalg.norm(backtrace, axis=-1)
@@ -195,9 +195,9 @@ class VMDPaths():
 
     @staticmethod
     def _get_color_id():
-        '''picks randonly one of VMD's colors (57 < id < 1057 to preserve solid
+        """picks randonly one of VMD's colors (57 < id < 1057 to preserve solid
         colors). Warning: this may interfere with other
-        represantations/drawings'''
+        represantations/drawings"""
         return int(np.random.random() * 1000 + 57)
 
     def draw_line(self, fn,
@@ -211,8 +211,8 @@ class VMDPaths():
                   arrow_length=None,
                   arrow_resolution=30,
                   ):
-        '''sparsity: skip every <sparse>th point in positions; <0 for reversed
-        order'''
+        """sparsity: skip every <sparse>th point in positions; <0 for reversed
+        order"""
         tool = 'line'
         options = f'width {width} style {style}'
         self.reduce(cutoff_aa=cutoff_aa)
@@ -248,8 +248,8 @@ class VMDPaths():
                   arrow_length=None,
                   arrow_resolution=30,
                   ):
-        '''sparsity: skip every <sparse>th point in positions; <0 for reversed
-        order'''
+        """sparsity: skip every <sparse>th point in positions; <0 for reversed
+        order"""
         tool = 'cylinder'
         options = f'radius {radius} resolution {resolution}'
         self.reduce(cutoff_aa=cutoff_aa)

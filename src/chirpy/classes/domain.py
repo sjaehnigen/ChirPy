@@ -28,7 +28,7 @@
 #
 # ----------------------------------------------------------------------
 
-'''Sparse domain objects defined on regular three-dimensional grids.'''
+"""Sparse domain objects defined on regular three-dimensional grids."""
 
 import numpy as _np
 import copy as _copy
@@ -39,18 +39,18 @@ from ..snippets import extract_keys
 
 
 class Domain3D(_CORE):
-    '''Contains arrays of positions in a grid with assigned (scalar) values.
+    """Contains arrays of positions in a grid with assigned (scalar) values.
        The object can be expanded into a full grid representation (see volume
-       class)'''
+       class)"""
 
     def __init__(self,  shape,  indices,  weights,  **kwargs):
-        '''Store sparse grid shape, occupied indices, and weights.'''
+        """Store sparse grid shape, occupied indices, and weights."""
         self.grid_shape = shape
         self.indices = indices
         self.weights = weights
 
     def __add__(self, other):
-        '''Combine two domains defined on the same grid.'''
+        """Combine two domains defined on the same grid."""
         if self.grid_shape != other.grid_shape:
             raise ValueError('cannot combine domains of grid shape '
                              f'{self.grid_shape} and {other.grid_shape}')
@@ -61,7 +61,7 @@ class Domain3D(_CORE):
         return new
 
     def map_vector(self, v3):
-        '''Map vector ``v3`` onto the domain support as a field.'''
+        """Map vector ``v3`` onto the domain support as a field."""
         n_x, n_y, n_z = self.grid_shape
         v3_field = _np.zeros((3, n_x, n_y, n_z))
         ind = self.indices
@@ -69,18 +69,18 @@ class Domain3D(_CORE):
         return v3_field
 
     def integrate_volume(self, f):
-        '''Integrate callable ``f`` over the weighted domain.'''
+        """Integrate callable ``f`` over the weighted domain."""
         # return simps(f(self.indices)*self.weights)
         return _np.sum(f(self.indices)*self.weights, axis=0)
 
     def expand(self):
-        '''Expand the sparse domain to a full scalar grid.'''
+        """Expand the sparse domain to a full scalar grid."""
         data = _np.zeros(self.grid_shape)
         data[self.indices] = self.weights
         return data
 
     def write(self, fn, **kwargs):
-        '''Write the expanded domain as a scalar field.'''
+        """Write the expanded domain as a scalar field."""
         _ScalarField.from_domain(self, **extract_keys(vars(self),
                                                       origin_aa=None,
                                                       pos_aa=None,

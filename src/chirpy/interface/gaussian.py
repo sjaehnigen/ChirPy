@@ -28,7 +28,7 @@
 #
 # ----------------------------------------------------------------------
 
-'''Readers and helpers for Gaussian output files.'''
+"""Readers and helpers for Gaussian output files."""
 
 
 import numpy as np
@@ -41,7 +41,7 @@ import copy
 
 # --- ToDo: OLD CODE
 def g09Reader(filename, run=1):
-    '''Read one Gaussian archive block and selected derived data.'''
+    """Read one Gaussian archive block and selected derived data."""
 
     # --- extract run
     with open(filename, 'r') as f:
@@ -85,7 +85,7 @@ def g09Reader(filename, run=1):
     properties['title'] = title
 
     def ParseAtomBlock(atom_block, properties):
-        '''Parse atomic symbols and coordinates from the archive block.'''
+        """Parse atomic symbols and coordinates from the archive block."""
 
         # print(atom_block)
         atom_block = atom_block.split('\\')[1:]
@@ -108,7 +108,7 @@ def g09Reader(filename, run=1):
         return properties
 
     def ParsePropertyBlock(property_block, properties):
-        '''Parse scalar and array properties from the archive block.'''
+        """Parse scalar and array properties from the archive block."""
 
         property_block = property_block.split('\\')
         for line in property_block:
@@ -121,7 +121,7 @@ def g09Reader(filename, run=1):
         return properties
 
     def ParseHessianBlock(hessian_block, n_atoms, properties):
-        '''Expand the packed Gaussian Hessian into a square matrix.'''
+        """Expand the packed Gaussian Hessian into a square matrix."""
 
         tmp = np.array(eval(hessian_block))
         # n_atoms = int((np.sqrt(2*tmp.shape[0]+0.5)-0.5)/3)
@@ -136,7 +136,7 @@ def g09Reader(filename, run=1):
         return properties
 
     def WhatIsThis(block, n_atoms, properties):
-        '''Parse the extra archive block into a temporary array.'''
+        """Parse the extra archive block into a temporary array."""
 
         tmp = np.array(eval(block.rstrip('\\')))
         properties['tmp'] = tmp.reshape((n_atoms, 3))
@@ -224,10 +224,10 @@ def g09Reader(filename, run=1):
 
 
 def read_g09_md(filename, masses):
-    '''Read Cartesian coordinates, velocities, and energies from G09 MD.'''
+    """Read Cartesian coordinates, velocities, and energies from G09 MD."""
 
     def ExtractFrame(f, offset, flen=30000):
-        '''Extract one MD frame block starting at a file offset.'''
+        """Extract one MD frame block starting at a file offset."""
 
         f.seek(offset)
         inbuffer = f.read(flen)
@@ -239,7 +239,7 @@ def read_g09_md(filename, masses):
         return inbuffer[p1:p2], p2 + offset
 
     def ParseFrame(frame, n_atoms):
-        '''Parse one Gaussian MD frame into arrays and total energy.'''
+        """Parse one Gaussian MD frame into arrays and total energy."""
 
         frame = frame.replace('D+', 'E+')
         frame = frame.replace('D-', 'E-')
@@ -290,7 +290,7 @@ def read_g09_md(filename, masses):
 
 
 def g09_extract_ir_data(filename):
-    '''Extract harmonic IR frequencies and intensities from a log file.'''
+    """Extract harmonic IR frequencies and intensities from a log file."""
 
     with open(filename, 'r') as f:
         data = np.array([line.split('--')[-1].split()
@@ -301,7 +301,7 @@ def g09_extract_ir_data(filename):
 
 
 def g09_extract_vcd_data(filename):
-    '''Extract harmonic VCD frequencies and rotational strengths.'''
+    """Extract harmonic VCD frequencies and rotational strengths."""
 
     with open(filename, 'r') as f:
         data = np.array([line.split('--')[-1].split()
@@ -312,7 +312,7 @@ def g09_extract_vcd_data(filename):
 
 
 def g09_extract_anharmonic_ir_data(filename):
-    '''Extract anharmonic IR band positions and intensities.'''
+    """Extract anharmonic IR band positions and intensities."""
 
     with open(filename, 'r') as f:
         istart = 1e99
@@ -355,7 +355,7 @@ def g09_extract_anharmonic_ir_data(filename):
 
 def g09_get_ir_spectrum(filename, x0, x1, w,
                         n=1024, shape='gaussian', anharmonic=False, vcd=False):
-    '''Build a broadened IR or VCD spectrum from Gaussian output.'''
+    """Build a broadened IR or VCD spectrum from Gaussian output."""
 
     if anharmonic:
         freqs, inten = g09_extract_anharmonic_ir_data(filename)
@@ -382,7 +382,7 @@ def g09_get_ir_spectrum(filename, x0, x1, w,
 
 # ToDo: Should not be here
 def GaussianConvolution(x, freqs, inten, w):
-    '''Evaluate a Gaussian line broadening at position x.'''
+    """Evaluate a Gaussian line broadening at position x."""
 
     # subs = (m-x)/(0.5*w)
     return sum([inten[z] * np.exp(-np.log(2) * ((m-x) / (0.5*w))**2)
@@ -390,7 +390,7 @@ def GaussianConvolution(x, freqs, inten, w):
 
 
 def LorentzianConvolution(x, freqs, inten, w):
-    '''Evaluate a Lorentzian line broadening at position x.'''
+    """Evaluate a Lorentzian line broadening at position x."""
 
     # subs = (m-x)/(0.5*w)
     return sum([inten[z] / (1 + ((m-x) / (0.5*w))**2)
@@ -399,7 +399,7 @@ def LorentzianConvolution(x, freqs, inten, w):
 
 def calculate_normal_modes(n_atoms, masses, coords, hessian,
                            p_tra=True, p_rot=True):
-    '''Project and diagonalise a Hessian to obtain normal modes.'''
+    """Project and diagonalise a Hessian to obtain normal modes."""
 
     sder, cmc = Projection(n_atoms, masses, coords, hessian, p_tra, p_rot)
     e_vec, e_val, mwe_vec = diagonalize_dynamical_matrix(n_atoms, masses, sder)
@@ -411,7 +411,7 @@ def calculate_normal_modes(n_atoms, masses, coords, hessian,
 
 
 def Projection(n_atoms, masses, coords, hessian, p_tra=True, p_rot=True):
-    '''Project translational and rotational motion from a Hessian.'''
+    """Project translational and rotational motion from a Hessian."""
 
     dim = n_atoms*3
     # no PBC support

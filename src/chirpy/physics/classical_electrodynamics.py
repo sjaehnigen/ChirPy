@@ -29,7 +29,7 @@
 # ----------------------------------------------------------------------
 
 
-'''Classical-electrodynamics utilities for moments and electromagnetic fields.'''
+"""Classical-electrodynamics utilities for moments and electromagnetic fields."""
 
 
 import numpy as np
@@ -44,17 +44,17 @@ from ..mathematics.algebra import cross
 
 
 def electric_dipole_moment(pos_au, charges_au):
-    '''Return per-particle electric dipole moments q r in a.u.'''
+    """Return per-particle electric dipole moments q r in a.u."""
     return pos_au * charges_au[:, None]
 
 
 def current_dipole_moment(vel_au, charges_au):
-    '''Return per-particle current dipole moments q v in a.u.'''
+    """Return per-particle current dipole moments q v in a.u."""
     return vel_au * charges_au[:, None]
 
 
 def electric_quadrupole_moment(pos_au, charges_au):
-    '''Return the traceless electric quadrupole tensor in a.u.'''
+    """Return the traceless electric quadrupole tensor in a.u."""
 
     return np.sum(
               (
@@ -66,26 +66,26 @@ def electric_quadrupole_moment(pos_au, charges_au):
 
 
 def electric_dipole_shift_origin(charges_au, trans_au):
-    '''Compute differential term of origin shift
+    """Compute differential term of origin shift
        charges_au ... particle charges
        trans_au ... translation vector from old to new origin
                     with shape ([n_frames, n_particles], 3)
-       '''
+       """
     return -trans_au * charges_au[..., None]
 
 
 def magnetic_dipole_shift_origin(c_au, trans_au):
-    '''Compute differential term of origin shift
+    """Compute differential term of origin shift
        c_au ... current dipole moment
        trans_au ... translation vector from old to new origin
        NB: No cgs-convention
-       '''
+       """
     return -0.5 * cross(trans_au, c_au)
 
 
 def shift_electric_origin_gauge(charges_au, mu_au, o_a_au, o_b_au,
                                 cell_au_deg=None):
-    '''Apply (distrubuted) origin gauge on electric dipole moments shifting
+    """Apply (distrubuted) origin gauge on electric dipole moments shifting
        from origin A to origin B.
        Accepts cell_au_deg argument to account for periodic boundaries.
        Expects atomic units (no cgs-convention).
@@ -98,7 +98,7 @@ def shift_electric_origin_gauge(charges_au, mu_au, o_a_au, o_b_au,
        o_b_au ... new origin(s) of shape (N, 3) or (3)
 
        Returns: An updated array of mu_au
-       '''
+       """
 
     _trans = mapping.vector_pbc(o_a_au, o_b_au, cell=cell_au_deg)
 
@@ -106,7 +106,7 @@ def shift_electric_origin_gauge(charges_au, mu_au, o_a_au, o_b_au,
 
 
 def shift_magnetic_origin_gauge(c_au, m_au, o_a_au, o_b_au, cell_au_deg=None):
-    '''Apply (distrubuted) origin gauge on magnetic dipole moments shifting
+    """Apply (distrubuted) origin gauge on magnetic dipole moments shifting
        from origin A to origin B.
        Accepts cell_au_deg argument to account for periodic boundaries.
        Expects atomic units (no cgs-convention).
@@ -119,7 +119,7 @@ def shift_magnetic_origin_gauge(c_au, m_au, o_a_au, o_b_au, cell_au_deg=None):
        o_b_au ... new origin(s) of shape (N, 3) or (3)
 
        Returns: An updated array of m_au
-       '''
+       """
 
     # --- points to the new origin
     _trans = mapping.vector_pbc(o_a_au, o_b_au, cell=cell_au_deg)
@@ -128,10 +128,10 @@ def shift_magnetic_origin_gauge(c_au, m_au, o_a_au, o_b_au, cell_au_deg=None):
 
 
 def coulomb(r0, r, q, cell=None, thresh=1.E-8):
-    '''Return Coulomb-field contributions at r0 from charges q at r.
+    """Return Coulomb-field contributions at r0 from charges q at r.
 
        r has shape (N, ..., 3).
-       '''
+       """
     d = mapping.vector_pbc(r, r0, cell=cell)  # r0 - r
     d3 = np.linalg.norm(d, axis=-1)**3
     with np.errstate(divide='ignore'):
@@ -141,10 +141,10 @@ def coulomb(r0, r, q, cell=None, thresh=1.E-8):
 
 
 def coulomb_grid(r, rho, pos_grid, voxel, cell=None, thresh=1.E-8):
-    '''Return the Coulomb field at r from a charge-density grid.
+    """Return the Coulomb field at r from a charge-density grid.
 
        r has shape (3, ..., N).
-       '''
+       """
     if cell is not None:
         raise NotImplementedError('coulomb_grid does not support periodic '
                                   'boundaries!')
@@ -158,15 +158,15 @@ def coulomb_grid(r, rho, pos_grid, voxel, cell=None, thresh=1.E-8):
 
 
 def coulomb_kspace(rho, cell_au, voxel):
-    '''Placeholder for reciprocal-space Coulomb fields on a grid.'''
+    """Placeholder for reciprocal-space Coulomb fields on a grid."""
     pass
 
 
 def biot_savart(r0, r, j, cell=None, thresh=1.E-8):
-    '''Return Biot-Savart field contributions at r0 from currents j at r.
+    """Return Biot-Savart field contributions at r0 from currents j at r.
 
        r has shape (N, ..., 3).
-       '''
+       """
     # in atomic units using cgs convention for B field would be: µ0/4*pi = 1/c
     # here we use au w/o cgs : µ0/4*pi = 1/c**2
     # d = r0 - r
@@ -179,10 +179,10 @@ def biot_savart(r0, r, j, cell=None, thresh=1.E-8):
 
 
 def biot_savart_grid(r, j, pos_grid, voxel, cell=None, thresh=1.E-8):
-    '''Return the Biot-Savart field at r from a current-density grid.
+    """Return the Biot-Savart field at r from a current-density grid.
 
        r has shape (3, ..., N).
-       '''
+       """
     if cell is not None:
         raise NotImplementedError('coulomb_grid does not support periodic '
                                   'boundaries!')
@@ -196,7 +196,7 @@ def biot_savart_grid(r, j, pos_grid, voxel, cell=None, thresh=1.E-8):
 
 
 def biot_savart_kspace(j, cell_vec_au, voxel):
-    '''Return the magnetic field from a current grid in reciprocal space.'''
+    """Return the magnetic field from a current grid in reciprocal space."""
     div, rot = divrot(j, cell_vec_au)
 
     # G != 0

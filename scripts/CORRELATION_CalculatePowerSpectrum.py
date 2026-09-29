@@ -29,7 +29,7 @@
 #
 # ----------------------------------------------------------------------
 
-'''Calculate and plot a power spectrum from atomic velocities.'''
+"""Calculate and plot a power spectrum from atomic velocities."""
 
 import argparse
 import numpy as np
@@ -42,8 +42,8 @@ from chirpy import config, constants
 
 
 def main():
-    '''Calculate and plot the power spectrum of the given trajectory through
-       time-correlation of the atomic velocities..'''
+    """Calculate and plot the power spectrum of the given trajectory through
+       time-correlation of the atomic velocities.."""
     parser = argparse.ArgumentParser(
             description="Calculate and plot the power spectrum of the given "
             "trajectory through time-correlation of the atomic velocities.",

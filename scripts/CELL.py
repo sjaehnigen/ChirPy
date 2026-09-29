@@ -29,7 +29,7 @@
 #
 # ----------------------------------------------------------------------
 
-'''Convert cell parameters between lengths, angles, and vectors.'''
+"""Convert cell parameters between lengths, angles, and vectors."""
 
 import argparse
 import numpy as np
@@ -39,7 +39,7 @@ np.set_printoptions(precision=5, suppress=True)
 
 
 def main():
-    '''Convert cell parameters.'''
+    """Convert cell parameters."""
     parser = argparse.ArgumentParser(
             description="Convert cell parameters.",
             formatter_class=argparse.ArgumentDefaultsHelpFormatter

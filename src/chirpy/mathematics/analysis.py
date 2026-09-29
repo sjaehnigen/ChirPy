@@ -28,20 +28,20 @@
 #
 # ----------------------------------------------------------------------
 
-'''Analysis functions for gridded vector fields and time series.'''
+"""Analysis functions for gridded vector fields and time series."""
 
 import numpy as np
 from ..constants import eijk
 
 
 def divrot(data, cell_vec):
-    '''Gridded calculation of divergence and rotation of a vector field
+    """Gridded calculation of divergence and rotation of a vector field
        using gradient along the dimensions of the grid (x, y, z only in the
        case of tetragonal cells).
 
            data of shape 3, x, y, z
            cell_vec ... grid unit vectors (spacing)
-       '''
+       """
     gradients = np.array(np.gradient(data, 1,
                                      np.linalg.norm(cell_vec[0]),
                                      np.linalg.norm(cell_vec[1]),
@@ -53,18 +53,18 @@ def divrot(data, cell_vec):
 
 
 def avg(x):
-    '''Average of x along the first axis.'''
+    """Average of x along the first axis."""
     return np.mean(x, axis=0)
 
 
 def cumavg(data):
-    '''Cumulative (running) average of data along the first axis.'''
+    """Cumulative (running) average of data along the first axis."""
     return np.cumsum(data, axis=0)/np.arange(1, len(data)+1)
 
 
 def movavg(a, n=3, axis=0):
-    '''Moving average of a over a window of n along the given axis
-       (adaptive at the edges, keeps the input size).'''
+    """Moving average of a over a window of n along the given axis
+       (adaptive at the edges, keeps the input size)."""
     ret = np.cumsum(a, dtype=float, axis=axis)
     ret[n:] = ret[n:] - ret[:-n]
 

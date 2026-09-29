@@ -29,7 +29,7 @@
 # ----------------------------------------------------------------------
 
 
-'''Vector and matrix algebra helpers (angles, rotations, products, etc.).'''
+"""Vector and matrix algebra helpers (angles, rotations, products, etc.)."""
 
 import numpy as np
 from scipy.interpolate import RegularGridInterpolator
@@ -38,11 +38,11 @@ from ..constants import eijk
 
 
 def dot(vector0, vector1):
-    '''v0 · v1 with vectors v0/v1 of shape ([n_frames, n_units], 3)
+    """v0 · v1 with vectors v0/v1 of shape ([n_frames, n_units], 3)
        (numpy.newaxis accepted)
 
        returns vector with the same shape as v0/v1
-       '''
+       """
     v0 = np.array(vector0)
     v1 = np.array(vector1)
 
@@ -57,11 +57,11 @@ def dot(vector0, vector1):
 
 
 def cross(vector0, vector1):
-    '''v0 × v1 with vectors v0/v1 of shape ([n_frames, n_units], 3)
+    """v0 × v1 with vectors v0/v1 of shape ([n_frames, n_units], 3)
        (numpy.newaxis accepted)
 
        returns vector with the same shape as v0/v1
-       '''
+       """
     v0 = np.array(vector0)
     v1 = np.array(vector1)
 
@@ -79,7 +79,7 @@ def cross(vector0, vector1):
 
 
 def vector(*args):
-    '''v = p1 - p0'''
+    """v = p1 - p0"""
     if len(args) == 1:
         p0, p1 = args[0]
     elif len(args) == 2:
@@ -148,8 +148,8 @@ def angle_from_points(*args):
 
 
 def dihedral(*args):
-    '''args: v0, v1, v2; dihedral angle along <-v0-.-v1->.-v2->;
-       all v as 3d-np.vectors or np.arrays (last axis will be used)'''
+    """args: v0, v1, v2; dihedral angle along <-v0-.-v1->.-v2->;
+       all v as 3d-np.vectors or np.arrays (last axis will be used)"""
     if len(args) == 1:
         v0, v1, v2 = args[0]
     elif len(args) == 3:
@@ -171,8 +171,8 @@ def dihedral(*args):
 
 
 def dihedral_from_points(*args):
-    '''args: p0, p1, p2, p3; dihedral angle along p0<--p1-->p2-->p3;
-       all p as 3d-np.vectors or np.arrays (last axis will be used)'''
+    """args: p0, p1, p2, p3; dihedral angle along p0<--p1-->p2-->p3;
+       all p as 3d-np.vectors or np.arrays (last axis will be used)"""
     if len(args) == 1:
         p0, p1, p2, p3 = args[0]
     elif len(args) == 4:
@@ -189,8 +189,8 @@ def dihedral_from_points(*args):
 
 
 def plane_normal(*args):
-    '''Plane spanned by vectors p1<--p2, p2-->p3;
-       all p as 3d-np.vectors or np.arrays (last axis will be used)'''
+    """Plane spanned by vectors p1<--p2, p2-->p3;
+       all p as 3d-np.vectors or np.arrays (last axis will be used)"""
     if len(args) == 1:
         p1, p2, p3 = args[0]
     elif len(args) == 3:
@@ -207,7 +207,7 @@ def plane_normal(*args):
 
 
 def triple_product(*args):
-    '''t = (v1 x v2) · v3'''
+    """t = (v1 x v2) · v3"""
     if len(args) == 1:
         v1, v2, v3 = args[0]
     elif len(args) == 3:
@@ -220,7 +220,7 @@ def triple_product(*args):
 
 
 def rotation_matrix(*args, angle=None):
-    '''rotate v1 to match v2 or normal vector (requires angle)'''
+    """rotate v1 to match v2 or normal vector (requires angle)"""
     if len(args) == 1:
         n = args[0]
         nnorm = np.linalg.norm(n)
@@ -260,9 +260,9 @@ def rotation_matrix(*args, angle=None):
 
 
 def change_euclidean_basis(v, basis):
-    '''Transform coordinates to cell vector basis with the help of dual basis
+    """Transform coordinates to cell vector basis with the help of dual basis
        v ... set of vectors of shape (....., 3) in old basis
-       basis ... new basis tensor of shape (3, 3)'''
+       basis ... new basis tensor of shape (3, 3)"""
     M = np.zeros_like(basis)
     M[0] = cross(basis[1], basis[2])
     M[1] = cross(basis[2], basis[0])
@@ -274,7 +274,7 @@ def change_euclidean_basis(v, basis):
 
 
 def kabsch_algorithm(P, ref):
-    '''Align P with respect to ref. Returns a rotation matrix'''
+    """Align P with respect to ref. Returns a rotation matrix"""
     C = np.dot(np.transpose(ref), P)
     V, S, W = np.linalg.svd(C)
 
@@ -287,12 +287,12 @@ def kabsch_algorithm(P, ref):
 
 
 def rotate_vector(vector, R, origin=np.zeros(3)):
-    '''Rotate vector around given origin with rotation matrix R.
+    """Rotate vector around given origin with rotation matrix R.
        Returns new vector.
 
        R of shape (N, N)
        vector of shape (N) or (M, N).
-    '''
+    """
 
     if len(vector.shape) == 1:
         return np.einsum('ji, i -> j', R, vector - origin) + origin
@@ -301,13 +301,13 @@ def rotate_vector(vector, R, origin=np.zeros(3)):
 
 
 def rotate_griddata(grid_positions, grid_data, R, origin=np.zeros(3)):
-    '''Rotate scalar field around given origin with rotation matrix R.
+    """Rotate scalar field around given origin with rotation matrix R.
        Keeps grid_positions fixed. Returns new grid_data.
 
        R of shape (N, N)
        grid_positions with shape (N, X, Y, Z)
        grid_data of shape (X, Y, Z)
-       '''
+       """
 
     _p_grid = grid_positions - origin[:, None, None, None]
     _f = RegularGridInterpolator(

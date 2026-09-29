@@ -29,7 +29,7 @@
 #
 # ----------------------------------------------------------------------
 
-'''Create a topology file from an input structure.'''
+"""Create a topology file from an input structure."""
 
 
 import argparse
@@ -37,7 +37,7 @@ import chirpy as cp
 
 
 def main():
-    '''Create a topology file from input.'''
+    """Create a topology file from input."""
     parser = argparse.ArgumentParser(
         description="Create a topology file from input.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter

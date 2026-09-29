@@ -28,7 +28,7 @@
 #
 # ----------------------------------------------------------------------
 
-'''Visualisation helpers for plots and formatted output.'''
+"""Visualisation helpers for plots and formatted output."""
 from . import timeline
 from . import pubplot
 from . import print_info

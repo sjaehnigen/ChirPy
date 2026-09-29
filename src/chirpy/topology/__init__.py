@@ -29,7 +29,7 @@
 # ----------------------------------------------------------------------
 
 
-'''Topology tools for molecular mapping, grids, distributions, and motion.'''
+"""Topology tools for molecular mapping, grids, distributions, and motion."""
 
 
 from . import distribution

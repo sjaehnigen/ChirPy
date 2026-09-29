@@ -29,7 +29,7 @@
 #
 # ----------------------------------------------------------------------
 
-'''Align a line between two atoms to a chosen axis.'''
+"""Align a line between two atoms to a chosen axis."""
 
 import argparse
 import numpy as np
@@ -37,7 +37,7 @@ from chirpy.classes import system
 
 
 def main():
-    '''Align a line that connects i0 and i1 to an axis.'''
+    """Align a line that connects i0 and i1 to an axis."""
     parser = argparse.ArgumentParser(
             description="Align a line that connects atoms i0 and i1 to an "
                         "axis (no PBC support).",

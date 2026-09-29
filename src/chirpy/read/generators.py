@@ -29,7 +29,7 @@
 # ----------------------------------------------------------------------
 
 
-'''Helpers for streaming and batching coordinate readers.'''
+"""Helpers for streaming and batching coordinate readers."""
 
 
 from itertools import islice, zip_longest
@@ -43,7 +43,7 @@ from .. import config
 
 
 def _gen(f):
-    '''Global generator for all formats'''
+    """Global generator for all formats"""
     # byte stream:
     # return (line for line in f if b'NEW DATA' not in line)
     return (line for line in f if 'NEW DATA' not in line and '#' not in line)
@@ -61,11 +61,11 @@ def _gen(f):
 #         return open(args[0], 'rb')  #, buffer_size=4096)
 
 def _open(*args, **kwargs):
-    '''Open and automatically decompress file if necessary.
+    """Open and automatically decompress file if necessary.
        Supported compressors: bz2
 
        Read-only support of compressed files.
-       '''
+       """
     if kwargs.get('bz2') or args[0].split('.')[-1] == 'bz2':
         return _bz2.open(args[0], 'rt')
     else:
@@ -73,8 +73,8 @@ def _open(*args, **kwargs):
 
 
 def _get(_it, kernel, **kwargs):
-    '''Gets batch of lines defined by _n_lines and processes
-       it with given _kernel. Returns processed data.'''
+    """Gets batch of lines defined by _n_lines and processes
+       it with given _kernel. Returns processed data."""
 
     n_lines = kwargs.get('n_lines')
 
@@ -90,9 +90,9 @@ def _get(_it, kernel, **kwargs):
     _sk = kwargs.pop("skip", [])
 
     class _line_iterator():
-        '''Iterate over frame-sized slices from a line stream.'''
+        """Iterate over frame-sized slices from a line stream."""
         def __init__(self):
-            '''Initialise the frame iterator state.'''
+            """Initialise the frame iterator state."""
             self.current_line = 0
             self._it = _it
             self._r = 0
@@ -107,11 +107,11 @@ def _get(_it, kernel, **kwargs):
                     self._r += 1
 
         def __iter__(self):
-            '''Return the iterator itself.'''
+            """Return the iterator itself."""
             return self
 
         def __next__(self):
-            '''Return the next frame-sized slice of lines.'''
+            """Return the next frame-sized slice of lines."""
             while (self._r - r0) % _ir != 0 or self._r + self._offset in _sk:
                 [next(_it) for _ik in range(n_lines)]
                 if self._r + self._offset in _sk:
@@ -145,8 +145,8 @@ def _reader(FN, n_lines, kernel,
             convert=1,
             verbose=config.__verbose__,
             **kwargs):
-    '''Opens file, checks contents, and parses arguments,
-       kernel, and generator.'''
+    """Opens file, checks contents, and parses arguments,
+       kernel, and generator."""
     with _open(FN, 'r', **kwargs) as _f:
         _it = _gen(_f)
         data = tqdm(_get(_it,
@@ -166,14 +166,14 @@ def _reader(FN, n_lines, kernel,
 
 
 def _dummy_kernel(frame, **kwargs):
-    '''Simplest _kernel. Does nothing.'''
+    """Simplest _kernel. Does nothing."""
     return frame
 
 
 def _container(reader_a, fn_a, args_a=(), kwargs_a=()):
-    '''Assemble multiple readers in one generator.
+    """Assemble multiple readers in one generator.
        reader_a/fn_a/args_a/kwargs_a are iterables
-       of reader functions and their filenames + arguments.'''
+       of reader functions and their filenames + arguments."""
     try:
         for _frame in zip_longest(*map(
              lambda x: x[0](x[1], *x[2], **x[3]),

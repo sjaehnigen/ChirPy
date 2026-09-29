@@ -28,7 +28,7 @@
 #
 # ----------------------------------------------------------------------
 
-'''Convenience imports for ChirPy class modules.'''
+"""Convenience imports for ChirPy class modules."""
 
 from . import core
 from . import quantum

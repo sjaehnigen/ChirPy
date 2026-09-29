@@ -28,7 +28,7 @@
 #
 # ----------------------------------------------------------------------
 
-'''File readers for coordinates, grids, modes, and topology data.'''
+"""File readers for coordinates, grids, modes, and topology data."""
 
 from . import topology
 from . import coordinates

@@ -28,7 +28,7 @@
 #
 # ----------------------------------------------------------------------
 
-'''Spectroscopic observables and spectra from time-correlation functions.'''
+"""Spectroscopic observables and spectra from time-correlation functions."""
 
 
 import copy
@@ -48,7 +48,7 @@ from ..config import ChirPyWarning as _ChirPyWarning
 
 
 def absorption_from_transition_moment(etdm_au):
-    '''Integrated absorption coeffcient in atomic units corresponding to
+    """Integrated absorption coeffcient in atomic units corresponding to
        distance**2 / time / amount.
        For integration over wavenumbers, i.e. distance / amount
        (e.g., km / mol in SI), divide by speed of light and transform
@@ -56,7 +56,7 @@ def absorption_from_transition_moment(etdm_au):
        etdm_au:    electric transition dipole moment of a normal mode
                    in atomic units (charge / sqrt(mass))
                    NB: assuming mass-weighted coordinate distance * sqrt(mass)!
-       '''
+       """
     # --- see Neugebauer2002
     # --- we take the prefacor from Fermi's Golden Rule and combine it with the
     #     harmonic oscillator approximation (prefactors); dependencies on omega
@@ -74,7 +74,7 @@ def absorption_from_transition_moment(etdm_au):
 
 
 def circular_dichroism_from_transition_moments(etdm_au, mtdm_au):
-    '''Integrated differential absorption coeffcient in atomic units
+    """Integrated differential absorption coeffcient in atomic units
        corresponding to distance**2 / time / amount.
        For integration over wavenumbers, i.e. distance / amount
        (e.g., km / mol in SI), divide by speed of light and transform
@@ -85,7 +85,7 @@ def circular_dichroism_from_transition_moments(etdm_au, mtdm_au):
                     (current * distance)
                     NB: NO mass-weighted coordinate * 1 / sqrt(mass)!
                     NB: NO cgs-convention for magnetic moments!
-       '''
+       """
     # --- see Neugebauer2002
     # --- we take the prefacor from Fermi's Golden Rule and combine it with the
     #     harmonic oscillator approximation (prefactors); dependencies on omega
@@ -108,7 +108,7 @@ def power_from_tcf(velocities_au, weights=1.0,
                    window_length_au=None,
                    flt_pow=None,
                    **kwargs):
-    '''Expects velocities of shape (n_frames, n_atoms, three)
+    """Expects velocities of shape (n_frames, n_atoms, three)
        No support of trajectory iterators.
 
        Expects atomic units.
@@ -124,7 +124,7 @@ def power_from_tcf(velocities_au, weights=1.0,
          "power"         - spectral density (FT TCF) in <energy>
                            (for weights in <mass>)
          "tcf_power"     - time-correlation function (TCF)
-       '''
+       """
     if flt_pow is not None:
         _warnings.warn('The flt_pow keyword is deprecated, '
                        'use window_length_au instead',
@@ -177,7 +177,7 @@ def power_from_tcf(velocities_au, weights=1.0,
 
 
 def absorption_from_tcf(*args, **kwargs):
-    '''Expects
+    """Expects
            1 - current (electric) dipole moments of shape
                (n_frames[, nkinds], three) (mode=abs)
 
@@ -197,13 +197,13 @@ def absorption_from_tcf(*args, **kwargs):
          "abs"/"cd"         - spectral density (FT TCF) in
                               distance**2 = 1 / (distance * density)
          "tcf_abs"/"tcf_cd" - time-correlation function (TCF)
-       '''
+       """
     kwargs.update({'mode': 'abs'})
     return _spectrum_from_tcf(*args, **kwargs)
 
 
 def circular_dichroism_from_tcf(*args, **kwargs):
-    '''Expects
+    """Expects
            1 - current (electric) dipole moments of shape
                (n_frames[, nkinds], three) (mode=abs)
            2 - magnetic dipole moments of shape
@@ -226,13 +226,13 @@ def circular_dichroism_from_tcf(*args, **kwargs):
          "abs"/"cd"         - spectral density (FT TCF) in
                               distance**2 = 1 / (distance * density)
          "tcf_abs"/"tcf_cd" - time-correlation function (TCF)
-       '''
+       """
     kwargs.update({'mode': 'cd'})
     return _spectrum_from_tcf(*args, **kwargs)
 
 
 def _apply_cut_sphere(x, pos, clip, cell=None, inverse=False):
-    '''Apply one or more spherical masks to an observable array.'''
+    """Apply one or more spherical masks to an observable array."""
     if len(clip) != 0:
         y = np.zeros_like(x)
         for _tr in clip:
@@ -248,7 +248,7 @@ def _apply_cut_sphere(x, pos, clip, cell=None, inverse=False):
 
 
 def _spectrum_from_tcf(*args, **kwargs):
-    '''Compatibility wrapper for :func:`spectrum_from_tcf`.'''
+    """Compatibility wrapper for :func:`spectrum_from_tcf`."""
     return spectrum_from_tcf(*args, **kwargs)
 
 
@@ -271,7 +271,7 @@ def spectrum_from_tcf(*args,
                       unwrap_pbc=True,
                       parallel=True,
                       **kwargs):
-    '''Choose between modes: abs, cd, abs_cd
+    """Choose between modes: abs, cd, abs_cd
        Expects
            1 - current (electric) dipole moments of shape
                (n_frames[, nkinds], three) (mode=abs)
@@ -308,7 +308,7 @@ def spectrum_from_tcf(*args,
          "abs"/"cd"         - spectral density (FT TCF) in
                               <distance**2> = 1 / (<distance> * <density>)
          "tcf_abs"/"tcf_cd" - time-correlation function (TCF)
-       '''
+       """
 
     if flt_pow is not None:
         _warnings.warn('The flt_pow keyword is deprecated, '
@@ -335,7 +335,7 @@ def spectrum_from_tcf(*args,
     _z = len(args)
 
     def _err(_s, _z):
-        '''Raise a mode-specific argument-count error.'''
+        """Raise a mode-specific argument-count error."""
         raise TypeError('tcf expected %d argument, got %d' % (_s, _z))
     if mode == 'abs':
         _s = 1
@@ -477,7 +477,7 @@ def spectrum_from_tcf(*args,
 
 
 def gauge_transport_particle_i(_i, pos, cur, cell, **kwargs) -> tuple:
-    '''Return the gauge-transport spectrum for one particle index.'''
+    """Return the gauge-transport spectrum for one particle index."""
     n_frames, n_particles, n_dim = pos.shape
     a = cur[:, _i]
 
@@ -500,7 +500,7 @@ def compute_gauge_transport_term(cur, pos, cell,
                                  unwrap_pbc=True,
                                  parallel=True,
                                  **kwargs):
-    '''Return the gauge-transport correction to the CD spectrum.'''
+    """Return the gauge-transport correction to the CD spectrum."""
     n_frames, n_particles, n_dim = pos.shape
 
     if cell is None:
@@ -546,7 +546,7 @@ def _background_correction(data, pos_au, origin_au, cutoff_bg_au, cut_type_bg,
                            unwrap_pbc=True,
                            parallel=True,
                            **kwargs):
-    '''Compute spectral density outside a given background cutoff'''
+    """Compute spectral density outside a given background cutoff"""
     _cut_sphere_bg = [Sphere(origin_au, cutoff_bg_au, edge=cut_type_bg)]
     _c_bg = _apply_cut_sphere(copy.deepcopy(data['c']), pos_au, _cut_sphere_bg,
                               inverse=True, cell=cell_au_deg)

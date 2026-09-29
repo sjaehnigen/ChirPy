@@ -29,7 +29,7 @@
 #
 # ----------------------------------------------------------------------
 
-'''Write volume data into file.'''
+"""Write volume data into file."""
 
 
 import argparse
@@ -37,7 +37,7 @@ from chirpy.classes import volume
 
 
 def main():
-    '''Write scalar volume data into file'''
+    """Write scalar volume data into file"""
     parser = argparse.ArgumentParser(
             description="Write volume data into file",
             formatter_class=argparse.ArgumentDefaultsHelpFormatter

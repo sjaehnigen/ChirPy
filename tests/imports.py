@@ -37,7 +37,7 @@ class TestImports(unittest.TestCase):
 
     @staticmethod
     def import_submodules(package, recursive=True):
-        '''https://stackoverflow.com/a/25562415'''
+        """https://stackoverflow.com/a/25562415"""
         if isinstance(package, str):
             package = importlib.import_module(package)
         results = {}

@@ -29,7 +29,7 @@
 # ----------------------------------------------------------------------
 
 
-'''Topology mapping utilities for periodic cells and molecular geometry.'''
+"""Topology mapping utilities for periodic cells and molecular geometry."""
 
 
 import numpy as np
@@ -51,9 +51,9 @@ from ..config import ChirPyWarning as _ChirPyWarning
 
 
 def dist_crit_aa(symbols):
-    '''Get distance criteria matrix for bond between atoms (in angstrom)
+    """Get distance criteria matrix for bond between atoms (in angstrom)
        http://www.ks.uiuc.edu/Research/vmd/vmd-1.9.1/ug/node26.html
-       '''
+       """
     natoms = len(symbols)
     crit_aa = np.zeros((natoms, natoms))
     _r = np.array(constants.symbols_to_rvdw(symbols)) / 100.0
@@ -91,9 +91,9 @@ def dec(prop, indices, n_ind=None, axis=0):
 
 
 def cowt(pos, wt, axis=-2, mask=None, subset=slice(None)):
-    '''Calculate centre of weight, consider periodic boundaries before
+    """Calculate centre of weight, consider periodic boundaries before
        calling this method.
-       Optional mask with (0-based) indices of units for subset.'''
+       Optional mask with (0-based) indices of units for subset."""
 
     _pos = np.moveaxis(pos, axis, 0)
     if not hasattr(wt, '__len__'):
@@ -114,10 +114,10 @@ def cowt(pos, wt, axis=-2, mask=None, subset=slice(None)):
 
 
 def cell_l_deg(cell_vec, multiply=(1, 1, 1)):
-    '''Convert cell vectors into box info. Unit of l (length) equal to the one
+    """Convert cell vectors into box info. Unit of l (length) equal to the one
        used in cell vector.
        cell_vec as 3×3 array
-       '''
+       """
     _m = np.array(multiply)
     return np.concatenate((
         np.linalg.norm(cell_vec * _m[:, None], axis=-1),
@@ -130,7 +130,7 @@ def cell_l_deg(cell_vec, multiply=(1, 1, 1)):
 
 
 def cell_vec(cell, n_fields=3, priority=(0, 1, 2)):
-    '''cell as np.array/list of: a b c al be ga
+    """cell as np.array/list of: a b c al be ga
        n_fields: usually 3
 
        Priority defines the alignment of non-rectangular objects in cartesian
@@ -143,7 +143,7 @@ def cell_vec(cell, n_fields=3, priority=(0, 1, 2)):
        Priority should always be (0,1,2) and symmetry conventions be used
        (e.g. for monoclinic cells: beta is the angle > 90°; CPMD wants alpha
        to be >90° but this is wrong and CELL VECTORS should be used instead)
-       '''
+       """
     if isinstance(cell, list):
         cell = np.array(cell)
 
@@ -162,16 +162,16 @@ def cell_vec(cell, n_fields=3, priority=(0, 1, 2)):
 
 
 def cell_volume(cell, n_fields=3):
-    '''Return the unit-cell volume from cell parameters.'''
+    """Return the unit-cell volume from cell parameters."""
     _cell_vec = cell_vec(cell, n_fields=n_fields)
 
     return np.dot(_cell_vec[0], np.cross(_cell_vec[1], _cell_vec[2]))
 
 
 def detect_lattice(cell, priority=(0, 1, 2)):
-    '''Obtain lattice system from cell measures.
+    """Obtain lattice system from cell measures.
        Does not care of axis order priority.
-       '''
+       """
     if cell is None:
         return None
     if np.any(cell == 0.):
@@ -206,8 +206,8 @@ def detect_lattice(cell, priority=(0, 1, 2)):
 
 
 def wrap_pbc(positions, cell):
-    '''positions: shape ([n_frames,] n_atoms, three)
-       cell: [ a b c al be ga ]'''
+    """positions: shape ([n_frames,] n_atoms, three)
+       cell: [ a b c al be ga ]"""
 
     if (lattice := detect_lattice(cell)) not in [None, 'void']:
         if lattice in ['cubic', 'orthorhombic', 'tetragonal']:
@@ -227,9 +227,9 @@ def wrap_pbc(positions, cell):
 
 
 def dihedral_pbc(p0, p1, p2, p3, cell=None):
-    '''p0 <– p1 –> p2 –> p3  with or without periodic boundaries
+    """p0 <– p1 –> p2 –> p3  with or without periodic boundaries
        accepts cell argument (a b c al be ga).
-       '''
+       """
     v0 = vector_pbc(p1, p0, cell)
     v1 = vector_pbc(p1, p2, cell)
     v2 = vector_pbc(p2, p3, cell)
@@ -238,9 +238,9 @@ def dihedral_pbc(p0, p1, p2, p3, cell=None):
 
 
 def angle_pbc(p0, p1, p2, cell=None, signed=False):
-    '''p0 <– p1 –> p2  with or without periodic boundaries
+    """p0 <– p1 –> p2  with or without periodic boundaries
        accepts cell argument (a b c al be ga).
-       '''
+       """
     v0 = vector_pbc(p1, p0, cell)
     v1 = vector_pbc(p1, p2, cell)
 
@@ -251,9 +251,9 @@ def angle_pbc(p0, p1, p2, cell=None, signed=False):
 
 
 def vector_pbc(p0, p1, cell=None, return_pbc_bool=False, **kwargs):
-    '''p1 – p0 with or without periodic boundaries
+    """p1 – p0 with or without periodic boundaries
        accepts cell argument (a b c al be ga).
-       '''
+       """
     _d = vector(p0, p1)
     if cell is not None:
         _d2 = _d - _pbc_shift(_d, cell, **kwargs)
@@ -265,13 +265,13 @@ def vector_pbc(p0, p1, cell=None, return_pbc_bool=False, **kwargs):
 
 
 def mean_pbc(positions, cell=None, axis=0, wrap=True):
-    '''average position of atoms without periodic jumps
+    """average position of atoms without periodic jumps
 
 
        cell ... [a b c al be ga]
        positions ... array of shape (N, [n_atoms, dim])
        wrap ... wrap average position into cell
-       '''
+       """
 
     mean = np.mean(
                 unwrap_pbc(positions, cell=cell, axis=axis),
@@ -284,7 +284,7 @@ def mean_pbc(positions, cell=None, axis=0, wrap=True):
 
 
 def unwrap_pbc(positions, reference=None, cell=None, axis=0, mode='naive'):
-    '''get smooth trajectory of positions without periodic jumps
+    """get smooth trajectory of positions without periodic jumps
 
        positions ... array of shape (n_frames, [n_atoms, dim])
        reference ... positions array of shape(1, [n_atoms, dim] that is
@@ -292,7 +292,7 @@ def unwrap_pbc(positions, reference=None, cell=None, axis=0, mode='naive'):
                      NB: The reference is going to be the first frame of the
                      returned positions.
        mode ...      How to treat non-orthorhombic cells (see _pbc_shift)
-       '''
+       """
 
     if cell is not None:
         if reference is None:
@@ -306,12 +306,12 @@ def unwrap_pbc(positions, reference=None, cell=None, axis=0, mode='naive'):
 
 # --- backward compatibility
 def distance_pbc(*args, **kwargs):
-    '''Alias for vector_pbc.'''
+    """Alias for vector_pbc."""
     return vector_pbc(*args, **kwargs)
 
 
 def _pbc_shift(_d, cell, mode='naive', priority='auto'):
-    '''_d in aa of shape ...
+    """_d in aa of shape ...
        cell: [ a b c al be ga ]
 
        Mode defines how non-orthorhombic cells are treated.
@@ -329,7 +329,7 @@ def _pbc_shift(_d, cell, mode='naive', priority='auto'):
        Naive works for (shortest) distances as long as the maximum distance to
        be found is smaller than half the shortest distance between crystal
        layers.
-       '''
+       """
 
     if all([_a <= 0.0 for _a in cell[:3]]):
         return np.zeros_like(_d)
@@ -378,10 +378,10 @@ def _pbc_shift(_d, cell, mode='naive', priority='auto'):
 
 # --- ToDo: rename the next two methods
 def get_cell_coordinates(positions, cell, angular=False):
-    '''Transform Cartesian coordinates into cell vector basis.
+    """Transform Cartesian coordinates into cell vector basis.
        angular=True for transformation of angular magnitudes
        of the form p × p or p × v
-       '''
+       """
     _cell_vec = cell_vec(cell)
     if angular:
         _cell_vec = np.linalg.det(_cell_vec) * np.linalg.inv(_cell_vec).T
@@ -389,10 +389,10 @@ def get_cell_coordinates(positions, cell, angular=False):
 
 
 def get_cartesian_coordinates(positions, cell, angular=False):
-    '''Transform cell coordinates into Cartesian basis
+    """Transform cell coordinates into Cartesian basis
        angular=True for transformation of angular magnitudes
        of the form p × p or p × v
-       '''
+       """
     _cell_vec = cell_vec(cell)
     if angular:
         _cell_vec = np.linalg.det(_cell_vec) * np.linalg.inv(_cell_vec).T
@@ -418,12 +418,12 @@ def get_cartesian_coordinates(positions, cell, angular=False):
 
 def distance_matrix(p0, p1=None, cell=None, cartesian=False,
                     return_pbc_bool=False, **kwargs):
-    '''Expects one or two args of shape (n_atoms, three) ... (FRAME).
+    """Expects one or two args of shape (n_atoms, three) ... (FRAME).
        Order: p0, p1 ==> d = p1 - p0
 
        Supports periodic boundaries (give cell as [x, y, z, al, be, ga];
                                      angles in degrees).
-       '''
+       """
     # ToDo: the following lines explode memory for many atoms
     #   ==> do coarse mapping beforehand
     # (overlapping batches) or set a max limit for n_atoms
@@ -459,9 +459,9 @@ def distance_matrix(p0, p1=None, cell=None, cartesian=False,
 def neighbour_matrix(pos_aa, symbols, cell_aa_deg=None,
                      return_distances=False, cartesian=False,
                      return_pbc_bool=False):
-    '''Create sparse matrix with entries 1 for neighbouring atoms.
+    """Create sparse matrix with entries 1 for neighbouring atoms.
        Expects positions in angstrom of shape (n_atoms, three).
-       '''
+       """
     symbols = np.array(symbols)
     if return_pbc_bool:
         dist_array, B = distance_matrix(pos_aa, cell=cell_aa_deg,
@@ -501,7 +501,7 @@ def neighbour_matrix(pos_aa, symbols, cell_aa_deg=None,
 
 def nearest_neighbour(p0, p1=None, cell=None, ignore=None,
                       return_distances=False):
-    '''Return indices of the nearest neighbours for each position in p0.'''
+    """Return indices of the nearest neighbours for each position in p0."""
     if p1 is None:
         p1 = p0
     _dists = distance_matrix(p0, p1, cell=cell)
@@ -514,7 +514,7 @@ def nearest_neighbour(p0, p1=None, cell=None, ignore=None,
 
 
 def close_neighbours(p0, cell=None, crit=None, symbols=None):
-    '''List atom pairs that are closer than the chosen distance criterion.'''
+    """List atom pairs that are closer than the chosen distance criterion."""
     _dM = distance_matrix(p0, cell=cell)
     if crit is None:
         if symbols is None:
@@ -528,12 +528,12 @@ def close_neighbours(p0, cell=None, crit=None, symbols=None):
 
 
 def connectivity(pos_aa, symbols, cell_aa_deg=None):
-    '''For each atom return covalently bound neighbours.
+    """For each atom return covalently bound neighbours.
        pos_aa:       np.array of shape (n_atoms, three) in angstrom
        symbols:      tuple of length n_atoms containing element symbols
        cell_aa_deg:  cell parametres (1 b c al be ga) in angstrom/degrees
                      (optional)
-    '''
+    """
     neighs = neighbour_matrix(pos_aa, symbols, cell_aa_deg=cell_aa_deg)
     return [np.argwhere(_n).ravel() for _n in neighs]
 
@@ -546,7 +546,7 @@ def join_molecules(pos_aa, mol_map, cell_aa_deg,
                    fast_forward=True,
                    reference=None,
                    ):
-    '''pos_aa (in angstrom) with shape ([n_frames,] n_atoms, three)
+    """pos_aa (in angstrom) with shape ([n_frames,] n_atoms, three)
     Has still problems with cell-spanning molecules
     Molecules have to be numbered starting with 0!
 
@@ -557,7 +557,7 @@ def join_molecules(pos_aa, mol_map, cell_aa_deg,
     reference ... if algorithm is set to 'reference', use reference positions
                    (1, n_atoms, three) of already joined molecules.
                    Similar to fast_forward.
-    '''
+    """
     if 0 not in mol_map:
         raise TypeError('Given mol_map not an enumeration of indices!' %
                         mol_map)
@@ -747,14 +747,14 @@ def join_molecules(pos_aa, mol_map, cell_aa_deg,
 
 
 def get_atom_spread(pos):
-    '''Return the coordinate range along each Cartesian axis.'''
+    """Return the coordinate range along each Cartesian axis."""
     return np.array([np.amax(_p) - np.amin(_p)
                      for _p in np.moveaxis(pos, -1, 0)])
 
 
 def align_atoms(positions, weights, reference=None, subset=slice(None),
                 data=None, return_Rmatrix=False):
-    '''Align atoms within trajectory or with respect to an external reference.
+    """Align atoms within trajectory or with respect to an external reference.
 
        positions ... array of shape ([n_frames,] n_atoms, three)
        weights   ... float or iterable of length n_atoms
@@ -763,7 +763,7 @@ def align_atoms(positions, weights, reference=None, subset=slice(None),
                      (each data item: array of shape like positions)
        return_Rmatrix ... for each frame return the rotation matrix that
                           aligns the coordinates to the reference
-       '''
+       """
 
     _sub = subset
     _data = data
@@ -825,8 +825,8 @@ def align_atoms(positions, weights, reference=None, subset=slice(None),
 
 
 def find_methyl_groups(pos, symbols, hetatm=False, cell_aa_deg=None):
-    '''pos of shape (n_atoms, n_fields) (FRAME)
-       Outformat is C H H H'''
+    """pos of shape (n_atoms, n_fields) (FRAME)
+       Outformat is C H H H"""
 
     dist_array = distance_matrix(pos, cell=cell_aa_deg)
     n_atoms = len(symbols)
@@ -849,7 +849,7 @@ def find_methyl_groups(pos, symbols, hetatm=False, cell_aa_deg=None):
 
 
 def isHB(*args, **kwargs):
-    '''Alias for ishydrogenbond.'''
+    """Alias for ishydrogenbond."""
     return ishydrogenbond(*args, **kwargs)
 
 
@@ -857,7 +857,7 @@ def ishydrogenbond(positions, donor, acceptor, hydrogens,
                    cell=None,
                    dist_crit=3.0,
                    angle_crit=130):
-    '''Returns a bool / an array of bools stating if there is a
+    """Returns a bool / an array of bools stating if there is a
        hydrogen bond (HB) between donor and acceptor (heavy atoms).
 
        positions … position array of shape (n_atoms, 3)
@@ -868,7 +868,7 @@ def ishydrogenbond(positions, donor, acceptor, hydrogens,
        angle_crit … float in degrees
 
        returns: bool array of shape (n_donors, n_acceptors)
-       '''
+       """
 
     _angle_crit = angle_crit / 180 * np.pi
     _hyd = np.array(hydrogens)
@@ -918,7 +918,7 @@ def guess_atom_types(pos_aa,
                      classification='integer',
                      similarity='connectivity',
                      order=1):
-    '''Define atom types and assign them to each atom using similarity kernel
+    """Define atom types and assign them to each atom using similarity kernel
        (default: connectivity).
        Atom types can be arbitrary integers (default) or actual pre-defined
        types as used by common force fields (NOT YET IMPLEMENTED).
@@ -929,21 +929,21 @@ def guess_atom_types(pos_aa,
                      (optional)
 
        Return:       tuple of atom types
-    '''
+    """
     if classification != 'integer':
         raise NotImplementedError('Only integer classification supported!')
 
     # duplicate of method in dissection; ToDo: externalise/unify method
     # (and rename it)
     def assign_molecule(molecule, n_mol, n_atoms, neigh_map, atom, atom_count):
-        '''This method can do more than molecules! See BoxObject
+        """This method can do more than molecules! See BoxObject
         molecule … assignment
         n_mol … species counter
         n_atoms … total number of entries
         neigh_map … list of neighbour atoms per atom
         atom … current line in reading neighbour map
         atom_count … starts with n_atoms until zero
-        '''
+        """
         molecule[atom] = n_mol
         atom_count -= 1
         for _i in neigh_map[atom]:
@@ -962,7 +962,7 @@ def guess_atom_types(pos_aa,
         return molecule, atom_count
 
     def assign_types(character, kernel):
-        '''general evaluation of similarity kernel'''
+        """general evaluation of similarity kernel"""
         similarity = np.array([[_i for _i, _ch1 in enumerate(character)
                                 if _ch1 == _ch0]
                                for _ch0 in character])
@@ -1000,7 +1000,7 @@ def guess_atom_types(pos_aa,
                           for _ch, _s in zip(_character, _core)]
 
         def _kernel(x, y):
-            '''Compare two local atom descriptors for equality.'''
+            """Compare two local atom descriptors for equality."""
             return x == y
 
     elif similarity == 'SOAP':

@@ -28,7 +28,7 @@
 #
 # ----------------------------------------------------------------------
 
-'''Physical constants, unit prefixes/conversions and periodic-table data.'''
+"""Physical constants, unit prefixes/conversions and periodic-table data."""
 
 import numpy as _np
 import scipy as _sp
@@ -143,17 +143,17 @@ E_aufreq2Hz = 1 / t_au
 
 
 def E_J2nm(x):
-    '''Convert energy in Joule to wavelength in nm.'''
+    """Convert energy in Joule to wavelength in nm."""
     return h_si * c_si / x / nano
 
 
 def E_nm2J(x):
-    '''Convert wavelength in nm to energy in Joule.'''
+    """Convert wavelength in nm to energy in Joule."""
     return h_si * c_si / x * nano
 
 
 def E_Hz2nm(x):
-    '''Convert frequency in Hz to wavelength in nm.'''
+    """Convert frequency in Hz to wavelength in nm."""
     return E_J2nm(x * E_Hz2J)
 
 
@@ -180,7 +180,7 @@ IntAbs_au2km_per_mol = IntAbs_au2km_mol
 
 
 def current_current_prefactor_au(T_K, n=1):
-    '''in time / charge**2'''
+    """in time / charge**2"""
     # --- from Fermi's Golden Rule we have factor of omega
     # --- finestr equals e**2 / (4 pi eps_0) / (hbar * c)
     # --- we multiply with omega * hbar * beta (classical limit for Kubo TCF)
@@ -192,18 +192,18 @@ def current_current_prefactor_au(T_K, n=1):
 
 
 def dipole_dipole_prefactor_au(T_K, omega_au, n=1):
-    '''in 1 / (time * charge**2)
-       omega_au = 2 * pi * freq_au'''
+    """in 1 / (time * charge**2)
+       omega_au = 2 * pi * freq_au"""
     prefactor_au = current_current_prefactor_au(T_K, n=n) * omega_au**2
     return prefactor_au
 
 
 def current_magnetic_prefactor_au(T_K, omega_au, n=1):
-    '''in time / (distance * charge**2)
+    """in time / (distance * charge**2)
        omega_au = 2 * pi * freq_au
        No cgs-convention for magnetic properties, i.e. unit of m is
        current * distance**2.
-    '''
+    """
     # --- factor 1/c here because we do not use cgs for B-field
 
     prefactor_au = 4 * current_current_prefactor_au(T_K, n=n) * omega_au / c_au
@@ -211,11 +211,11 @@ def current_magnetic_prefactor_au(T_K, omega_au, n=1):
 
 
 def dipole_magnetic_prefactor_au(T_K, omega_au, n=1):
-    '''in 1 / (distance * charge**2)
+    """in 1 / (distance * charge**2)
        omega_au = 2 * pi * freq_au
        No cgs-convention for magnetic properties, i.e. unit of m is
        current * distance**2.
-       '''
+       """
     # --- factor 1/c here because we do not use cgs for B-field
 
     prefactor_au = current_magnetic_prefactor_au(T_K, omega_au, n=n) * omega_au
@@ -298,8 +298,8 @@ for _z, _ZV in _ZV_list:
 
 
 def _get_property(kinds, key, fmt=None, fill_value=None):
-    '''Look up a periodic-table property for each entry in kinds, guessing
-       progressively shorter element symbols/names if needed.'''
+    """Look up a periodic-table property for each entry in kinds, guessing
+       progressively shorter element symbols/names if needed."""
     pr = []
     for _k in kinds:
         try:
@@ -348,32 +348,32 @@ def _get_property(kinds, key, fmt=None, fill_value=None):
 
 
 def numbers_to_symbols(numbers):
-    '''Convert a list of atomic numbers to element symbols.'''
+    """Convert a list of atomic numbers to element symbols."""
     return tuple(_get_property(numbers, 'symbol'))
 
 
 def symbols_to_symbols(numbers):
-    '''Normalise/validate a list of element symbols.'''
+    """Normalise/validate a list of element symbols."""
     return tuple(_get_property(numbers, 'symbol', fill_value='self'))
 
 
 def symbols_to_numbers(symbols):
-    '''Convert a list of element symbols to atomic numbers.'''
+    """Convert a list of element symbols to atomic numbers."""
     return _get_property(symbols, 'number', fmt=int)
 
 
 def symbols_to_masses(symbols):
-    '''Convert a list of element symbols to atomic masses.'''
+    """Convert a list of element symbols to atomic masses."""
     return _np.array(_get_property(symbols, 'mass'))
 
 
 def symbols_to_valence_charges(symbols):
-    '''Convert a list of element symbols to valence charges.'''
+    """Convert a list of element symbols to valence charges."""
     return _np.array(_get_property(symbols, 'valence_charge'))
 
 
 def symbols_to_rvdw(symbols):
-    '''Convert a list of element symbols to van der Waals radii.'''
+    """Convert a list of element symbols to van der Waals radii."""
     return _np.array(_get_property(symbols, 'van_der_waals_radius'))
 
 
@@ -383,10 +383,10 @@ numbers_to_rvdw = symbols_to_rvdw
 
 
 def get_conversion_factor(name, unit):
-    '''Return factor to convert given unit into default unit according to
+    """Return factor to convert given unit into default unit according to
        chirpy.version.<name>.
        name ... type of magnitude (positions, velocities, etc.)
-       '''
+       """
     _db = {
             'length': {
                 'aa': 1.,
@@ -433,9 +433,9 @@ def get_conversion_factor(name, unit):
 
 
 def convert(units):
-    '''Return the conversion factor for the given units specification
+    """Return the conversion factor for the given units specification
        (a (name, unit) tuple, list of such tuples, plain number, or
-       'default').'''
+       'default')."""
     if units == 'default':
         return 1.
 

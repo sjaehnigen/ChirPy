@@ -29,7 +29,7 @@
 # ----------------------------------------------------------------------
 
 
-'''Statistical-mechanics utilities for energies, distributions, and spectra.'''
+"""Statistical-mechanics utilities for energies, distributions, and spectra."""
 
 
 import numpy as np
@@ -47,21 +47,21 @@ def kinetic_energies(vel_au, masses_amu):
 
 
 def temperature_from_energies(e_kin_au, fixed_dof=6):
-    '''Ideal gas after Boltzmann.
+    """Ideal gas after Boltzmann.
        fixed_dof=6 ... fixed total linear and angular momentum.
-       Expects kinetic energies of shape ([n_frames,] n_atoms)'''
+       Expects kinetic energies of shape ([n_frames,] n_atoms)"""
     _n_dof = 3 * e_kin_au.shape[-1] - fixed_dof
     return (2. * e_kin_au / constants.k_B_au / _n_dof).sum(axis=-1)
 
 
 def maxwell_boltzmann_distribution(T_K, *args, option='energy'):
-    '''Return the Maxwell-Boltzmann distribution function for given temperature
-       in K and species with masses in a.m.u.'''
+    """Return the Maxwell-Boltzmann distribution function for given temperature
+       in K and species with masses in a.m.u."""
 
     def _velocity_distribution(T_K, vel_norm_au, mass_amu):
-        '''Returns the probability density of a given velocity in a.u. of a
+        """Returns the probability density of a given velocity in a.u. of a
            particle with mass in a.m.u. at a given temperature in K.
-           Accepts np.arrays of species if shapes of vel and mass are equal.'''
+           Accepts np.arrays of species if shapes of vel and mass are equal."""
         m_au = mass_amu * constants.m_amu_au
         beta = constants.k_B_au * T_K
 
@@ -71,8 +71,8 @@ def maxwell_boltzmann_distribution(T_K, *args, option='energy'):
         return N * p1 * vel_norm_au**2
 
     def _energy_distribution(T_K, E_au):
-        '''Returns the probability density of a given energy in a.u.
-           at a given temperature in K'''
+        """Returns the probability density of a given energy in a.u.
+           at a given temperature in K"""
         beta = constants.k_B_au * T_K
 
         N = 2 * np.sqrt(E_au / np.pi) * pow(1 / beta, 3.0/2.0)
@@ -86,14 +86,14 @@ def maxwell_boltzmann_distribution(T_K, *args, option='energy'):
             }
 
     def PDF(x):
-        '''Evaluate the selected Maxwell-Boltzmann probability density.'''
+        """Evaluate the selected Maxwell-Boltzmann probability density."""
         return _options.get(option)(T_K, x, *args)
 
     return PDF
 
 
 def signal_filter(n_frames, filter_length=None, filter_type='welch'):
-    '''Return a one-sided window for filtering finite signals.'''
+    """Return a one-sided window for filtering finite signals."""
     if filter_length is None:
         filter_length = n_frames
     if filter_length > n_frames:
@@ -123,7 +123,7 @@ def time_correlation_function(*args,
                               window_length=None,
                               adjusted_signal_length=None,
                               ):
-    '''Calculate the time-correlation function (TCF) of a signal and
+    """Calculate the time-correlation function (TCF) of a signal and
        using the Wiener-Khinchin theorem (fftconvolve).
        The method automatically chooses to calculate auto- or cross-
        correlation functions based on the number of arguments (max 2).
@@ -143,7 +143,7 @@ def time_correlation_function(*args,
        sum … sum over <n_dim> dimensions
        Returns:
         1 - time-correlation function (timestep as in input)
-       '''
+       """
 
     if len(args) == 1:
         # --- auto-correlation
@@ -177,7 +177,7 @@ def time_correlation_function(*args,
                          % (len(_sh1), _sh1))
 
     def _corr(_val1, _val2):
-        '''Return the full FFT-based correlation for the given signals.'''
+        """Return the full FFT-based correlation for the given signals."""
         _sig = np.array([scipy.signal.correlate(
                                                 v1,
                                                 v2,
@@ -251,7 +251,7 @@ def time_correlation_function(*args,
 
 def spectral_density(*args, ts=1, factor=1/(2*np.pi), symmetry=None,
                      **kwargs) -> tuple:
-    '''Calculate the spectral distribution as the Fourier transformed
+    """Calculate the spectral distribution as the Fourier transformed
        time-correlation function (TCF) of a vector signal (*args).
        The method automatically chooses to calculate auto- or cross-
        correlation functions based on the number of arguments (max 2).
@@ -265,7 +265,7 @@ def spectral_density(*args, ts=1, factor=1/(2*np.pi), symmetry=None,
         1 - discrete sample frequencies f = omega/(2*pi)
         2 - spectral density (FT TCF) as f(omega)
         3 - time-correlation function (timestep as in input)
-       '''
+       """
 
     # --- enforce summation over dimensions
     kwargs.update({'sum_dims': True})
