@@ -54,7 +54,7 @@ def tracked_extract_keys(dict1, **defaults):
 
 
 def tracked_update(dict1, dict2, msg='in dict1!'):
-    """Update dict1 with dict2 but warns if existing data is changed"""
+    """Update dict1 with dict2 but warns if existing data is changed."""
     for _k2 in dict2:
         _v1 = dict1.get(_k2)
         _v2 = dict2.get(_k2)
@@ -70,7 +70,7 @@ def tracked_update(dict1, dict2, msg='in dict1!'):
 
 
 def equal(a, b):
-    """return all-equal regardless of type"""
+    """Return all-equal regardless of type."""
     if isinstance(a, _np.ndarray) or isinstance(b, _np.ndarray):
         return _np.all(a == b)
     else:

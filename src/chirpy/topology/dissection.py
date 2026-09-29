@@ -240,7 +240,7 @@ def assign_molecule(molecule, n_mol, n_atoms, neigh_list, atom, atom_count):
 
 
 def read_topology_file(fn, **kwargs):
-    """Returns dict of properties"""
+    """Returns dict of properties."""
 
     from ..read.coordinates import pdbReader, xyzReader
     from ..interface import cp2k

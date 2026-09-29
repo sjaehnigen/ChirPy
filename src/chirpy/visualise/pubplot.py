@@ -120,7 +120,7 @@ def source_params(matplotlib):
 
 
 def make_nice_ax(p):
-    """p object ... AxesSubplot"""
+    """p object ... AxesSubplot."""
     p.tick_params('both',  length=5,   width=2,  which='minor')
     p.tick_params('both',  length=10,  width=2,  which='major')
     p.tick_params(axis='both',  which='both',  pad=10,  direction='out')

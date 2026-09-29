@@ -111,7 +111,7 @@ def read_ener_file(fn):
 
 
 def read_tot_dipole_file(fn):
-    """returns total dipole moments in a.u."""
+    """Returns total dipole moments in a.u."""
 
     dat = np.genfromtxt(fn,
                         dtype=None,

@@ -55,7 +55,7 @@ class WannierFunction(_ScalarField):
     """Scalar field representation of a Wannier function."""
 
     def auto_crop(self, thresh=1.0):
-        """crop all after threshold"""
+        """Crop all after threshold."""
         r = self.auto_crop(thresh=thresh)
 
         return r
@@ -262,7 +262,7 @@ class TDElectronicState(_CORE):
     """Time-dependent electronic state with wavefunction and current."""
 
     def __init__(self, *args, psi1=None, **kwargs):
-        """psi1 - imaginary part from linear response calculation"""
+        """Psi1 - imaginary part from linear response calculation."""
         if len(args) == 4:
             self.psi = WaveFunction(args[0], **kwargs)
             self.j = CurrentDensity(*args[1:], **kwargs)
@@ -300,7 +300,7 @@ class TDElectronicState(_CORE):
         return self.psi.pos_grid()
 
     def auto_crop(self, thresh=1.0):
-        """crop all after threshold"""
+        """Crop all after threshold."""
         r = self.psi.auto_crop(thresh=thresh, dry_run=True)
         self.crop(r)
 
@@ -318,7 +318,7 @@ class TDElectronicState(_CORE):
             self.psi1._sync_class()
 
     def calculate_velocity_field(self, rho, thresh=1.E-8):
-        """Requires total density rho"""
+        """Requires total density rho."""
         self.v = _VectorField.from_object(self.j)
         self.v.normalise(norm=rho, thresh=thresh)
 
@@ -364,7 +364,7 @@ class TDElectronDensity(_CORE):
         self.j._sync_class()
 
     def auto_crop(self, thresh=5.E-4):
-        """crop all after density threshold"""
+        """Crop all after density threshold."""
         r = self.rho.auto_crop(thresh=thresh, dry_run=True)
         self.crop(r)
 
@@ -376,7 +376,7 @@ class TDElectronDensity(_CORE):
         self.v.normalise(norm=self.rho, thresh=thresh)
 
     def propagate_density(self, dt=8.0):
-        """dt in atomic units"""
+        """Dt in atomic units."""
         rho2 = copy.deepcopy(self.rho)
 
         self.j.divergence_and_rotation()
@@ -385,7 +385,7 @@ class TDElectronDensity(_CORE):
         return rho2
 
     def read_nuclear_velocities(self, fn):
-        """Has to be in shape n_frames,n_atoms, 3"""
+        """Has to be in shape n_frames,n_atoms, 3."""
         self.nuc_vel_au,\
             self.nuc_symbols,\
             self.nuc_vel_comments = _xyzReader(fn)
@@ -395,7 +395,7 @@ class TDElectronDensity(_CORE):
                             'Electronic System!')
 
     def calculate_aim_differential_current(self):
-        """Map vector of nuclear velocity on atom domain"""
+        """Map vector of nuclear velocity on atom domain."""
         self.v_diff = copy.deepcopy(self.v)
         for i in range(self.rho.n_atoms):
             field = self.rho.aim_atoms[i].map_vector(self.nuc_vel_au[0, i, :])
@@ -406,7 +406,7 @@ class TDElectronDensity(_CORE):
         self.j_diff.data = self.v_diff.data*self.rho.data[_np.newaxis]
 
     def calculate_interatomic_flux(self, rho_dt, dt):
-        """rho_dt ... ElectronicDensity object with aim_atoms list"""
+        """Rho_dt ... ElectronicDensity object with aim_atoms list."""
         def rec_grid(grid):
             """Elementwise reciprocal of grid, leaving zeros unchanged."""
             r_grid = _np.zeros(grid.shape)
@@ -538,7 +538,7 @@ class TDElectronDensity(_CORE):
 
     @staticmethod
     def time_integral(dt, n='auto', n_thresh=0.1):
-        """propagates rho by dt n times and calculates gain,loss,and balance
+        """Propagates rho by dt n times and calculates gain,loss,and balance
            between atoms at each step
            n=auto ... propagate until interatomic flux (i.e., the norm of the
            balance matrix) vanishes (n_thresh)"""

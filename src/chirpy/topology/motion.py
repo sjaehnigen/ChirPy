@@ -40,7 +40,7 @@ from .mapping import ishydrogenbond
 
 
 def linear_momenta(velocities, wt, subset=slice(None), axis=-2):
-    """sum(velocities * wt)
+    """Sum(velocities * wt)
        Use subset= to select atoms
        """
     _wt = np.array(wt)[subset]
@@ -56,7 +56,7 @@ def linear_momenta(velocities, wt, subset=slice(None), axis=-2):
 
 def angular_momenta(positions, velocities, wt, subset=slice(None), axis=-2,
                     origin=np.zeros((3)), moI=False):
-    """sum(positions x velocities * wt)
+    """Sum(positions x velocities * wt)
        Use subset= to select atoms
        """
     _wt = np.array(wt)[subset]

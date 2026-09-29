@@ -105,7 +105,7 @@ class _COLVAR(_CORE):
 
 
 class Bond(_COLVAR):
-    """i0 --> i1"""
+    """i0 --> i1."""
     def __init__(self, i0, i1):
         """Define a bond distance between two atoms."""
         self.label = f'{self.__class__.__name__}({i0}, {i1})'
@@ -139,7 +139,7 @@ class Bond(_COLVAR):
 
 
 class Angle(_COLVAR):
-    """i0 <-- i1 --> i2"""
+    """i0 <-- i1 --> i2."""
     def __init__(self, i0, i1, i2):
         """Define a bond angle for three atoms."""
         self.label = f'{self.__class__.__name__}({i0}, {i1}, {i2})'
@@ -192,7 +192,7 @@ class Angle(_COLVAR):
 
 
 class Dihedral(_COLVAR):
-    """i0 <-- i1 --> i2 --> i3"""
+    """i0 <-- i1 --> i2 --> i3."""
     def __init__(self, i0, i1, i2, i3):
         """Define a dihedral angle for four atoms."""
         self.label = f'{self.__class__.__name__}({i0}, {i1}, {i2}, {i3})'
@@ -256,8 +256,7 @@ class Dihedral(_COLVAR):
 
 
 class Outplane(_COLVAR):
-    """
-    i0 <-- i3 --> i2
+    """i0 <-- i3 --> i2
            ¦
            V
            i1"""
@@ -360,7 +359,7 @@ class Outplane(_COLVAR):
 
 
 class Coord(_COLVAR):
-    """i0 along axis"""
+    """i0 along axis."""
     def __init__(self, i0, axis):
         """Define one Cartesian coordinate of an atom."""
         self.label = f'{self.__class__.__name__}({i0}[{axis}])'

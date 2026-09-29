@@ -57,7 +57,7 @@ def k_get_cell(n1, n2, n3, a1, a2, a3):
 
 
 def _k_v1(k):
-    """Fourier transform of Coulomb potential $1/r$"""
+    """Fourier transform of Coulomb potential $1/r$."""
     with np.errstate(divide='ignore'):
         return np.where(k == 0.0, 0.0, np.divide(4.0 * np.pi, k**2))
 

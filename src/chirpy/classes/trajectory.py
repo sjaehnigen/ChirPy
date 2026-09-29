@@ -149,7 +149,7 @@ class _FRAME(_CORE):
         return new
 
     def sort(self, *args):
-        """sort atoms by symbols in order of appearance"""
+        """Sort atoms by symbols in order of appearance."""
         _symbols = _np.array(self.symbols)
 
         # --- scratch for in-depth sort that includes data
@@ -297,7 +297,7 @@ class _FRAME(_CORE):
     @staticmethod
     def map_frame(obj1, obj2, congruence_threshold_aa=0.1,
                   shift_centers_of_mass=False, **kwargs):
-        """obj1, obj2 ... Frame objects.
+        """Obj1, obj2 ... Frame objects.
            Returns indices that would sort obj2 to match obj1.
            """
         ie, tmp = obj1._is_similar(obj2)
@@ -906,7 +906,7 @@ class _XYZ():
             self.clean_velocities(weights=weights)
 
     def _pos_aa(self, *args):
-        """Update positions"""
+        """Update positions."""
         if len(args) == 0:
             self.pos_aa = _np.take(self.data, [0, 1, 2], axis=-1)
         elif len(args) == 1:
@@ -920,7 +920,7 @@ class _XYZ():
                             % self._pos_aa.__name__)
 
     def _vel_au(self, *args):
-        """Update velocities"""
+        """Update velocities."""
         if len(args) == 0:
             self.vel_au = _np.take(self.data, [3, 4, 5], axis=-1)
         elif len(args) == 1:
@@ -953,7 +953,7 @@ class _XYZ():
         self.cell_aa_deg = _np.array(self.cell_aa_deg)
 
     def _check_distances(self, clean=False):
-        """current frame only"""
+        """Current frame only."""
         if self._type == 'trajectory':
             _warnings.warn('can only check distance for single frame',
                            _ChirPyWarning, stacklevel=2)
@@ -988,7 +988,7 @@ class _XYZ():
             self.split(mask, select=[1])
 
     def _is_equal(self, other, atol=1e-08, noh=True):
-        """atol adds up to dist_crit_aa from vdw radii"""
+        """Atol adds up to dist_crit_aa from vdw radii."""
         _p, ie = self._is_similar(other)
 
         def f(a):
@@ -1250,7 +1250,7 @@ class _XYZ():
         self.center_position(_ref, self.cell_aa_deg)
 
     def center_position(self, pos, cell_aa_deg, wrap=True):
-        """pos reference in shape (n_frames, three)"""
+        """Pos reference in shape (n_frames, three)"""
         cell_vec_aa = mapping.cell_vec(cell_aa_deg)
         if self._type == 'frame':
             self._pos_aa(self.pos_aa + cell_vec_aa.sum(axis=0) / 2
@@ -1292,8 +1292,7 @@ class _XYZ():
         self._vel_au(_vel)
 
     def align_to_vector(self, i0, i1, vec):
-        """
-        Align a reference line pos[i1]-pos[i0] to vec (no pbc support)
+        """Align a reference line pos[i1]-pos[i0] to vec (no pbc support)
         Center of rotation is  pos[i0]. """
 
         if self._type == 'frame':
@@ -1491,7 +1490,7 @@ class _XYZ():
             raise ValueError('Unknown format for TRAJECTORY: %s.' % fmt)
 
     def get_atom_spread(self):
-        """pos_aa: np.array of shape ([n_frames,] n_atoms, 3)"""
+        """Pos_aa: np.array of shape ([n_frames,] n_atoms, 3)"""
         dim_qm = _np.zeros((3))
         for i in range(3):
             imin = _np.min(_np.moveaxis(self.pos_aa, -1, 0)[i])
@@ -1592,7 +1591,7 @@ class _MOMENTS():
             self._pos_aa(mapping.wrap_pbc(self.pos_aa, self.cell_aa_deg))
 
     def center_position(self, pos, cell_aa_deg, wrap=True):
-        """pos reference in shape (n_frames, three)"""
+        """Pos reference in shape (n_frames, three)"""
         if self._type == 'frame':
             self._pos_aa(self.pos_aa + cell_aa_deg[None, :3] / 2
                          - pos[None, :])
@@ -1652,7 +1651,7 @@ class _MOMENTS():
                             % self._pos_aa.__name__)
 
     def _c_au(self, *args):
-        """Current dipole moments"""
+        """Current dipole moments."""
         if len(args) == 0:
             self.c_au = _np.take(self.data, [3, 4, 5], axis=-1)
         elif len(args) == 1:
@@ -1666,7 +1665,7 @@ class _MOMENTS():
                             % self._c_au.__name__)
 
     def _m_au(self, *args):
-        """Magnetic dipole moments"""
+        """Magnetic dipole moments."""
         if len(args) == 0:
             self.m_au = _np.take(self.data, [6, 7, 8], axis=-1)
         elif len(args) == 1:
@@ -1733,7 +1732,7 @@ class MOMENTSFrame(_MOMENTS, _FRAME):
 
     @classmethod
     def from_classical_nuclei(cls, obj, **kwargs):
-        """Convert XYZFrame into _MOMENTS"""
+        """Convert XYZFrame into _MOMENTS."""
         _pos = obj.data[:, :3]
         _vel = obj.data[:, 3:6]
         ZV = _np.array(constants.symbols_to_valence_charges(obj.symbols))
@@ -2059,7 +2058,7 @@ class XYZ(_XYZ, _ITERATOR, _FRAME):
         self._mask(self, 'repeat', *args, **kwargs)
 
     def split(self, *args, **kwargs):
-        """split is faster with fully loaded trajectory"""
+        """Split is faster with fully loaded trajectory."""
         if 'select' not in kwargs:
             _warnings.warn('Splitting iterator without select argument has '
                            'no effect!', _ChirPyWarning, stacklevel=2)
@@ -2198,7 +2197,7 @@ class MOMENTS(_MOMENTS, _ITERATOR, _FRAME):
 
 
 class _XYZTrajectory(_XYZ, _TRAJECTORY):
-    """Load full XYZ trajectory into memory"""
+    """Load full XYZ trajectory into memory."""
 
     def _sync_class(self, **kwargs):
         """Run trajectory and XYZ synchronisation hooks."""
@@ -2206,7 +2205,7 @@ class _XYZTrajectory(_XYZ, _TRAJECTORY):
         _XYZ._sync_class(self)
 
     def calculate_nuclear_velocities(self, ts=0.5):
-        """finite diff, linear (frame1-frame0, frame2-frame1, etc.)"""
+        """Finite diff, linear (frame1-frame0, frame2-frame1, etc.)"""
         if _np.linalg.norm(self.vel_au) != 0:
             _warnings.warn('Overwriting existing velocities in object!',
                            _ChirPyWarning, stacklevel=2)
@@ -2215,7 +2214,7 @@ class _XYZTrajectory(_XYZ, _TRAJECTORY):
 
 
 class _MOMENTSTrajectory(_MOMENTS, _TRAJECTORY):
-    """Load full MOMENTS trajectory into memory"""
+    """Load full MOMENTS trajectory into memory."""
 
     def _sync_class(self, **kwargs):
         """Run trajectory and moment synchronisation hooks."""
@@ -2278,7 +2277,7 @@ class VibrationalModes(_XYZ, _MODES):
         self._vel_au(_VEL)
 
     def get_mode(self, mode, **kwargs):
-        """Returns a XYZFrame of given mode"""
+        """Returns a XYZFrame of given mode."""
 
         return XYZFrame(data=self.data[mode],
                         symbols=self.symbols,

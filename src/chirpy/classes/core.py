@@ -260,7 +260,7 @@ class ITERATOR():
         return a
 
     def _copy(self):
-        """return an exact copy of the iterator [BETA]
+        """Return an exact copy of the iterator [BETA]
            not a deepcopy ? """
         new = self.__new__(self.__class__)
         new.__dict__.update(self.__dict__)
@@ -309,7 +309,7 @@ class ITERATOR():
         del self._gen_old
 
     def rewind(self):
-        """Reinitialises the iterator"""
+        """Reinitialises the iterator."""
         if '_skip' in self._kwargs:
             self._kwargs['skip'] = self._kwargs['_skip'].copy()
         self.__init__(*self._fn, **self._kwargs)
@@ -377,7 +377,7 @@ class ITERATOR():
                 dim2 = slice(None)
 
         def _add(obj1, obj2):
-            """combine two frames"""
+            """Combine two frames."""
             obj1._axis_pointer = axis
             obj2._axis_pointer = axis
 
@@ -484,7 +484,7 @@ class ITERATOR():
 
 
 class AttrDict(dict):
-    """Converts dictionary keys into attributes"""
+    """Converts dictionary keys into attributes."""
     def __init__(self, *args, **kwargs):
         """Initialise the dictionary and expose keys as attributes."""
         super(AttrDict, self).__init__(*args, **kwargs)
@@ -548,7 +548,7 @@ _attributes = {
 
 
 def convert_object(source, target):
-    """source is an object and target is a class"""
+    """Source is an object and target is a class."""
     try:
         _ko = _known_objects[target.__name__]
 

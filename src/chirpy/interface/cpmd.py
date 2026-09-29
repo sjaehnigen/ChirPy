@@ -650,7 +650,7 @@ class CPMDjob():
 
     @classmethod
     def load_template(cls, template):
-        """Load the specified template and return a class object"""
+        """Load the specified template and return a class object."""
         pass
 
     def _check_consistency(self):
@@ -660,7 +660,7 @@ class CPMDjob():
 
     @classmethod
     def read_input_file(cls, fn, **kwargs):
-        """CPMD 4"""
+        """CPMD 4."""
 
         def _parse_file(_iter):
             """Collect one raw section from a CPMD input stream."""
@@ -684,7 +684,7 @@ class CPMDjob():
         return cls(**CONTENT)
 
     def write_input_file(self, fn, **kwargs):
-        """ CPMD 4 """
+        """ CPMD 4. """
 
         # known sections and order
         _SEC = ['INFO', 'CPMD', 'RESP', 'DFT', 'SYSTEM', 'ATOMS']
@@ -702,7 +702,7 @@ class CPMDjob():
     # ToDo: into atoms
 
     def get_positions(self):
-        """ in a. u. ? """
+        """ In a. u. ? """
         return np.vstack(self.ATOMS.data)
 
     def get_symbols(self):

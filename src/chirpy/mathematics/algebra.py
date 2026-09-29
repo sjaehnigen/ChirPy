@@ -79,7 +79,7 @@ def cross(vector0, vector1):
 
 
 def vector(*args):
-    """v = p1 - p0"""
+    """v = p1 - p0."""
     if len(args) == 1:
         p0, p1 = args[0]
     elif len(args) == 2:
@@ -91,7 +91,7 @@ def vector(*args):
 
 
 def angle(*args):
-    """args: v0, v1; angle between two vectors"""
+    """Args: v0, v1; angle between two vectors."""
     if len(args) == 1:
         v0, v1 = args[0]
     elif len(args) == 2:
@@ -115,7 +115,7 @@ def angle(*args):
 
 
 def signed_angle(*args):
-    """args: v0, v1, n; n is the reference/plane normal for angle direction;
+    """Args: v0, v1, n; n is the reference/plane normal for angle direction;
        sign: v0 --(rot)-> v1"""
     # NB: atan2 only valid for 3D if the two vectors lie in the same plane
     # defined by n
@@ -131,7 +131,7 @@ def signed_angle(*args):
 
 
 def angle_from_points(*args):
-    """Angle spanned by p1<--p2, p2-->p3"""
+    """Angle spanned by p1<--p2, p2-->p3."""
     if len(args) == 1:
         p0, p1, p2 = args[0]
     elif len(args) == 3:
@@ -148,7 +148,7 @@ def angle_from_points(*args):
 
 
 def dihedral(*args):
-    """args: v0, v1, v2; dihedral angle along <-v0-.-v1->.-v2->;
+    """Args: v0, v1, v2; dihedral angle along <-v0-.-v1->.-v2->;
        all v as 3d-np.vectors or np.arrays (last axis will be used)"""
     if len(args) == 1:
         v0, v1, v2 = args[0]
@@ -171,7 +171,7 @@ def dihedral(*args):
 
 
 def dihedral_from_points(*args):
-    """args: p0, p1, p2, p3; dihedral angle along p0<--p1-->p2-->p3;
+    """Args: p0, p1, p2, p3; dihedral angle along p0<--p1-->p2-->p3;
        all p as 3d-np.vectors or np.arrays (last axis will be used)"""
     if len(args) == 1:
         p0, p1, p2, p3 = args[0]
@@ -207,7 +207,7 @@ def plane_normal(*args):
 
 
 def triple_product(*args):
-    """t = (v1 x v2) · v3"""
+    """t = (v1 x v2) · v3."""
     if len(args) == 1:
         v1, v2, v3 = args[0]
     elif len(args) == 3:
@@ -220,7 +220,7 @@ def triple_product(*args):
 
 
 def rotation_matrix(*args, angle=None):
-    """rotate v1 to match v2 or normal vector (requires angle)"""
+    """Rotate v1 to match v2 or normal vector (requires angle)"""
     if len(args) == 1:
         n = args[0]
         nnorm = np.linalg.norm(n)
@@ -274,7 +274,7 @@ def change_euclidean_basis(v, basis):
 
 
 def kabsch_algorithm(P, ref):
-    """Align P with respect to ref. Returns a rotation matrix"""
+    """Align P with respect to ref. Returns a rotation matrix."""
     C = np.dot(np.transpose(ref), P)
     V, S, W = np.linalg.svd(C)
 

@@ -36,7 +36,7 @@ import numpy as np
 
 
 def main():
-    """Evaluate Sum Rules for APT and AAT"""
+    """Evaluate Sum Rules for APT and AAT."""
     parser = argparse.ArgumentParser(
             description="Evaluate Sum Rules for APT and AAT",
             formatter_class=argparse.ArgumentDefaultsHelpFormatter

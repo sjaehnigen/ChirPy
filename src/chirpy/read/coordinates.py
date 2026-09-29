@@ -226,7 +226,7 @@ def _arc(frame, convert=1, n_lines=1, cell_line=False):
 
 
 def _pdb(frame, convert=1., n_lines=1):
-    """Kernel for processing PDB frame"""
+    """Kernel for processing PDB frame."""
     names, resns, resids, data, symbols, cell_aa_deg, title = \
         [], [], [], [], [], None, None
 

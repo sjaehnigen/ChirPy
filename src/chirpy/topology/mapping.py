@@ -63,7 +63,7 @@ def dist_crit_aa(symbols):
 
 
 def dec(prop, indices, n_ind=None, axis=0):
-    """decompose prop according to indices
+    """Decompose prop according to indices
        n_ind: interpret numerical entries of indices and return empty arrays
        for missing indices"""
     if n_ind is not None:
@@ -130,7 +130,7 @@ def cell_l_deg(cell_vec, multiply=(1, 1, 1)):
 
 
 def cell_vec(cell, n_fields=3, priority=(0, 1, 2)):
-    """cell as np.array/list of: a b c al be ga
+    """Cell as np.array/list of: a b c al be ga
        n_fields: usually 3
 
        Priority defines the alignment of non-rectangular objects in cartesian
@@ -206,7 +206,7 @@ def detect_lattice(cell, priority=(0, 1, 2)):
 
 
 def wrap_pbc(positions, cell):
-    """positions: shape ([n_frames,] n_atoms, three)
+    """Positions: shape ([n_frames,] n_atoms, three)
        cell: [ a b c al be ga ]"""
 
     if (lattice := detect_lattice(cell)) not in [None, 'void']:
@@ -265,7 +265,7 @@ def vector_pbc(p0, p1, cell=None, return_pbc_bool=False, **kwargs):
 
 
 def mean_pbc(positions, cell=None, axis=0, wrap=True):
-    """average position of atoms without periodic jumps
+    """Average position of atoms without periodic jumps
 
 
        cell ... [a b c al be ga]
@@ -284,7 +284,7 @@ def mean_pbc(positions, cell=None, axis=0, wrap=True):
 
 
 def unwrap_pbc(positions, reference=None, cell=None, axis=0, mode='naive'):
-    """get smooth trajectory of positions without periodic jumps
+    """Get smooth trajectory of positions without periodic jumps
 
        positions ... array of shape (n_frames, [n_atoms, dim])
        reference ... positions array of shape(1, [n_atoms, dim] that is
@@ -546,7 +546,7 @@ def join_molecules(pos_aa, mol_map, cell_aa_deg,
                    fast_forward=True,
                    reference=None,
                    ):
-    """pos_aa (in angstrom) with shape ([n_frames,] n_atoms, three)
+    """Pos_aa (in angstrom) with shape ([n_frames,] n_atoms, three)
     Has still problems with cell-spanning molecules
     Molecules have to be numbered starting with 0!
 
@@ -825,7 +825,7 @@ def align_atoms(positions, weights, reference=None, subset=slice(None),
 
 
 def find_methyl_groups(pos, symbols, hetatm=False, cell_aa_deg=None):
-    """pos of shape (n_atoms, n_fields) (FRAME)
+    """Pos of shape (n_atoms, n_fields) (FRAME)
        Outformat is C H H H"""
 
     dist_array = distance_matrix(pos, cell=cell_aa_deg)
@@ -962,7 +962,7 @@ def guess_atom_types(pos_aa,
         return molecule, atom_count
 
     def assign_types(character, kernel):
-        """general evaluation of similarity kernel"""
+        """General evaluation of similarity kernel."""
         similarity = np.array([[_i for _i, _ch1 in enumerate(character)
                                 if _ch1 == _ch0]
                                for _ch0 in character])

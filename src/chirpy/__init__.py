@@ -77,7 +77,7 @@ if __name__ == '__main__':
 #    ( https://stackoverflow.com/questions/57354700/starmap-combined-with-tqdm)
 
 def istarmap(self, func, iterable, chunksize=1):
-    """starmap-version of imap
+    """Starmap-version of imap
     """
     self._check_running()
     if chunksize < 1:

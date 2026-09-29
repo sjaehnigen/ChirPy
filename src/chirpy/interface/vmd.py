@@ -59,7 +59,7 @@ class VMDPaths():
         print(self.pos_aa.shape)
 
     def smooth(self):
-        """Smoothing with k=3 spline"""
+        """Smoothing with k=3 spline."""
         def spline(points):
             """Smooth one path with cubic splines."""
 
@@ -74,7 +74,7 @@ class VMDPaths():
                 ).swapaxes(0, 1)
 
     def reduce(self, cutoff_aa=0.0):
-        """Keep paths whose length is above given cutoff"""
+        """Keep paths whose length is above given cutoff."""
         ind = np.linalg.norm(np.abs(
                                 np.diff(self.pos_aa[:, :, :3], axis=0)
                                 ).sum(axis=0),
@@ -175,7 +175,7 @@ class VMDPaths():
             length = 8 * radius
 
         def arr_head_sense(p, depth):
-            """unit vector of pointing cone"""
+            """Unit vector of pointing cone."""
             backtrace = p[-1, None] - p[-depth:-1]
             with np.errstate(divide='ignore'):
                 _N = np.linalg.norm(backtrace, axis=-1)
@@ -195,7 +195,7 @@ class VMDPaths():
 
     @staticmethod
     def _get_color_id():
-        """picks randonly one of VMD's colors (57 < id < 1057 to preserve solid
+        """Picks randonly one of VMD's colors (57 < id < 1057 to preserve solid
         colors). Warning: this may interfere with other
         represantations/drawings"""
         return int(np.random.random() * 1000 + 57)
@@ -211,7 +211,7 @@ class VMDPaths():
                   arrow_length=None,
                   arrow_resolution=30,
                   ):
-        """sparsity: skip every <sparse>th point in positions; <0 for reversed
+        """Sparsity: skip every <sparse>th point in positions; <0 for reversed
         order"""
         tool = 'line'
         options = f'width {width} style {style}'
@@ -248,7 +248,7 @@ class VMDPaths():
                   arrow_length=None,
                   arrow_resolution=30,
                   ):
-        """sparsity: skip every <sparse>th point in positions; <0 for reversed
+        """Sparsity: skip every <sparse>th point in positions; <0 for reversed
         order"""
         tool = 'cylinder'
         options = f'radius {radius} resolution {resolution}'

@@ -118,7 +118,7 @@ class OriginGauge(_CORE):
 
     @staticmethod
     def time_derivative(data, dt=1.):
-        """data array of shape (n_frames, [n_units, 3])"""
+        """Data array of shape (n_frames, [n_units, 3])"""
         return _np.gradient(data, axis=0) / dt
 
     def shift_origin_gauge(self, origins_aa, assignment=None,

@@ -546,7 +546,7 @@ def _background_correction(data, pos_au, origin_au, cutoff_bg_au, cut_type_bg,
                            unwrap_pbc=True,
                            parallel=True,
                            **kwargs):
-    """Compute spectral density outside a given background cutoff"""
+    """Compute spectral density outside a given background cutoff."""
     _cut_sphere_bg = [Sphere(origin_au, cutoff_bg_au, edge=cut_type_bg)]
     _c_bg = _apply_cut_sphere(copy.deepcopy(data['c']), pos_au, _cut_sphere_bg,
                               inverse=True, cell=cell_au_deg)

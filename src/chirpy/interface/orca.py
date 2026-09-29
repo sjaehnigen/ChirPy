@@ -49,7 +49,7 @@ def orcaReader(fn):
 
 
 def read_hessian_file(fn):
-    """This is an antiquated reader for Orca .hess files"""
+    """This is an antiquated reader for Orca .hess files."""
 
     with open(fn, 'r') as f:
         inbuffer = f.read()

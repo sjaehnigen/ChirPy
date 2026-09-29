@@ -180,7 +180,7 @@ IntAbs_au2km_per_mol = IntAbs_au2km_mol
 
 
 def current_current_prefactor_au(T_K, n=1):
-    """in time / charge**2"""
+    """In time / charge**2."""
     # --- from Fermi's Golden Rule we have factor of omega
     # --- finestr equals e**2 / (4 pi eps_0) / (hbar * c)
     # --- we multiply with omega * hbar * beta (classical limit for Kubo TCF)
@@ -192,14 +192,14 @@ def current_current_prefactor_au(T_K, n=1):
 
 
 def dipole_dipole_prefactor_au(T_K, omega_au, n=1):
-    """in 1 / (time * charge**2)
+    """In 1 / (time * charge**2)
        omega_au = 2 * pi * freq_au"""
     prefactor_au = current_current_prefactor_au(T_K, n=n) * omega_au**2
     return prefactor_au
 
 
 def current_magnetic_prefactor_au(T_K, omega_au, n=1):
-    """in time / (distance * charge**2)
+    """In time / (distance * charge**2)
        omega_au = 2 * pi * freq_au
        No cgs-convention for magnetic properties, i.e. unit of m is
        current * distance**2.
@@ -211,7 +211,7 @@ def current_magnetic_prefactor_au(T_K, omega_au, n=1):
 
 
 def dipole_magnetic_prefactor_au(T_K, omega_au, n=1):
-    """in 1 / (distance * charge**2)
+    """In 1 / (distance * charge**2)
        omega_au = 2 * pi * freq_au
        No cgs-convention for magnetic properties, i.e. unit of m is
        current * distance**2.

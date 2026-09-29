@@ -150,7 +150,7 @@ class ScalarField(_CORE):
 
     @classmethod
     def from_object(cls, obj, **kwargs):
-        """Use kwargs to transfer new attribute values"""
+        """Use kwargs to transfer new attribute values."""
         nargs = extract_keys(_copy.deepcopy(vars(obj)),
                              data=None, cell_vec_aa=None,
                              origin_aa=None, pos_aa=None, numbers=None)
@@ -237,7 +237,7 @@ class ScalarField(_CORE):
         return self
 
     def _is_similar(self, other, strict=1, return_false=False):
-        """level of strictness: 1...similar, 2...very similar, 3...equal"""
+        """Level of strictness: 1...similar, 2...very similar, 3...equal."""
         def _f_check(a):
             """Whether attribute a differs between self and other."""
             return [_BOOL for _BOOL in (
@@ -323,25 +323,25 @@ class ScalarField(_CORE):
 
     # --- ToDo: these should be static methods
     def grid(self):
-        """Return an empty copy of grid"""
+        """Return an empty copy of grid."""
         return _np.zeros(self.data.shape)
 
     def _rtransform(self, p):
-        """transform position (relative to origin) into grid index"""
+        """Transform position (relative to origin) into grid index."""
         return mp.get_cell_coordinates(
                 p,
                 mp.cell_l_deg(self.cell_vec_aa)
                 )
 
     def _ltransform(self, i):
-        """transform grid index into position"""
+        """Transform grid index into position."""
         return mp.get_cartesian_coordinates(
                 i,
                 mp.cell_l_deg(self.cell_vec_aa)
                 )
 
     def ind_grid(self):
-        """Return grid point indices"""
+        """Return grid point indices."""
         xaxis = _np.arange(0, self.n_x)
         yaxis = _np.arange(0, self.n_y)
         zaxis = _np.arange(0, self.n_z)
@@ -359,7 +359,7 @@ class ScalarField(_CORE):
                 self.cell_vec_aa) + self.origin_aa[:, None, None, None]
 
     def smoothen(self, sigma):
-        """Apply a sequence of 1D Gaussian filters to grid data"""
+        """Apply a sequence of 1D Gaussian filters to grid data."""
         self.data = _gaussian_filter1d(self.data, sigma, axis=-1)
         self.data = _gaussian_filter1d(self.data, sigma, axis=-2)
         self.data = _gaussian_filter1d(self.data, sigma, axis=-3)
@@ -524,7 +524,7 @@ class VectorField(ScalarField):
         self._sync_class()
 
     def _join_scalar_fields(self, x, y, z):
-        """x, y, z ... ScalarField objects"""
+        """x, y, z ... ScalarField objects."""
         if x._is_similar(y, strict=2) and x._is_similar(z, strict=2):
             self._fn1, self._fn2, self._fn3 = x._fn, y._fn, z._fn
             self.comments = _np.array([x.comments, y.comments, z.comments])
@@ -559,7 +559,7 @@ class VectorField(ScalarField):
         F[_slc] = V
 
     def grid(self):
-        """Return an empty copy of grid"""
+        """Return an empty copy of grid."""
         return _np.zeros(self.data.shape[1:])
 
     def rotate(self, *args, **kwargs):
@@ -697,7 +697,7 @@ class VectorField(ScalarField):
         return result
 
     def streamtubes(self):
-        """See notebook 24b"""
+        """See notebook 24b."""
         pass
 
     @staticmethod

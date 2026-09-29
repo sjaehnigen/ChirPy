@@ -120,7 +120,7 @@ class _BoxObject(_CORE):
                        _np.cross(self.cell_vec_aa[1], self.cell_vec_aa[2]))
 
     def _sync_class(self):
-        """Calculates intensive properties only"""
+        """Calculates intensive properties only."""
         self.n_members = len(self.members)
         self.mass_amu = sum([_n * sum(_m.masses_amu)
                              for _n, _m in self.member_set])
@@ -181,7 +181,7 @@ class _BoxObject(_CORE):
         self._sync_class()
 
     def __add__(self, other):
-        """Combine members of different systems"""
+        """Combine members of different systems."""
         if not isinstance(other, _BoxObject):
             raise TypeError('unsupported operand type(s) for +: '
                             '\'%s\' and \'%s\''
@@ -198,7 +198,7 @@ class _BoxObject(_CORE):
         # Later: choose largest cell param and lowest symmetry
 
     def __mul__(self, other):
-        """Multiply system keeping box size constant"""
+        """Multiply system keeping box size constant."""
         new = _copy.deepcopy(self)
         if isinstance(other, int):
             for _i in range(other-1):
@@ -211,7 +211,7 @@ class _BoxObject(_CORE):
         return new
 
     def __pow__(self, other):
-        """Multiply system and scale box accordingly"""
+        """Multiply system and scale box accordingly."""
         _warnings.warn('pow() in beta state. Proceed with care!',
                        _ChirPyWarning,
                        stacklevel=2)
@@ -454,7 +454,7 @@ class Solution(_BoxObject):
         return self._fill_box(**kwargs)
 
     def _fill_box(self, verbose=False, sort_atoms=False, write_pdb=True):
-        """requires packmol
+        """Requires packmol
            sort_atoms ... sort atoms alphabetically (False: sorted by resid)"""
         # --- calculate packmol box
         _box_aa = _np.concatenate((self.origin_aa, _np.dot(_np.ones((3)),

@@ -51,7 +51,7 @@ class _SYSTEM(_CORE):
        organised in attributed classes."""
 
     def __init__(self, *args, **kwargs):
-        """Manually given arguments overwrite file attributes"""
+        """Manually given arguments overwrite file attributes."""
         self._topo = kwargs.get('fn_topo')
         if self._topo is not None:
             self._topo = _read_topology_file(self._topo)
@@ -161,7 +161,7 @@ class _SYSTEM(_CORE):
                                        stacklevel=3)
 
     def _copy(self):
-        """return an exact copy of the iterator [BETA]
+        """Return an exact copy of the iterator [BETA]
            not a deepcopy ? """
         new = self.__new__(self.__class__)
         new.__dict__.update(self.__dict__)
@@ -169,7 +169,7 @@ class _SYSTEM(_CORE):
         return new
 
     def __add__(self, other):
-        """does not work if self and other are the same instance"""
+        """Does not work if self and other are the same instance."""
         new = self._copy()
         new.mol_map = None
         new.XYZ.merge(other.XYZ, axis=0)
