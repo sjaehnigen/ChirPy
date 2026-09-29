@@ -160,6 +160,25 @@ class TestMapping(unittest.TestCase):
         lattice = mapping.detect_lattice(cell_aa_deg)
         self.assertEqual(lattice, 'monoclinic')
 
+    def test_get_cell_coordinates(self):
+        # --- l/rtransform: convert between Cartesian and cell-vector
+        #     (fractional) basis for a non-tetragonal (monoclinic) cell
+        cell_aa_deg = np.array([24.218, 15.92, 13.362, 90.0, 111.95, 90.0])
+        pos_cart = np.array([[5., 4., 3.], [1., 2., 3.]])
+
+        pos_cell = mapping.get_cell_coordinates(pos_cart, cell_aa_deg)
+        pos_back = mapping.get_cartesian_coordinates(pos_cell, cell_aa_deg)
+        self.assertTrue(np.allclose(pos_back, pos_cart))
+
+        # --- angular quantities (e.g. moments/tensors) transform via the
+        # reciprocal (dual) basis instead of the direct one
+        vec_cart = np.array([1., 0., 0.])
+        vec_cell = mapping.get_cell_coordinates(vec_cart, cell_aa_deg,
+                                                angular=True)
+        vec_back = mapping.get_cartesian_coordinates(vec_cell, cell_aa_deg,
+                                                      angular=True)
+        self.assertTrue(np.allclose(vec_back, vec_cart))
+
     def test_wrap_pbc(self):
         cell_aa_deg = np.array([1., 2., np.sqrt(2), 90., 135., 90.])
         _p1 = np.ones((2, 3))

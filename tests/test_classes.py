@@ -36,6 +36,8 @@ import numpy as np
 
 from chirpy.classes import system, quantum, trajectory, core, volume
 from chirpy.config import ChirPyWarning
+from chirpy import constants
+from chirpy.physics import statistical_mechanics
 
 _test_dir = os.path.dirname(os.path.abspath(__file__)) + '/test_files'
 
@@ -449,6 +451,32 @@ class TestSystem(unittest.TestCase):
         self.assertTrue(np.array_equal(_load.mol_map, mol_map[sel]))
         self.assertTrue(set(_load.mol_map).issubset({10, 11}))
 
+    def test_split_pdb_by_atom_names(self):
+        # --- splitting a trajectory loaded with a pdb topology using the
+        # atom names taken from that topology (instead of a mol_map)
+        largs = {
+                'fn_topo': self.dir + "/topo.pdb",
+                'range': (0, 3, 10),
+                'sort': True,
+                }
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore', category=ChirPyWarning)
+            _load = system.Supercell(
+                    self.dir + "/MD-NVT-production-pos-1.xyz",
+                    fmt='xyz', **largs)
+
+        names = _load.XYZ.names
+        n_atoms = len(_load.XYZ.symbols)
+        n_carbon = sum(1 for _n in names if _n == 'C')
+        self.assertGreater(n_carbon, 0)
+
+        _load.XYZ.split(names, select=['C'])
+
+        self.assertEqual(len(_load.XYZ.symbols), n_carbon)
+        self.assertLess(len(_load.XYZ.symbols), n_atoms)
+        self.assertSetEqual(set(_load.XYZ.names), {'C'})
+        self.assertSetEqual(set(_load.XYZ.symbols), {'C'})
+
 
 class TestQuantum(unittest.TestCase):
     # --- insufficiently tested
@@ -546,6 +574,76 @@ class TestVibrationalModes(unittest.TestCase):
         self.assertEqual(vib.n_atoms, 8 * n_atoms)
         self.assertEqual(vib.n_modes, n_modes)
         self.assertTupleEqual(vib.data.shape, (n_modes, 8 * n_atoms, 9))
+
+    def test_calculate_nuclear_velocities(self):
+        # --- equipartition theorem: velocities generated from normal modes
+        # (occupation='single') must reproduce the requested temperature,
+        # i.e. average kinetic energy per mode == 0.5 * k_B * T
+        # (previously scaled velocities linearly by 'scale' instead of
+        # sqrt(scale), overshooting the target temperature by a factor of
+        # 'scale' since kinetic energy is quadratic in velocity)
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore', category=ChirPyWarning)
+            vib = trajectory.VibrationalModes(self.dir + '/test.xvibs')
+
+        T = 300.
+        vib.calculate_nuclear_velocities(occupation='single', temperature=T)
+
+        self.assertTupleEqual(vib.vel_au.shape, (vib.n_modes, vib.n_atoms, 3))
+
+        e_kin_au = statistical_mechanics.kinetic_energies(vib.vel_au,
+                                                          vib.masses_amu)
+        T_eff = 2 * e_kin_au.sum(axis=1).mean() / constants.k_B_au
+        self.assertAlmostEqual(T_eff, T, places=6)
+
+    def test_rotate(self):
+        # --- rotate() previously crashed for VibrationalModes/'modes'-type
+        # objects with an UnboundLocalError (pos_aa/vel_au were referenced
+        # unconditionally but never assigned in the 'modes' branch)
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore', category=ChirPyWarning)
+            vib = trajectory.VibrationalModes(self.dir + '/test.xvibs')
+
+        theta = np.pi / 5
+        R = np.array([[np.cos(theta), -np.sin(theta), 0],
+                     [np.sin(theta), np.cos(theta), 0],
+                     [0, 0, 1]])
+
+        pos0 = vib.pos_aa.copy()
+        modes0 = vib.modes.copy()
+        vib.rotate(R)
+
+        self.assertTrue(np.allclose(vib.pos_aa,
+                                    np.einsum('ji,fai->faj', R, pos0)))
+        self.assertTrue(np.allclose(vib.modes,
+                                    np.einsum('ji,fai->faj', R, modes0)))
+
+        # --- rank-2 tensors (APT/AAT) must rotate as R @ T @ R^T per atom,
+        # and derived (e/m)transition dipole moments must stay consistent
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore', category=ChirPyWarning)
+            vib2 = trajectory.VibrationalModes(self.dir + '/test.xvibs')
+        rng = np.random.default_rng(0)
+        vib2.APT_au = rng.random((vib2.n_atoms, 3, 3))
+        vib2.AAT_au = rng.random((vib2.n_atoms, 3, 3))
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore', category=ChirPyWarning)
+            vib2._sync_class(check_orthonormality=False)
+
+        apt0 = vib2.APT_au.copy()
+        aat0 = vib2.AAT_au.copy()
+        etdm0 = vib2.etdm_au.copy()
+
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore', category=ChirPyWarning)
+            vib2.rotate(R)
+
+        self.assertTrue(np.allclose(
+                vib2.APT_au, np.einsum('ij,ajk,lk->ail', R, apt0, R)))
+        self.assertTrue(np.allclose(
+                vib2.AAT_au, np.einsum('ij,ajk,lk->ail', R, aat0, R)))
+        self.assertTrue(np.allclose(
+                vib2.etdm_au, np.einsum('ij,aj->ai', R, etdm0)))
 
 
 class TestVolume(unittest.TestCase):

@@ -35,6 +35,7 @@ import numpy as np
 import warnings
 
 from chirpy import constants
+from chirpy.config import ChirPyWarning
 from chirpy.physics import statistical_mechanics, spectroscopy, \
     classical_electrodynamics, kspace
 from chirpy.classes import trajectory
@@ -56,6 +57,32 @@ class TestConstants(unittest.TestCase):
                 constants.symbols_to_masses(('C', 'H', 'D', 'P')).tolist(),
                 [12.011, 1.008, 2.01410177784, 30.973761998],
                 )
+
+    def test_symbols_to_symbols_detect_element(self):
+        # --- detect_element: guess the chemical element from an arbitrary
+        # atom kind/name label (e.g. force-field style labels) by
+        # progressively truncating from the right until a known element
+        # symbol is matched; a warning is issued whenever guessing kicks in
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            detected = constants.symbols_to_symbols(
+                    ('OW', 'HW1', 'NA+', 'C')
+                    )
+            msgs = [str(_w.message) for _w in w]
+
+        self.assertTupleEqual(detected, ('O', 'H', 'Na', 'C'))
+        # --- exact element symbols are recognised without any guessing
+        self.assertFalse(any('C' == _m for _m in msgs))
+        self.assertTrue(any('OW --> O' in _m for _m in msgs))
+        self.assertTrue(any('HW1 --> H' in _m for _m in msgs))
+        self.assertTrue(any('NA+ --> Na' in _m for _m in msgs))
+
+        # --- unresolvable labels fall back to the original label itself
+        # (fill_value='self')
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore', category=ChirPyWarning)
+            fallback = constants.symbols_to_symbols(('##!!',))
+        self.assertTupleEqual(fallback, ('##!!',))
 
     def test_numbers_to_symbols(self):
         self.assertTupleEqual(
