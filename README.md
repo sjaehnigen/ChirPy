@@ -17,6 +17,19 @@ Furthermore:
 
 (... work in progress)
 
+## Package structure
+*ChirPy* is organised into the following sub-packages under `src/chirpy/`:
+- `classes` — core data structures (trajectories, molecular systems, quantum-chemical data, volumetric fields)
+- `read` / `write` — parsers and writers for coordinate, volume, and mode file formats
+- `create` — generation of supercells, collective variables, and input files
+- `interface` — bridges to third-party software (CPMD, CP2K, Gaussian, Orca, VMD, PyMOL, Tinker, NAMD, Molden)
+- `topology` — molecular topology, mapping, distribution, and dissection tools
+- `physics` — electrodynamics, spectroscopy, statistical mechanics, and the modern theory of magnetisation
+- `mathematics` — algebra and analysis helper routines
+- `visualise` — plotting and scientific visualisation utilities
+
+Command-line entry points wrapping these features are provided in `scripts/`.
+
 
 ## Installation 
 Copy or clone the repository into a local directory. Open a bash terminal and change directory to the local copy of the repository.
@@ -74,3 +87,15 @@ in aqueous solution, *Phys. Chem. Chem. Phys.*, **2021**, *23*, 17232.](https://
 4. [S. Jähnigen, R. Vuilleumier, A. Zehnacker; The genesis of OH-stretching vibrational circular dichroism in chiral molecular crystals, *Chemical Science*, **2025**, *16*, 9833-9842.](https://doi.org/10.1039/D4SC08055F) ([data](https://doi.org/10.5281/zenodo.14222397))
 
 Note: some publications by the developers apply *ChirPy* to post-process or analyse trajectories from other software (e.g. CP2K, CPMD) without contributing new *ChirPy* features; e.g., the Girsanov-reweighting study (S. Jähnigen, B. G. Keller, *Commun. Appl. Math. Comput. Sci.*, **2026**, accepted) is such an application and is not itself a *ChirPy* development.
+
+## Citing ChirPy
+If you use *ChirPy* in your work, please cite it via its Zenodo record; see `CITATION.bib` for the corresponding BibTeX entry:
+
+> S. Jähnigen; *ChirPy* -- A python package for chirality, dynamics, and molecular vibrations, **2022**. https://doi.org/10.5281/zenodo.4775330
+
+## Contributing
+Contributions, bug reports, and feature requests are welcome. Please open an issue or pull request on [GitHub](https://github.com/sjaehnigen/chirpy), or contact the [developers](https://github.com/sjaehnigen/chirpy/blob/master/AUTHORS.txt) directly.
+
+## License
+*ChirPy* is distributed under the [GNU General Public License v3.0 (or later)](https://github.com/sjaehnigen/chirpy/blob/master/LICENSE.txt).
+
