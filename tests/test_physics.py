@@ -36,9 +36,9 @@ import warnings
 
 from chirpy import constants
 from chirpy.physics import statistical_mechanics, spectroscopy, \
-    classical_electrodynamics
+    classical_electrodynamics, kspace
 from chirpy.classes import trajectory
-# kspace, modern_theory_of_magnetisation
+# modern_theory_of_magnetisation
 
 _test_dir = os.path.dirname(os.path.abspath(__file__)) + '/test_files'
 
@@ -260,12 +260,67 @@ class TestClassicalElectrodyanmics(unittest.TestCase):
         self.assertListEqual(np.round(_m, decimals=2).tolist(),
                              [[1.2, 2.12, 0.6], [2.2, 2.12, 1.8]])
 
-        # -- multiple origins ---> one origin
-        _m = classical_electrodynamics.shift_magnetic_origin_gauge(
-                np.array([[1.2, 3, -1], [1.2, 3, -1]]),
-                np.array([[1., 2., 0.], [1., 2., 0.]]),
-                np.array([[-1., 0., 0.1], [-1., -2., 0.1]]),
-                np.array([-1., 1., -0.1])
+    def test_shift_electric_origin_gauge(self):
+        # mu(B) = mu(A) + q * (o_a - o_b)
+        _mu = classical_electrodynamics.shift_electric_origin_gauge(
+                np.array([2.0]),
+                np.array([1.2, 3.0, -1.0]),
+                np.array([-1., 3., 0.1]),
+                np.array([0., 0., 0.]),
                 )
-        self.assertListEqual(np.round(_m, decimals=2).tolist(),
-                             [[1.2, 2.12, 0.6], [2.2, 2.12, 1.8]])
+        self.assertListEqual(np.round(_mu, decimals=6).tolist(),
+                             [[-0.8, 9.0, -0.8]])
+
+        # --- shifting there and back returns the original dipole moment
+        _mu_back = classical_electrodynamics.shift_electric_origin_gauge(
+                np.array([2.0]),
+                _mu[0],
+                np.array([0., 0., 0.]),
+                np.array([-1., 3., 0.1]),
+                )
+        self.assertListEqual(np.round(_mu_back, decimals=6).tolist(),
+                             [[1.2, 3.0, -1.0]])
+
+        # -- periodic
+        _mu_pbc = classical_electrodynamics.shift_electric_origin_gauge(
+                np.array([2.0]),
+                np.array([1.2, 3.0, -1.0]),
+                np.array([-1., 3., 0.1]),
+                np.array([0., 0., 0.]),
+                cell_au_deg=np.array([10., 0.7, 10., 90., 90., 90.])
+                )
+        self.assertTupleEqual(_mu_pbc.shape, (1, 3))
+
+
+class TestKspace(unittest.TestCase):
+
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_k_get_cell(self):
+        R, K = kspace.k_get_cell(4, 4, 4, 8., 8., 8.)
+        self.assertTupleEqual(R.shape, (4, 4, 4))
+        self.assertTupleEqual(K.shape, (4, 4, 4))
+        self.assertAlmostEqual(R.min(), 0.0, places=6)
+
+        # -- refining the grid while keeping the same box: minimum
+        # k-vector magnitude (k=0) stays 0, real-space spans the same box
+        R2, K2 = kspace.k_get_cell(8, 8, 8, 8., 8., 8.)
+        self.assertAlmostEqual(R2.max(), R.max(), places=6)
+
+    def test_k_potential(self):
+        n = 8
+        cell_au = np.eye(3)
+        rho = np.zeros((n, n, n))
+        rho[n // 2, n // 2, n // 2] = 1.0
+
+        R, V = kspace.k_potential(rho, cell_au)
+        self.assertTupleEqual(V.shape, (n, n, n))
+
+        # --- Coulomb potential of a point charge is maximal at the
+        # charge position
+        self.assertEqual(np.argmax(V), np.ravel_multi_index(
+                (n // 2, n // 2, n // 2), V.shape))

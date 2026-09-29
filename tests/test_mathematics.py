@@ -50,6 +50,23 @@ class TestAlgebra(unittest.TestCase):
         ang = algebra.signed_angle([0.51, 0.51, 0.], [1, 0, 0], [0, 0, 1])
         self.assertEqual(ang, -45 * np.pi / 180.)
 
+    def test_cross(self):
+        # --- single vector pair matches numpy
+        v0 = np.array([1., 0., 0.])
+        v1 = np.array([0., 1., 0.])
+        self.assertListEqual(algebra.cross(v0, v1).tolist(),
+                             np.cross(v0, v1).tolist())
+
+        # --- batched vectors (shape (n, 3)) also match numpy row-wise
+        v0b = np.array([[1., 0., 0.], [0., 1., 0.]])
+        v1b = np.array([[0., 1., 0.], [1., 0., 0.]])
+        self.assertListEqual(algebra.cross(v0b, v1b).tolist(),
+                             np.cross(v0b, v1b).tolist())
+
+        # --- shape mismatch raises
+        with self.assertRaises(ValueError):
+            algebra.cross(v0, v1b)
+
     def test_angle_from_points(self):
         ang = algebra.angle_from_points([0, 0, 0], [2, 0, 1], [2, 2, 1])
         self.assertEqual(ang, 90 * np.pi / 180)
@@ -152,3 +169,60 @@ class TestAlgebra(unittest.TestCase):
 
         self.assertTrue(np.allclose(np.matmul(R, R2), np.identity(3)),
                         'The rotation matrices are not inverse!')
+
+    def test_rotate_griddata(self):
+        n = 21
+        coords = np.linspace(-5, 5, n)
+        X, Y, Z = np.meshgrid(coords, coords, coords, indexing='ij')
+        grid_positions = np.array([X, Y, Z])
+        data = np.zeros((n, n, n))
+        ix = np.argmin(np.abs(coords - 2.0))
+        iy = np.argmin(np.abs(coords - 0.0))
+        iz = np.argmin(np.abs(coords - 0.0))
+        data[ix, iy, iz] = 1.0
+
+        # --- rotate the peak by 90 degrees around the z axis: (2,0,0) ->
+        # (0, 2, 0)
+        theta = np.pi / 2
+        R = np.array([[np.cos(theta), -np.sin(theta), 0.],
+                     [np.sin(theta), np.cos(theta), 0.],
+                     [0., 0., 1.]])
+        rotated = algebra.rotate_griddata(grid_positions, data, R)
+
+        peak = np.unravel_index(np.argmax(rotated), rotated.shape)
+        self.assertAlmostEqual(coords[peak[0]], 0.0, places=6)
+        self.assertAlmostEqual(coords[peak[1]], 2.0, places=6)
+        self.assertAlmostEqual(coords[peak[2]], 0.0, places=6)
+        self.assertAlmostEqual(rotated[peak], 1.0, places=6)
+
+
+class TestAnalysis(unittest.TestCase):
+
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_divrot(self):
+        from chirpy.mathematics.analysis import divrot
+
+        n = 20
+        length = 10.0
+        cell_vec = np.eye(3) * (length / n)
+        coords = (np.arange(n) - n / 2) * (length / n)
+        X, Y, Z = np.meshgrid(coords, coords, coords, indexing='ij')
+
+        # --- radial field F(r) = r: analytically div(F) = 3, rot(F) = 0
+        data = np.array([X, Y, Z])
+        div, rot = divrot(data, cell_vec)
+
+        self.assertTupleEqual(div.shape, (n, n, n))
+        self.assertTupleEqual(rot.shape, (3, n, n, n))
+
+        # --- exclude the outer boundary where the finite-difference
+        # gradient is inaccurate
+        _c = slice(5, 15)
+        self.assertAlmostEqual(div[_c, _c, _c].mean(), 3.0, places=6)
+        self.assertAlmostEqual(
+                np.abs(rot[:, _c, _c, _c]).max(), 0.0, places=6)
