@@ -231,6 +231,63 @@ class TestTrajectory(unittest.TestCase):
         traj_nj.center_of_mass(mask=mask, join_molecules=False)
         self.assertTrue(np.allclose(traj_nj.mol_com_aa[0], ref_com0))
 
+    def test_wrap(self):
+        cell = np.array([10., 10., 10., 90., 90., 90.])
+        pos = np.array([[11.0, -2.0, 5.0],
+                        [3.0, 3.0, 3.0]])
+
+        traj = trajectory._XYZTrajectory(data=pos[None],
+                                         symbols=['H', 'H'],
+                                         cell_aa_deg=cell)
+        traj.wrap()
+        self.assertTrue(np.allclose(traj.pos_aa[0], [[1.0, 8.0, 5.0],
+                                                      [3.0, 3.0, 3.0]]))
+
+        # --- _MOMENTS.wrap() follows the same convention for positions
+        data = np.zeros((1, 2, 12))
+        data[0, :, :3] = pos
+        mom = trajectory._MOMENTSTrajectory(data=data,
+                                            symbols=['X', 'X'],
+                                            cell_aa_deg=cell)
+        mom.wrap()
+        self.assertTrue(np.allclose(mom.pos_aa[0], [[1.0, 8.0, 5.0],
+                                                     [3.0, 3.0, 3.0]]))
+
+    def test_wrap_molecules(self):
+        cell = np.array([10., 10., 10., 90., 90., 90.])
+        pos = np.array([[0.5, 0.5, 0.5],
+                        [1.458, 0.5, 0.5],
+                        [0.26, 1.427, 0.5],
+                        [0.2, 5.0, 5.0],
+                        [9.8, 5.0, 5.0],
+                        [0.958, 5.927, 5.0]])
+        symbols = ['O', 'H', 'H', 'O', 'H', 'H']
+        mol_map = [0, 0, 0, 1, 1, 1]
+
+        traj = trajectory._XYZTrajectory(data=pos[None],
+                                         symbols=symbols,
+                                         cell_aa_deg=cell)
+        # --- a plain wrap() does not restore molecular connectivity
+        # across periodic boundaries: atom 4 stays far from its molecule
+        traj_plain = trajectory._XYZTrajectory(data=pos[None],
+                                               symbols=symbols,
+                                               cell_aa_deg=cell)
+        traj_plain.wrap()
+        self.assertGreater(
+                np.linalg.norm(traj_plain.pos_aa[0, 3]
+                               - traj_plain.pos_aa[0, 4]),
+                5.0
+                )
+
+        # --- wrap_molecules() keeps molecules whole (correct periodic
+        # image chosen relative to the reference atom of each molecule)
+        traj.wrap_molecules(mol_map)
+        self.assertTrue(np.allclose(traj.pos_aa[0, 4], [-0.2, 5.0, 5.0]))
+        self.assertLess(
+                np.linalg.norm(traj.pos_aa[0, 3] - traj.pos_aa[0, 4]),
+                1.0
+                )
+
 
 class TestSystem(unittest.TestCase):
     # --- insufficiently tested
@@ -365,6 +422,32 @@ class TestSystem(unittest.TestCase):
                                     _load1.XYZ.pos_aa))
         self.assertTrue(np.allclose(_added.XYZ.pos_aa[n_atoms:],
                                     _load2.XYZ.pos_aa))
+
+    def test_extract_atoms(self):
+        largs = {
+                'fn_topo': self.dir + "/topo.pdb",
+                'range': (0, 3, 10),
+                'sort': True,
+                }
+        with warnings.catch_warnings():
+            warnings.filterwarnings('ignore', category=ChirPyWarning)
+            _load = system.Supercell(
+                    self.dir + "/MD-NVT-production-pos-1.xyz",
+                    fmt='xyz', **largs)
+
+        mol_map = np.array(_load.mol_map)
+        sel = [_i for _i, _m in enumerate(mol_map) if _m in (10, 11)]
+
+        _load.extract_atoms(sel)
+
+        # --- equivalent to selecting the same atoms via extract_molecules
+        self.assertEqual(len(_load.symbols), len(sel))
+        self.assertTupleEqual(_load.XYZ.pos_aa.shape, (len(sel), 3))
+        # --- mol_map must be re-indexed consistently with the selection
+        # (previously used membership test on wrong index domain, cf.
+        # extract_atoms)
+        self.assertTrue(np.array_equal(_load.mol_map, mol_map[sel]))
+        self.assertTrue(set(_load.mol_map).issubset({10, 11}))
 
 
 class TestQuantum(unittest.TestCase):

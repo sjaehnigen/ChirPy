@@ -87,6 +87,25 @@ class TestCPMD(unittest.TestCase):
             atol=0
             ))
 
+    def test_cpmdReader_MOMENTS_position_form(self):
+        # --- position form (d_au) must be auto-detected from column count
+        #     (13 columns incl. frame index instead of 10) and correctly
+        #     appended as the last 3 (of 12) data columns
+        data = cpmd.cpmdReader(self.dir + '/MOMENTS_PF',
+                               filetype='MOMENTS',
+                               symbols=['X', 'X'])['data']
+
+        self.assertTupleEqual(data.shape, (1, 2, 12))
+        self.assertTrue(np.allclose(
+            data[0, :, 9:12],
+            [[0.11, 0.22, 0.33], [0.44, 0.55, 0.66]],
+            ))
+        # --- plain MOMENTS (9 data columns) has no position form
+        data = cpmd.cpmdReader(self.dir + '/MOMENTS',
+                               filetype='MOMENTS',
+                               symbols=['X']*288)['data']
+        self.assertEqual(data.shape[-1], 9)
+
     def test_cpmdWriter(self):
         data_r = cpmd.cpmdReader(self.dir + '/TRAJECTORY',
                                  filetype='TRAJECTORY',
