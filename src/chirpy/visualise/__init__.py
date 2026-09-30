@@ -27,6 +27,8 @@
 #   If not, see <https://www.gnu.org/licenses/>.
 #
 # ----------------------------------------------------------------------
+
+"""Visualisation helpers for plots and formatted output."""
 from . import timeline
 from . import pubplot
 from . import print_info

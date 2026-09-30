@@ -29,6 +29,7 @@
 #
 # ----------------------------------------------------------------------
 
+"""Print box information for a supercell file."""
 
 import argparse
 import numpy as np
@@ -36,6 +37,7 @@ from chirpy.create import supercell
 
 
 def main():
+    """Print box information for a supercell file."""
     parser = argparse.ArgumentParser(
             description="Read supercell and print box information.",
             formatter_class=argparse.ArgumentDefaultsHelpFormatter

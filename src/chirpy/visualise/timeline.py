@@ -28,11 +28,14 @@
 #
 # ----------------------------------------------------------------------
 
+"""Simple helpers for plotting and fitting timeline data."""
+
 import matplotlib.pyplot as plt
 from pylab import polyfit
 
 
 def show_and_interpolate_array(x, y, title, xlabel, ylabel, plot):
+    """Plot data and print linear trends for the full series and chunks."""
     m = list()
     b = list()
     if plot == 1:

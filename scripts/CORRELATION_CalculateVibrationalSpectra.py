@@ -29,6 +29,8 @@
 #
 # ----------------------------------------------------------------------
 
+"""Calculate and plot vibrational spectra from dipole time correlations."""
+
 import sys
 import argparse
 import warnings
@@ -41,8 +43,8 @@ from chirpy import config, constants
 
 
 def main():
-    '''Calculate and plot vibrational spectra of the given trajectory through
-       time-correlation of dipole moments.'''
+    """Calculate and plot vibrational spectra of the given trajectory through
+       time-correlation of dipole moments."""
     parser = argparse.ArgumentParser(
             description="Calculate and plot vibrational spectra of the given "
             "trajectory through time-correlation of dipole moments.",

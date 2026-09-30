@@ -28,6 +28,8 @@
 #
 # ----------------------------------------------------------------------
 
+"""Convenience imports for ChirPy class modules."""
+
 from . import core
 from . import quantum
 from . import volume

@@ -29,6 +29,8 @@
 #
 # ----------------------------------------------------------------------
 
+"""Inspect a trajectory for duplicate frames."""
+
 import argparse
 import warnings
 
@@ -36,7 +38,7 @@ from chirpy.classes import system
 
 
 def main():
-    '''Scan for duplicate frames and write new trajectory.'''
+    """Scan for duplicate frames and write new trajectory."""
     parser = argparse.ArgumentParser(
             description="Scan for duplicate frames and write new trajectory.",
             formatter_class=argparse.ArgumentDefaultsHelpFormatter

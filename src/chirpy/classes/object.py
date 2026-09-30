@@ -28,6 +28,8 @@
 #
 # ----------------------------------------------------------------------
 
+"""Geometric helper objects used to mask or select data."""
+
 from functools import partial
 import numpy as np
 import copy
@@ -38,13 +40,15 @@ from ..topology.mapping import vector_pbc
 
 
 class Sphere(_CORE):
+    """Spherical clipping object with hard or soft edges."""
+
     def __init__(self, position=None, radius=None, edge='hard', D=0.23622):
-        '''Define a sphere at position, radius and edge (soft/hard).
+        """Define a sphere at position, radius and edge (soft/hard).
            D=0.23622 bohr corresponds to 0.125 angstrom (soft sphere only)
            Expects positions of shape ([n_frames, ...] dim).
            Radius can be a float (costants) or an array of shape (n_frames)
            (dynamic).
-           '''
+           """
 #        if len(position.shape) != 2:
 #            raise TypeError('Got wrong shape for sphere position!',
 #                            position.shape)
@@ -67,16 +71,17 @@ class Sphere(_CORE):
             raise ValueError(f'unknown edge \'{edge}\'')
 
     def clip_section_observable(self, x, pos, cell=None, inverse=False):
-        '''Apply sphere on observable x using.
+        """Apply sphere on observable x using.
            Scaling is applied according to positions relative to the sphere's
            origin.
 
            Expects x of shape ([FR,] N, [1 ...]) and pos{itions} of shape
            ([FR, N,] 3) that have to correspond to Sphere position's shape.
            cell: [a, b, c, al, be, ga]
-           '''
+           """
 
         def get_d(orig, _pos):
+            """Distance from orig to _pos under periodic boundary conditions."""
             return np.linalg.norm(vector_pbc(orig, _pos, cell=cell), axis=-1)
 
         # --- never manipulate input

@@ -29,6 +29,8 @@
 #
 # ----------------------------------------------------------------------
 
+"""Check conservation in a CP2K energy file."""
+
 import sys
 import argparse
 import numpy as np
@@ -40,7 +42,7 @@ from chirpy.visualise import timeline
 
 
 def main(*args):
-
+    """Check conservation in a CP2K energy file."""
     if len(args) == 0:
         parser = argparse.ArgumentParser(
                 description="check_convergence",

@@ -28,6 +28,8 @@
 #
 # ----------------------------------------------------------------------
 
+"""Classes describing molecular systems and supercells."""
+
 import numpy as _np
 import warnings as _warnings
 import copy as _copy
@@ -45,11 +47,11 @@ from ..visualise import print_info
 
 
 class _SYSTEM(_CORE):
-    '''Parent class that parses and manages properties of a chemical system
-       organised in attributed classes.'''
+    """Parent class that parses and manages properties of a chemical system
+       organised in attributed classes."""
 
     def __init__(self, *args, **kwargs):
-        '''Manually given arguments overwrite file attributes'''
+        """Manually given arguments overwrite file attributes."""
         self._topo = kwargs.get('fn_topo')
         if self._topo is not None:
             self._topo = _read_topology_file(self._topo)
@@ -79,6 +81,7 @@ class _SYSTEM(_CORE):
                                stacklevel=2)
 
     def _cell_aa_deg(self, cell_aa_deg):
+        """Update the unit-cell description on all linked objects."""
         _cell = _copy.deepcopy(cell_aa_deg)
         self.cell_aa_deg = _np.array(_cell)
         # --- deep change to iterator frame
@@ -87,6 +90,7 @@ class _SYSTEM(_CORE):
             self.Modes.cell_aa_deg = _np.array(_cell)
 
     def _check_distances(self, clean=False):
+        """Check interatomic distances and optionally rebuild molecules."""
         self.XYZ._check_distances(clean=clean)
         if clean:
             self.mol_map = None
@@ -94,6 +98,7 @@ class _SYSTEM(_CORE):
         self._sync_class()
 
     def _sync_class(self, check_consistency=True, **kwargs):
+        """Synchronise cached system attributes from the coordinate object."""
         if (_cell := kwargs.get('cell_aa_deg')) is not None:
             self._cell_aa_deg(_cell)
         elif not hasattr(self, 'cell_aa_deg'):
@@ -131,6 +136,7 @@ class _SYSTEM(_CORE):
             self._check_consistency(tag=kwargs.get('tag', ''))
 
     def _check_consistency(self, tag=''):
+        """Check consistency between linked objects and topology data."""
         if hasattr(self, 'Modes'):
             # --- ToDo: synchronize all sub-objects (pos_aa, cell_aa_deg)
             try:
@@ -155,15 +161,15 @@ class _SYSTEM(_CORE):
                                        stacklevel=3)
 
     def _copy(self):
-        '''return an exact copy of the iterator [BETA]
-           not a deepcopy ? '''
+        """Return an exact copy of the iterator [BETA]
+           not a deepcopy ? """
         new = self.__new__(self.__class__)
         new.__dict__.update(self.__dict__)
         new.XYZ = self.XYZ._copy()  # necessary to split iterator
         return new
 
     def __add__(self, other):
-        '''does not work if self and other are the same instance'''
+        """Does not work if self and other are the same instance."""
         new = self._copy()
         new.mol_map = None
         new.XYZ.merge(other.XYZ, axis=0)
@@ -177,6 +183,7 @@ class _SYSTEM(_CORE):
         return new
 
     def read_fn(self, *args, **kwargs):
+        """Read coordinates and optional vibrational data from file input."""
         self.XYZ = self._XYZ(*args, **kwargs)
         fmt = self.XYZ._fmt
 
@@ -192,6 +199,7 @@ class _SYSTEM(_CORE):
                 self.mol_map = _topo['mol_map']
 
     def center_molecule(self, index, **kwargs):
+        """Center the selected molecule inside the simulation cell."""
         weights = kwargs.pop('weights', self.weights)
 
         if self.mol_map is None:
@@ -205,6 +213,7 @@ class _SYSTEM(_CORE):
         self.wrap_molecules()
 
     def wrap_molecules(self, **kwargs):
+        """Wrap molecules into the current cell using ``mol_map``."""
         weights = kwargs.pop('weights', self.weights)
         if self.mol_map is None:
             raise AttributeError('Wrap molecules requires a topology '
@@ -213,10 +222,10 @@ class _SYSTEM(_CORE):
         self.XYZ.wrap_molecules(self.mol_map, weights=weights, **kwargs)
 
     def repeat(self, times, unwrap_ref=None, priority=(0, 1, 2), **kwargs):
-        '''Propagate kinds using cell tensor, duplicate if cell is not defined.
+        """Propagate kinds using cell tensor, duplicate if cell is not defined.
            times ... integer or tuple of integers for each Cartesian dimension
            priority ... (see chirpy.topology.mapping.cell_vec)
-           '''
+           """
         if isinstance(times, int):
             times = 3 * (times,)
         elif not isinstance(times, tuple):
@@ -250,13 +259,14 @@ class _SYSTEM(_CORE):
         self._sync_class(tag='repeat', **kwargs)
 
     def wrap(self, **kwargs):
+        """Wrap atomic coordinates into the current unit cell."""
         self.XYZ.wrap(**kwargs)
 
     def extract_molecules(self, mols):
-        '''Split XYZ through topology and select molecule(s) according to given
+        """Split XYZ through topology and select molecule(s) according to given
            ids
         mols  ...  list of molecular indices
-        '''
+        """
         if self.mol_map is None:
             _warnings.warn('uses auto-detection of molecules',
                            _ChirPyWarning, stacklevel=2)
@@ -270,10 +280,10 @@ class _SYSTEM(_CORE):
         # self.names = self.XYZ.names
 
     def extract_atoms(self, atoms):
-        '''Split XYZ through topology and select atoms according to given
+        """Split XYZ through topology and select atoms according to given
            ids
         atoms  ...  list of atomic indices
-        '''
+        """
         self.XYZ.split(_np.arange(len(self.symbols)), select=atoms)
         if hasattr(self, 'Modes'):
             self.Modes.split(_np.arange(len(self.symbols)), select=atoms)
@@ -286,8 +296,8 @@ class _SYSTEM(_CORE):
         # self.names = self.XYZ.names
 
     def define_molecules(self, silent=False):
-        '''Create molecular map (mol_map) based on distance
-           criteria'''
+        """Create molecular map (mol_map) based on distance
+           criteria"""
         if self.mol_map is not None and not silent:
             _warnings.warn('Overwriting existing mol_map!',
                            _ChirPyWarning, stacklevel=2)
@@ -299,8 +309,8 @@ class _SYSTEM(_CORE):
         self.clean_residues()
 
     def clean_residues(self):
-        '''Update residue numbers in XYZ (but not names!).
-           Modes not supported.'''
+        """Update residue numbers in XYZ (but not names!).
+           Modes not supported."""
 
         if hasattr(self.XYZ, 'residues'):
             self.XYZ.residues = tuple([[_im+1, _resn]
@@ -311,7 +321,7 @@ class _SYSTEM(_CORE):
             self.XYZ.residues = tuple([[_im+1, 'MOL'] for _im in self.mol_map])
 
     def sort_atoms(self, slist=None):
-        '''Sort atoms alphabetically (default)'''
+        """Sort atoms alphabetically (default)"""
         if slist is None:
             slist = self.XYZ.sort()
         # self.XYZ.sort(slist)
@@ -340,6 +350,7 @@ class _SYSTEM(_CORE):
         self._sync_class(tag='sort_atoms')
 
     def print_info(self):
+        """Print a short summary of the current system state."""
         # Todo: use self._print_info = [print_info.print_header]
         print_info.print_header(self)
         print('%12d Atoms\n%12s' %
@@ -350,7 +361,7 @@ class _SYSTEM(_CORE):
         print(77 * '–')
 
     def _parse_write_args(self, fn, **kwargs):
-        '''Work in progress...'''
+        """Work in progress..."""
         nargs = {}
         fmt = kwargs.get('fmt', fn.split('.')[-1])
         nargs['fmt'] = fmt
@@ -369,7 +380,7 @@ class _SYSTEM(_CORE):
         return nargs
 
     def write(self, fn, **kwargs):
-        '''Write entire XYZ/Modes content to file (frame or trajectory).'''
+        """Write entire XYZ/Modes content to file (frame or trajectory)."""
 
         nargs = self._parse_write_args(fn, **kwargs)
         if hasattr(self, 'Modes'):
@@ -378,17 +389,23 @@ class _SYSTEM(_CORE):
             self.XYZ.write(fn, **nargs)
 
     def write_frame(self, fn, **kwargs):
-        '''Write current XYZ frame to file (frame or trajectory).'''
+        """Write current XYZ frame to file (frame or trajectory)."""
 
         nargs = self._parse_write_args(fn, **kwargs)
         self.XYZ._frame.write(fn, **nargs)
 
 
 class Molecule(_SYSTEM):
+    """Single-frame molecular system wrapper."""
+
     def _XYZ(self, *args, **kwargs):
+        """Create the coordinate reader for a single structure."""
         return XYZ(*args, range=(0, 1, 1), **kwargs)
 
 
 class Supercell(_SYSTEM):
+    """Periodic system wrapper with full trajectory support."""
+
     def _XYZ(self, *args, **kwargs):
+        """Create the coordinate reader for a supercell or trajectory."""
         return XYZ(*args, **kwargs)

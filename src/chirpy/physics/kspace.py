@@ -29,11 +29,15 @@
 # ----------------------------------------------------------------------
 
 
+"""Reciprocal-space utilities for electrostatic potentials."""
+
+
 import numpy as np
 from numpy.fft import fftfreq, ifftn, fftn
 
 
 def k_get_cell(n1, n2, n3, a1, a2, a3):
+    """Return radial real- and reciprocal-space grids for a regular cell."""
     r1 = np.arange(n1) * (a1 / n1) - a1 / 2
     r2 = np.arange(n2) * (a2 / n2) - a2 / 2
     r3 = np.arange(n3) * (a3 / n3) - a3 / 2
@@ -53,12 +57,13 @@ def k_get_cell(n1, n2, n3, a1, a2, a3):
 
 
 def _k_v1(k):
-    """Fourier transform of Coulomb potential $1/r$"""
+    """Fourier transform of Coulomb potential $1/r$."""
     with np.errstate(divide='ignore'):
         return np.where(k == 0.0, 0.0, np.divide(4.0 * np.pi, k**2))
 
 
 def k_potential(data, cell_au):
+    """Return the real-space Coulomb potential from gridded data."""
     n1, n2, n3 = data.shape
     a1, a2, a3 = tuple(cell_au.diagonal())
     R, K = k_get_cell(n1, n2, n3, a1 * n1, a2 * n2, a3 * n3)

@@ -29,5 +29,9 @@
 # ----------------------------------------------------------------------
 
 
+"""Readers for topology file formats."""
+
+
 def psfReader(FN, **kwargs):
+    """Read a PSF topology file."""
     pass

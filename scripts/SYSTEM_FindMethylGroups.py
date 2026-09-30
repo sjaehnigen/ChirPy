@@ -29,6 +29,8 @@
 #
 # ----------------------------------------------------------------------
 
+"""Find methyl-like subgroups in a molecular structure."""
+
 
 import argparse
 import numpy as np
@@ -37,7 +39,7 @@ from chirpy.topology import mapping
 
 
 def main():
-    '''Unit Cell parametres are taken from fn if needed'''
+    """Unit Cell parametres are taken from fn if needed."""
     parser = argparse.ArgumentParser(
             description="Find Methyl Group (like) subgroups in molecule",
             formatter_class=argparse.ArgumentDefaultsHelpFormatter

@@ -29,12 +29,14 @@
 #
 # ----------------------------------------------------------------------
 
+"""Print atom spread values for frames in a structure or trajectory."""
+
 import argparse
 from chirpy.classes import system
 
 
 def main():
-    '''Print spread in angstrom.'''
+    """Print spread in angstrom."""
     parser = argparse.ArgumentParser(
             description="Print spread in angstrom.",
             formatter_class=argparse.ArgumentDefaultsHelpFormatter

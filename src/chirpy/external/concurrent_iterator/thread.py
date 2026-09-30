@@ -1,4 +1,6 @@
 # vim: set fileencoding=utf-8
+"""Thread-based producer and consumer implementations."""
+
 from __future__ import absolute_import, division, unicode_literals
 
 import threading
@@ -33,6 +35,7 @@ class MultiProducer(IProducer):
     """
 
     def __init__(self, iterables, maxsize=100):
+        """Start worker threads for the given iterables."""
         self._queue = Queue(maxsize)
         self._threads = []
 
@@ -40,6 +43,7 @@ class MultiProducer(IProducer):
         self._active_threads = len(self._threads)
 
     def _spawn_workers(self, iterables):
+        """Create and start one worker thread per iterable."""
         for iterable in iterables:
             thread = threading.Thread(
                 target=self._run, args=(iter(iterable), self._queue))
@@ -49,6 +53,7 @@ class MultiProducer(IProducer):
             self._threads.append(thread)
 
     def __next__(self):
+        """Return the next buffered value from any worker thread."""
         if not self._active_threads:
             # This producer is exhausted.
             raise StopIteration
@@ -71,10 +76,12 @@ class MultiProducer(IProducer):
                 return item
 
     def next(self):
+        """Return the next buffered value from any worker thread."""
         return self.__next__()
 
     @staticmethod
     def _run(iterator, queue):
+        """Feed values from one iterator into the shared queue."""
         while True:
             try:
                 item = next(iterator)
@@ -96,6 +103,7 @@ class Producer(MultiProducer):
     """
 
     def __init__(self, iterable, maxsize=100):
+        """Start a worker thread for the given iterable."""
         super(Producer, self).__init__([iterable], maxsize)
 
 
@@ -103,6 +111,7 @@ class Consumer(IConsumer):
     """Feeds the given coroutine in a separate thread."""
 
     def __init__(self, coroutine, maxsize=1):
+        """Start a worker thread for the given coroutine."""
         self._coroutine = coroutine
 
         self._closed = False
@@ -115,6 +124,7 @@ class Consumer(IConsumer):
 
     @check_open
     def send(self, value, timeout=0):
+        """Queue a value for the worker thread."""
         try:
             self._queue.put(value, block=(timeout != 0), timeout=timeout)
         except Full:
@@ -122,16 +132,19 @@ class Consumer(IConsumer):
 
     @check_open
     def close(self):
+        """Stop the worker thread after pending values are consumed."""
         self._closed = True
         self._queue.put(StopIterationSentinel)
         self._thread.join()
 
     @property
     def closed(self):
+        """Whether the consumer has been closed."""
         return self._closed
 
     @staticmethod
     def _run(coroutine, queue):
+        """Drain queued values into the coroutine."""
         for value in iter(queue.get, StopIterationSentinel):
             coroutine.send(value)
         coroutine.close()

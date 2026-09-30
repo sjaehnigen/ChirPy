@@ -29,6 +29,9 @@
 # ----------------------------------------------------------------------
 
 
+"""Readers for vibrational mode files."""
+
+
 import numpy as np
 import warnings as _warnings
 
@@ -37,10 +40,10 @@ from .. import constants
 
 
 def xvibsReader(fn, au=False, mw=False):
-    '''Read an XVIBS file containing Cartesian displacements in angstrom.
+    """Read an XVIBS file containing Cartesian displacements in angstrom.
        au=True/mw=True change convention by expecting atomic units and/or
        mass-weighted displacements, respectively
-       '''
+       """
     with open(fn, 'r') as f:
         inbuffer = f.read()
     pos_natoms = inbuffer.index('NATOMS')

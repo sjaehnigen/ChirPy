@@ -28,12 +28,16 @@
 #
 # ----------------------------------------------------------------------
 
+"""Readers and writers for Molden vibrational data files."""
+
 
 import numpy as np
 from .. import constants
 
 
 def read_moldenvib_file(filename):
+    """Read frequencies, coordinates, and modes from a Molden file."""
+
     f = open(filename, 'r')
     inbuffer = iter(f.readlines())
     f.close()
@@ -73,6 +77,8 @@ def read_moldenvib_file(filename):
 
 
 def write_moldenvib_file(filename, symbols, coords_aa, freqs, modes):
+    """Write vibrational data in Molden format."""
+
     n_modes = freqs.shape[0]
     n_atoms = len(symbols)
     coords = coords_aa*constants.l_aa2au

@@ -28,6 +28,8 @@
 #
 # ----------------------------------------------------------------------
 
+"""Writers for coordinate trajectory and structure files."""
+
 
 from itertools import zip_longest
 import warnings
@@ -114,7 +116,8 @@ def xyzWriter(fn, data, symbols,
 def _write_arc_frame(fn, data, symbols, numbers,
                      types=[], connectivity=[],
                      comment=None, selection=None, append=False):
-    """
+    """Write a single frame in Tinker XYZ/ARC format.
+
     Input:
         1. fn: File to write to
         2. data: np.array of shape (#atoms, #fields/atom)
@@ -166,7 +169,8 @@ def _write_arc_frame(fn, data, symbols, numbers,
 def arcWriter(fn, data, symbols, types=[], connectivity=[],
               comments=None, units='default', selection=None,
               append=False):
-    """
+    """Write a Tinker ARC trajectory file.
+
        Input:
         1. fn: File to write to
         2. data: np.array of shape (#atoms, #fields/atom)

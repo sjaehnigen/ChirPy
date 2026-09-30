@@ -29,6 +29,9 @@
 # ----------------------------------------------------------------------
 
 
+"""Distribution functions for analysing spatial particle correlations."""
+
+
 import numpy as np
 
 from .mapping import vector_pbc, cell_volume
@@ -43,7 +46,7 @@ def radial_distribution_function(positions,
                                  bins=100,
                                  half_vector=None,
                                  remove_zeros=True):
-    '''Compute the normalised radial distribution function (RDF).
+    """Compute the normalised radial distribution function (RDF).
        Array of positions ((n_frames, n_particles, 3)) is evaluated
        against an array of origins ((n_frames, n_origins, 3)).
        Optional half_vector ((n_frames, n_origins, 3)) for defining
@@ -51,7 +54,7 @@ def radial_distribution_function(positions,
        Returns:
         r   - bin positions
         RDF - values
-       '''
+       """
     n_frames, n_O, three = origins.shape
 
     if cell is not None:
@@ -60,9 +63,9 @@ def radial_distribution_function(positions,
         volume = 1.0
 
     def _rdf(_P, rng, bins):
-        '''RDF kernel.
+        """RDF kernel.
            _P … positions of shape (n_frames, n_particles)
-           '''
+           """
 #        if remove_zeros:
 #            _P = _P[_P != 0.0]
 #
@@ -80,6 +83,7 @@ def radial_distribution_function(positions,
         return rdf
 
     def get_P(s, o, _hv=None, cell=cell):
+        """Return origin-centred distances, optionally restricted to a half-space."""
         _P = vector_pbc(o[:, None], s, cell=cell)
 
         if _hv is not None:  # beta
@@ -104,6 +108,7 @@ def radial_distribution_function(positions,
 
     if half_vector is not None:
         def _func(x):
+            """Evaluate the RDF contribution for one origin in a half-sphere."""
             return _rdf(
                      get_P(
                         positions,
@@ -117,6 +122,7 @@ def radial_distribution_function(positions,
 
     else:
         def _func(x):
+            """Evaluate the RDF contribution for one origin."""
             return _rdf(
                      get_P(
                         positions,
@@ -132,4 +138,5 @@ def radial_distribution_function(positions,
 
 
 def rdf(*args, **kwargs):
+    """Alias for radial_distribution_function."""
     return radial_distribution_function(*args, **kwargs)

@@ -29,6 +29,9 @@
 # ----------------------------------------------------------------------
 
 
+"""Topology helpers for molecular dissection and file-based assignments."""
+
+
 import numpy as np
 import copy
 
@@ -39,15 +42,16 @@ from ..constants import symbols_to_symbols
 
 
 def fermi_cutoff_function(distance, R_cutoff, D):
+    """Evaluate a Fermi-style cutoff function for a distance array."""
     return 1 / (1 + np.exp((distance - R_cutoff) / D))
 
 
 def _make_batches(MIN, MAX, nb, ov=None):
-    '''Split the cartesian space into subsegments (batches).
+    """Split the cartesian space into subsegments (batches).
        nb ... number of batches: tuple (nx, ny, nz)
        ov ... overlap of batches (for cross communication)
        Future: allow manual definition of batches (adaptive grid)
-       '''
+       """
     _nodes = [np.linspace(_min, _max, _n + 1)
               for _min, _max, _n in zip(MIN, MAX, nb)]
     if ov is None:
@@ -68,12 +72,12 @@ def _make_batches(MIN, MAX, nb, ov=None):
 
 
 def define_molecules(pos_aa, symbols, cell_aa_deg=None, neigh_cutoff_aa=24.):
-    '''Distance analysis in batches to create a neighbour list which is
+    """Distance analysis in batches to create a neighbour list which is
        further evaluated to obtain clusters/molecules.
        Expects positions in angstrom of shape (n_atoms, three).
        It returns a list with assignments.
        neigh_cutoff_aa ... max distance to look for neighbours
-       '''
+       """
 
     _p = pos_aa
     if len(_p.shape) != 2:
@@ -112,6 +116,7 @@ def define_molecules(pos_aa, symbols, cell_aa_deg=None, neigh_cutoff_aa=24.):
     _batch = _make_batches(MIN, MAX, _n_b)
 
     def _w(p):
+        """Wrap positions into the working cell when periodicity is active."""
         return wrap_pbc(p, _cell)
 
     pair_list = []
@@ -208,14 +213,14 @@ def define_molecules(pos_aa, symbols, cell_aa_deg=None, neigh_cutoff_aa=24.):
 
 
 def assign_molecule(molecule, n_mol, n_atoms, neigh_list, atom, atom_count):
-    '''This method can do more than molecules! See BoxObject
+    """This method can do more than molecules! See BoxObject
     molecule … assignment
     n_mol … species counter
     n_atoms … total number of entries
     neigh_list … list of neighbour atoms per atom
     atom … current line in reading neighbour map
     atom_count … starts with n_atoms until zero
-    '''
+    """
     molecule[atom] = n_mol
     atom_count -= 1
     for _i in neigh_list[atom]:
@@ -235,7 +240,7 @@ def assign_molecule(molecule, n_mol, n_atoms, neigh_list, atom, atom_count):
 
 
 def read_topology_file(fn, **kwargs):
-    '''Returns dict of properties'''
+    """Returns dict of properties."""
 
     from ..read.coordinates import pdbReader, xyzReader
     from ..interface import cp2k

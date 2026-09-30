@@ -28,6 +28,10 @@
 #
 # ----------------------------------------------------------------------
 
+
+"""Topology tools for molecular mapping, grids, distributions, and motion."""
+
+
 from . import distribution
 from . import grid
 from . import dissection

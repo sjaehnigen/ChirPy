@@ -28,11 +28,14 @@
 #
 # ----------------------------------------------------------------------
 
+"""Helpers for printing structural information to stderr."""
+
 import sys
 from ..topology.mapping import detect_lattice, cell_vec
 
 
 def print_header(obj):
+    """Print a formatted header for an object."""
     print(f'''
 {77 * '–'}
 {'%-12s' % obj.__class__.__name__}
@@ -42,6 +45,7 @@ def print_header(obj):
 
 
 def print_cell(obj):
+    """Print cell parameters and vectors for an object if available."""
     if getattr(obj, 'cell_aa_deg') is None:
         return
     cell_vec_aa = cell_vec(obj.cell_aa_deg)

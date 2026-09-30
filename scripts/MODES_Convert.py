@@ -29,6 +29,7 @@
 #
 # ----------------------------------------------------------------------
 
+"""Convert vibrational mode files between supported formats."""
 
 import argparse
 from chirpy.classes import system
@@ -36,7 +37,7 @@ from chirpy import config
 
 
 def main():
-    '''Converts vibrational modes.'''
+    """Converts vibrational modes."""
     parser = argparse.ArgumentParser(
         description="Converts vibrational modes.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter

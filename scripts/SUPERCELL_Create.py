@@ -29,6 +29,7 @@
 #
 # ----------------------------------------------------------------------
 
+"""Create a new supercell from input coordinates."""
 
 import argparse
 import numpy as np
@@ -36,6 +37,7 @@ from chirpy.create.supercell import MolecularCrystal
 
 
 def main():
+    """Create a new supercell from input coordinates."""
     parser = argparse.ArgumentParser(
             description="Read coordinates and create a new supercell.",
             formatter_class=argparse.ArgumentDefaultsHelpFormatter

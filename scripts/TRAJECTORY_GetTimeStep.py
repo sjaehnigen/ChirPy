@@ -29,6 +29,8 @@
 #
 # ----------------------------------------------------------------------
 
+"""Extract a selected time step from a trajectory."""
+
 
 import argparse
 import numpy as np
@@ -38,7 +40,7 @@ from chirpy.snippets import extract_keys
 
 
 def main():
-    '''Extract given time step from trajectory.'''
+    """Extract given time step from trajectory."""
     parser = argparse.ArgumentParser(
             description="Extract given time step from trajectory.",
             formatter_class=argparse.ArgumentDefaultsHelpFormatter

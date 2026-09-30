@@ -29,13 +29,14 @@
 #
 # ----------------------------------------------------------------------
 
+"""Convert an ORCA Hessian file to a vibrational mode file."""
 
 import argparse
 from chirpy.classes import system
 
 
 def main():
-    '''Converts a Orca Hessian file into a XVIBS vibration file'''
+    """Converts a Orca Hessian file into a XVIBS vibration file."""
     parser = argparse.ArgumentParser(
         description="Converts a Orca Hessian file into a XVIBS vibration file",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter

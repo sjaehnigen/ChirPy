@@ -28,6 +28,8 @@
 #
 # ----------------------------------------------------------------------
 
+"""Helpers for publication-style matplotlib plots."""
+
 
 import numpy as np
 import warnings
@@ -42,6 +44,8 @@ from ..config import ChirPyWarning
 
 
 class pub_label():
+    """Reusable text label helper for plot annotations."""
+
     def __init__(self, ax,
                  X=1400,
                  Y=0.0,
@@ -51,6 +55,7 @@ class pub_label():
                  alpha=1.0,
                  stancil=r'\textbf{%s}',
                  ):
+        """Store default label parameters for an axes object."""
         self.ax = ax
         self.X = X
         self.Y = Y
@@ -61,6 +66,7 @@ class pub_label():
         self.alpha = alpha
 
     def print(self,  string,  **kwargs):
+        """Draw a label on the axes and return the used parameters."""
         args = AttrDict()
         for _key in self.__dict__.keys():
             args[_key] = kwargs.get(_key,  getattr(self,  _key))
@@ -75,6 +81,7 @@ class pub_label():
 
 
 def source_params(matplotlib):
+    """Set matplotlib defaults used by ChirPy plots."""
     # mpl.rcParams.update({
     # 'font.size':16,
     # 'axes.linewidth':6,
@@ -113,7 +120,7 @@ def source_params(matplotlib):
 
 
 def make_nice_ax(p):
-    '''p object ... AxesSubplot'''
+    """p object ... AxesSubplot."""
     p.tick_params('both',  length=5,   width=2,  which='minor')
     p.tick_params('both',  length=10,  width=2,  which='major')
     p.tick_params(axis='both',  which='both',  pad=10,  direction='out')
@@ -133,6 +140,7 @@ def set_mutliple_y_axes(ax, sep, n_axes,
                         fmt='%5.1f',
                         auxiliary_axis=False,
                         ):
+    """Place multiple y-axis tick scales on a single axes."""
     if not isinstance(offset, list):
         offset = [offset] * n_axes
     if not isinstance(minor, list):
@@ -197,10 +205,10 @@ def multiplot(
              ylim=None,
              gaussian_filter=None,
              **kwargs):
-    '''Make a nice plot of data in list.
+    """Make a nice plot of data in list.
        Arguments with _a denote list of values corresponding to data list y_a
        kwargs contains argument for pyplot
-       '''
+       """
     if gaussian_filter is None:
         y_a = copy.deepcopy(Y_a)
     else:
@@ -222,6 +230,7 @@ def multiplot(
 
     # --- ToDo: create class attributes
     def _listify(xx):
+        """Broadcast xx to a list of length n_plots if it is not one already."""
         if not isinstance(xx, (list, tuple)):
             # return [np.array([_x for _x in xx])] * n_plots
             return [xx] * n_plots
@@ -479,8 +488,8 @@ def histogram(ax_a, data_a,
               ylim=None,
               weights_a=None,
               **kwargs):
-    '''Create a beautiful histogram plot.
-       Requires list of ax'''
+    """Create a beautiful histogram plot.
+       Requires list of ax"""
     global _shift
     _shift = 0
     n_plots = len(data_a)
