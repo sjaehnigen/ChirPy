@@ -37,9 +37,10 @@ import warnings
 from chirpy import constants
 from chirpy.config import ChirPyWarning
 from chirpy.physics import statistical_mechanics, spectroscopy, \
-    classical_electrodynamics, kspace
+    classical_electrodynamics
+from chirpy.physics import kspace
 from chirpy.classes import trajectory
-# modern_theory_of_magnetisation
+# kspace, modern_theory_of_magnetisation
 
 _test_dir = os.path.dirname(os.path.abspath(__file__)) + '/test_files'
 
@@ -316,6 +317,16 @@ class TestClassicalElectrodyanmics(unittest.TestCase):
                 np.array([[1., 2., 0.], [1., 2., 0.]]),
                 np.array([-1., 0., 0.1]),
                 np.array([[-1., 1., -0.1], [-1., 3., -0.1]])
+                )
+        self.assertListEqual(np.round(_m, decimals=2).tolist(),
+                             [[1.2, 2.12, 0.6], [2.2, 2.12, 1.8]])
+
+        # -- multiple origins ---> one origin
+        _m = classical_electrodynamics.shift_magnetic_origin_gauge(
+                np.array([[1.2, 3, -1], [1.2, 3, -1]]),
+                np.array([[1., 2., 0.], [1., 2., 0.]]),
+                np.array([[-1., 0., 0.1], [-1., -2., 0.1]]),
+                np.array([-1., 1., -0.1])
                 )
         self.assertListEqual(np.round(_m, decimals=2).tolist(),
                              [[1.2, 2.12, 0.6], [2.2, 2.12, 1.8]])

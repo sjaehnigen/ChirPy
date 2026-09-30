@@ -34,7 +34,8 @@ import numpy as np
 from functools import partial
 from itertools import product
 
-from chirpy.topology import mapping, dissection, motion, grid, distribution
+from chirpy.topology import mapping, dissection, motion, grid  # , distribution
+from chirpy.topology import distribution
 from chirpy.read import coordinates
 from chirpy import constants
 
